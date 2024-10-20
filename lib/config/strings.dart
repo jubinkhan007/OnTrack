@@ -1,0 +1,37 @@
+class Strings {
+  Strings._();
+
+  static const String app_name = "Kick Track";
+  static const String transforming_inquiries =
+      "Transforming Inquiries\ninto Actionable Tasks";
+  static const String buyer_inquiry_task_management =
+      'Buyer Inquiry & \nTask Management';
+  static const String intro_title_1 =
+      'Streamlined inquiry management for timely responses and improved accountability.';
+  static const String intro_title_2 =
+      'Manage inquiries, assign tasks, and keep the conversation going!';
+  static const String intro_title_3 =
+      'Get notifications and update your tasks.';
+  static const String lets_started = 'Lets Started';
+  static const String skip = 'Skip';
+  static const String next = 'Next';
+  static const String staff_id = 'Staff Id';
+  static const String password = 'Password';
+  static const String login_using_your_hris =
+      'Login using your HRIS staff ID and password.';
+  static const String login = 'Login';
+  static const String summary = 'Summary';
+  static const String pending_inquiry = 'Pending Inquiry';
+  static const String delayed_inquiry = 'Delayed Inquiry';
+  static const String completed_inquiry = 'Completed Inquiry';
+  static const String inquiry = 'Inquiry';
+  static const String inquiry_view = 'Inquiry View';
+  static const String pending = 'Pending';
+  static const String attachment = 'Attachment';
+  static const String project = 'Project';
+  static const String owner = 'Owner';
+  static const String overview = 'Overview';
+  static const String date = 'Date';
+  static const String company = 'Company';
+  static const String tasks = 'Tasks';
+}

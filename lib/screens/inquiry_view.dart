@@ -1,0 +1,205 @@
+import 'package:flutter/material.dart';
+import 'package:tmbi/config/strings.dart';
+
+import '../config/converts.dart';
+import '../config/palette.dart';
+import '../data/inquiry_response.dart';
+import '../widgets/widgets.dart';
+
+class InquiryView extends StatelessWidget {
+  static const String routeName = '/inquiry_screen';
+  final InquiryResponse inquiryResponse;
+
+  const InquiryView({super.key, required this.inquiryResponse});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Colors.white,
+            title: TextViewCustom(
+              text: Strings.inquiry_view,
+              fontSize: Converts.c20,
+              tvColor: Colors.black,
+              isTextAlignCenter: false,
+              isBold: true,
+            ),
+            floating: true,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Palette.iconColor),
+              // Customize icon color
+              onPressed: () {
+                Navigator.pop(context); // Navigate back
+              },
+            ),
+          ),
+          SliverPadding(
+            padding: EdgeInsets.only(
+              left: Converts.c16,
+              right: Converts.c16,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _iconView(Icons.folder_open_outlined, "${Strings.project}:",
+                      inquiryResponse.title),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  _iconView(Icons.account_circle_outlined, "${Strings.owner}:",
+                      "${inquiryResponse.postedBy.name} & ${inquiryResponse.buyerInfo.name}"),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  _iconView(Icons.note_outlined, "${Strings.overview}:", ""),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  TextViewCustom(
+                    text: inquiryResponse.description,
+                    fontSize: Converts.c16,
+                    tvColor: Palette.semiTv,
+                    isTextAlignCenter: false,
+                    isBold: false,
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  _iconView(Icons.timer_outlined, "${Strings.date}:",
+                      inquiryResponse.endDate),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  _iconView(Icons.label_outline, "${Strings.company}:",
+                      inquiryResponse.company),
+                  SizedBox(
+                    height: Converts.c20,
+                  ),
+                  Row(
+                    children: [
+                      ButtonCircularIcon(
+                          height: Converts.c32,
+                          width: Converts.c96,
+                          radius: 8,
+                          bgColor: Colors.orange,
+                          hasOpacity: false,
+                          text: Strings.pending,
+                          fontSize: Converts.c16,
+                          tvColor: Colors.black,
+                          onTap: () {}),
+                      SizedBox(
+                        width: Converts.c8,
+                      ),
+                      ButtonCircularIcon(
+                          height: Converts.c32,
+                          width: Converts.c96,
+                          radius: 8,
+                          bgColor: Colors.black,
+                          hasOpacity: false,
+                          text: inquiryResponse.endDate.split(",")[0],
+                          fontSize: Converts.c16,
+                          iconData: Icons.flag_outlined,
+                          tvColor: Colors.white,
+                          onTap: () {}),
+                      SizedBox(
+                        width: Converts.c8,
+                      ),
+                      ButtonCircularIcon(
+                          height: Converts.c32,
+                          width: Converts.c152,
+                          radius: 8,
+                          bgColor: Colors.purple,
+                          hasOpacity: false,
+                          text: "Attachment",
+                          fontSize: Converts.c16,
+                          iconData: Icons.attach_file,
+                          tvColor: Colors.white,
+                          onTap: () {}),
+                    ],
+                  ),
+                  SizedBox(
+                    height: Converts.c20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextViewCustom(
+                        text: Strings.tasks,
+                        fontSize: Converts.c20,
+                        tvColor: Colors.black,
+                        isTextAlignCenter: false,
+                        isBold: false,
+                      ),
+                      ButtonCircularIcon(
+                          height: Converts.c32,
+                          width: Converts.c40,
+                          radius: 8,
+                          bgColor: Colors.orange,
+                          hasOpacity: false,
+                          text: "2/3",
+                          fontSize: Converts.c12,
+                          tvColor: Colors.black,
+                          onTap: () {})
+                    ],
+                  ),
+                  SizedBox(
+                    height: Converts.c20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverList(
+              delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              final task = inquiryResponse.tasks[index];
+              return TaskList(
+                task: task,
+              );
+            },
+            childCount: inquiryResponse
+                .tasks.length, // Provide the total count of items
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _iconView(IconData icon, String text, String title) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: Colors.black,
+          size: 18,
+        ),
+        SizedBox(
+          width: Converts.c12,
+        ),
+        TextViewCustom(
+          text: text,
+          fontSize: Converts.c16,
+          tvColor: Colors.black,
+          isBold: false,
+        ),
+        const SizedBox(
+          width: 4,
+        ),
+        Expanded(
+          child: TextViewCustom(
+            text: title,
+            fontSize: Converts.c16,
+            tvColor: Palette.semiTv,
+            isTextAlignCenter: false,
+            isBold: false,
+          ),
+        ),
+      ],
+    );
+  }
+}
