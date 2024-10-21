@@ -7,6 +7,7 @@ import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/data/counter_item.dart';
 import 'package:tmbi/data/home_flag_item.dart';
 import 'package:tmbi/data/inquiry_response.dart';
+import 'package:tmbi/screens/create_inquiry_screen.dart';
 import 'package:tmbi/screens/inquiry_view.dart';
 import 'package:tmbi/widgets/feature_status.dart';
 import 'package:tmbi/widgets/widgets.dart';
@@ -21,7 +22,12 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            CreateInquiryScreen.routeName,
+          );
+        },
         mini: true,
         backgroundColor: Palette.mainColor,
         child: const Icon(

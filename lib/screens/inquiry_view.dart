@@ -19,17 +19,17 @@ class InquiryView extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.redAccent,
             title: TextViewCustom(
               text: Strings.inquiry_view,
               fontSize: Converts.c20,
-              tvColor: Colors.black,
+              tvColor: Colors.white,
               isTextAlignCenter: false,
               isBold: true,
             ),
             floating: true,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, color: Palette.iconColor),
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               // Customize icon color
               onPressed: () {
                 Navigator.pop(context); // Navigate back
@@ -40,6 +40,7 @@ class InquiryView extends StatelessWidget {
             padding: EdgeInsets.only(
               left: Converts.c16,
               right: Converts.c16,
+              top: Converts.c16,
             ),
             sliver: SliverToBoxAdapter(
               child: Column(
@@ -63,7 +64,7 @@ class InquiryView extends StatelessWidget {
                   TextViewCustom(
                     text: inquiryResponse.description,
                     fontSize: Converts.c16,
-                    tvColor: Palette.semiTv,
+                    tvColor: Colors.black45,
                     isTextAlignCenter: false,
                     isBold: false,
                   ),
@@ -194,7 +195,7 @@ class InquiryView extends StatelessWidget {
           child: TextViewCustom(
             text: title,
             fontSize: Converts.c16,
-            tvColor: Palette.semiTv,
+            tvColor: Colors.black54,
             isTextAlignCenter: false,
             isBold: false,
           ),

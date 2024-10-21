@@ -42,7 +42,7 @@ class TaskList extends StatelessWidget {
             children: [
               Icon(
                 Icons.account_circle,
-                color: Palette.semiTv,
+                color: Colors.black45,
                 size: Converts.c20,
               ),
               SizedBox(
@@ -51,7 +51,7 @@ class TaskList extends StatelessWidget {
               TextViewCustom(
                 text: task.assignedPerson,
                 fontSize: Converts.c16,
-                tvColor: Palette.semiTv,
+                tvColor: Colors.black45,
                 isTextAlignCenter: false,
                 isBold: false,
               ),

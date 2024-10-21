@@ -6,3 +6,6 @@ export 'text_view_custom.dart';
 export 'inquiry_list.dart';
 export 'button_circular_icon.dart';
 export 'task_list.dart';
+export 'customer_add_view.dart';
+export 'combo_box_custom.dart';
+export 'file_attachment.dart';

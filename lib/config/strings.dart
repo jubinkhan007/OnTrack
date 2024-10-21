@@ -33,5 +33,13 @@ class Strings {
   static const String overview = 'Overview';
   static const String date = 'Date';
   static const String company = 'Company';
+  static const String inquiry_type = 'Inquiry type';
   static const String tasks = 'Tasks';
+  static const String create_new = 'Create New';
+  static const String description = 'Description';
+  static const String enter_brief_description = 'Enter Brief Description';
+  static const String buyer_customer = 'Buyer/Customer';
+  static const String end_date = 'End date';
+  static const String select_company = 'Select Company';
+  static const String select_a_date = 'Select a Date';
 }
