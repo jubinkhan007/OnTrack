@@ -66,23 +66,25 @@ class HomeScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Colors.white,
+            centerTitle: false,
+            backgroundColor: Colors.red,
             title: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextViewCustom(
                   text: "Good Morning Salauddin",
-                  fontSize: Converts.c12,
-                  tvColor: Palette.semiTv,
+                  fontSize: Converts.c20,
+                  tvColor: Colors.white,
+                  isRubik: false,
                   isTextAlignCenter: false,
-                  isBold: false,
+                  isBold: true,
                 ),
                 TextViewCustom(
                   text: "08 Oct,2024",
                   fontSize: Converts.c16,
                   isTextAlignCenter: false,
-                  tvColor: Colors.black,
+                  tvColor: Colors.white,
                   isBold: false,
                 ),
               ],
@@ -91,9 +93,10 @@ class HomeScreen extends StatelessWidget {
             actions: [
               IconButton(
                 onPressed: () {},
-                icon: const Icon(
+                icon: Icon(
                   Icons.notifications,
-                  color: Palette.iconColor,
+                  color: Colors.white,
+                  size: Converts.c20,
                 ),
               )
             ],
@@ -142,7 +145,12 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(
                   height: Converts.c16,
                 ),
-                FeatureStatus(homeFlags: HomeFlagItem().homeFlagItems)
+                FeatureStatus(
+                  homeFlags: HomeFlagItem().homeFlagItems,
+                  onPressed: (value) {
+                    debugPrint(value);
+                  },
+                )
               ],
             ),
           ),

@@ -1,6 +1,10 @@
 class HomeFlag {
   final String title;
-  final bool isSelected;
+  bool isSelected;
 
   HomeFlag({required this.title, required this.isSelected});
+
+  toggleButton() {
+    isSelected = !isSelected;
+  }
 }
