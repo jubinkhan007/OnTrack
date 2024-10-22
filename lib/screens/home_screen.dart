@@ -38,7 +38,7 @@ class HomeScreen extends StatelessWidget {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         height: 48,
-        color: Colors.grey[200],
+        color: Palette.mainColor,
         shape: const CircularNotchedRectangle(),
         notchMargin: 5,
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -48,14 +48,14 @@ class HomeScreen extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(
-                Icons.menu,
-                color: Colors.black,
+                Icons.home_outlined,
+                color: Colors.white,
               ),
               onPressed: () {},
             ),
             IconButton(
               icon: const Icon(
-                Icons.search,
+                Icons.folder_open,
                 color: Colors.black,
               ),
               onPressed: () {},
@@ -67,7 +67,7 @@ class HomeScreen extends StatelessWidget {
         slivers: [
           SliverAppBar(
             centerTitle: false,
-            backgroundColor: Colors.red,
+            backgroundColor: Palette.mainColor,
             title: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,6 +173,9 @@ class HomeScreen extends StatelessWidget {
             childCount:
                 _getDemoTasks().length, // Provide the total count of items
           )),
+          SliverPadding(
+            padding: EdgeInsets.only(bottom: Converts.c24),
+          ),
         ],
       ),
     );

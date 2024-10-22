@@ -19,7 +19,7 @@ class InquiryView extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Colors.redAccent,
+            backgroundColor: Palette.mainColor,
             title: TextViewCustom(
               text: Strings.inquiry_view,
               fontSize: Converts.c20,
@@ -64,7 +64,7 @@ class InquiryView extends StatelessWidget {
                   TextViewCustom(
                     text: inquiryResponse.description,
                     fontSize: Converts.c16,
-                    tvColor: Colors.black45,
+                    tvColor: Palette.normalTv,
                     isTextAlignCenter: false,
                     isBold: false,
                   ),
@@ -87,11 +87,11 @@ class InquiryView extends StatelessWidget {
                           height: Converts.c32,
                           width: Converts.c96,
                           radius: 8,
-                          bgColor: Colors.orange,
+                          bgColor: Palette.tabColor,
                           hasOpacity: false,
                           text: Strings.pending,
                           fontSize: Converts.c16,
-                          tvColor: Colors.black,
+                          tvColor: Colors.white,
                           onTap: () {}),
                       SizedBox(
                         width: Converts.c8,
@@ -134,17 +134,19 @@ class InquiryView extends StatelessWidget {
                         fontSize: Converts.c20,
                         tvColor: Colors.black,
                         isTextAlignCenter: false,
-                        isBold: false,
+                        isRubik: false,
+                        isBold: true,
                       ),
                       ButtonCircularIcon(
                           height: Converts.c32,
                           width: Converts.c40,
                           radius: 8,
-                          bgColor: Colors.orange,
+                          bgColor: Palette.tabColor,
                           hasOpacity: false,
                           text: "2/3",
                           fontSize: Converts.c12,
                           tvColor: Colors.black,
+                          isTvBold: true,
                           onTap: () {})
                     ],
                   ),
@@ -176,7 +178,7 @@ class InquiryView extends StatelessWidget {
       children: [
         Icon(
           icon,
-          color: Colors.black,
+          color: Palette.normalTv,
           size: 18,
         ),
         SizedBox(
@@ -185,8 +187,8 @@ class InquiryView extends StatelessWidget {
         TextViewCustom(
           text: text,
           fontSize: Converts.c16,
-          tvColor: Colors.black,
-          isBold: false,
+          tvColor: Palette.normalTv,
+          isBold: true,
         ),
         const SizedBox(
           width: 4,
@@ -195,7 +197,7 @@ class InquiryView extends StatelessWidget {
           child: TextViewCustom(
             text: title,
             fontSize: Converts.c16,
-            tvColor: Colors.black54,
+            tvColor: Palette.normalTv,
             isTextAlignCenter: false,
             isBold: false,
           ),

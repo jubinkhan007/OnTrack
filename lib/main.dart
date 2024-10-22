@@ -23,11 +23,11 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           onGenerateRoute: (settings) => generateRoute(settings),
           theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              colorScheme: ColorScheme.fromSeed(seedColor: Palette.mainColor),
               useMaterial3: true,
               scaffoldBackgroundColor: Palette.scaffold),
           home: /*const IntroScreen()*/ /*const LoginScreen()*/
-              const HomeScreen(),
+              const LoginScreen(),
         );
       },
     );

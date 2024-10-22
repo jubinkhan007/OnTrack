@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
 class ComboBoxCustom extends StatelessWidget {
@@ -26,36 +27,16 @@ class ComboBoxCustom extends StatelessWidget {
         ),
         hint: TextViewCustom(
           text: hintName,
-          tvColor: Colors.black54,
+          tvColor: Palette.semiTv,
           fontSize: Converts.c16,
           isBold: false,
         ),
-        /*items: [
-          DropdownMenuItem<String>(
-            value: "Option 1",
-            child: TextViewCustom(
-              text: "Walker",
-              tvColor: Colors.black54,
-              fontSize: Converts.c16,
-              isBold: false,
-            ),
-          ),
-          DropdownMenuItem<String>(
-            value: "Option 2",
-            child: TextViewCustom(
-              text: "Winner",
-              tvColor: Colors.black54,
-              fontSize: Converts.c16,
-              isBold: false,
-            ),
-          ),
-        ],*/
         items: items.map((String item) {
           return DropdownMenuItem<String>(
             value: item,
             child: TextViewCustom(
               text: item,
-              tvColor: Colors.black54,
+              tvColor: Palette.normalTv,
               fontSize: Converts.c16,
               isBold: false,
             ),

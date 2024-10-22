@@ -20,10 +20,12 @@ class CounterCard extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           return Container(
             decoration: BoxDecoration(
-              border: Border.all(
-                color: Palette.semiTv, // Border color
+              //color: _getColor(counters[index].title),
+              gradient: Palette.createRoomGradient,
+              /*border: Border.all(
+                color: Palette.normalTv, // Border color
                 width: 0.5, // Border width
-              ),
+              ),*/
               borderRadius: BorderRadius.circular(4),
             ),
             padding:
@@ -36,20 +38,36 @@ class CounterCard extends StatelessWidget {
                 TextViewCustom(
                     text: counters[index].title,
                     fontSize: Converts.c12,
-                    tvColor: Palette.semiTv,
+                    tvColor: counters[index].isDelayed
+                        ? Colors.white
+                        : Palette.normalTv,
+                    isRubik: false,
                     isBold: false),
                 TextViewCustom(
                     text: counters[index].count.toString(),
                     fontSize: Converts.c24,
                     tvColor: counters[index].isDelayed
-                        ? Palette.errorColor
-                        : Colors.black,
-                    isBold: false)
+                        ? Colors.white
+                        : Palette.normalTv,
+                    isBold: true)
               ],
             ),
           );
         },
       ),
     );
+  }
+
+  Color _getColor(String name) {
+    switch (name) {
+      case "Delayed Inquiry":
+        return Palette.delayedCardColor; // Color for Pending
+      case "Pending Inquiry":
+        return Palette.pendingCardColor; // Color for Approved
+      case "Completed Inquiry":
+        return Palette.completedCardColor; // Color for Rejected
+      default:
+        return Palette.grayColor; // Default color
+    }
   }
 }

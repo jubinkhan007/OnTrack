@@ -16,11 +16,11 @@ class TaskList extends StatelessWidget {
       decoration: BoxDecoration(
         color: task.hasAccess
             ? task.isUpdated
-                ? Colors.green.withOpacity(0.2)
-                : Colors.purple.withOpacity(0.2)
+                ? Colors.green.withOpacity(0.1)
+                : Colors.purple.withOpacity(0.1)
             : task.isUpdated
-                ? Colors.green.withOpacity(0.2)
-                : Colors.red.withOpacity(0.2),
+                ? Colors.green.withOpacity(0.1)
+                : Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(4),
       ),
       padding: const EdgeInsets.all(8),
@@ -33,16 +33,17 @@ class TaskList extends StatelessWidget {
           TextViewCustom(
               text: task.name,
               fontSize: Converts.c16,
-              tvColor: Colors.black,
+              tvColor: Palette.normalTv,
               isTextAlignCenter: false,
-              isBold: false),
+              isRubik: false,
+              isBold: true),
 
           /// completer name
           Row(
             children: [
               Icon(
                 Icons.account_circle,
-                color: Colors.black45,
+                color: Palette.semiTv,
                 size: Converts.c20,
               ),
               SizedBox(
@@ -51,7 +52,7 @@ class TaskList extends StatelessWidget {
               TextViewCustom(
                 text: task.assignedPerson,
                 fontSize: Converts.c16,
-                tvColor: Colors.black45,
+                tvColor: Palette.semiTv,
                 isTextAlignCenter: false,
                 isBold: false,
               ),
@@ -78,7 +79,7 @@ class TaskList extends StatelessWidget {
                               : Colors.purple
                           : task.isUpdated
                               ? Colors.green
-                              : Colors.orange,
+                              : Palette.tabColor,
                       hasOpacity: false,
                       tvColor: Colors.white,
                       fontSize: 14,

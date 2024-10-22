@@ -44,11 +44,14 @@ class _FeatureStatusState extends State<FeatureStatus> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: widget.homeFlags[index].isSelected
-                    ? Colors.orange
-                    : Colors.orange.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(4),
-              ),
+                  color: widget.homeFlags[index].isSelected
+                      ? Palette.tabColor
+                      : Palette.tabColor.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                      color: widget.homeFlags[index].isSelected
+                          ? Colors.white
+                          : Palette.tabColor.withOpacity(0.8))),
               padding:
                   const EdgeInsets.only(left: 8, right: 16, top: 2, bottom: 2),
               //color: Colors.green,
@@ -59,9 +62,9 @@ class _FeatureStatusState extends State<FeatureStatus> {
                     fontSize: Converts.c16,
                     tvColor: widget.homeFlags[index].isSelected
                         ? Colors.white
-                        : Colors.orange.withOpacity(0.8),
+                        : Colors.black,
                     isRubik: false,
-                    isBold: true),
+                    isBold: widget.homeFlags[index].isSelected ? true : false),
               ),
             ),
           );

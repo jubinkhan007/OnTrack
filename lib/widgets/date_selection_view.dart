@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../config/strings.dart';
@@ -33,11 +34,11 @@ class _DateSelectionViewState extends State<DateSelectionView> {
               child: TextViewCustom(
                   text: _selectedDate ?? Strings.select_a_date,
                   fontSize: Converts.c16,
-                  tvColor: Colors.black54,
+                  tvColor: Palette.semiTv,
                   isTextAlignCenter: false,
                   isBold: false),
             ),
-             Icon(Icons.calendar_today, color: Colors.black54, size: Converts.c16,),
+             Icon(Icons.calendar_today, color: Palette.semiTv, size: Converts.c16,),
           ],
         ),
       ),

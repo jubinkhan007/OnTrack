@@ -18,7 +18,7 @@ class CreateInquiryScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Colors.redAccent,
+            backgroundColor: Palette.mainColor,
             title: TextViewCustom(
               text: Strings.create_new,
               fontSize: Converts.c20,
@@ -54,7 +54,7 @@ class CreateInquiryScreen extends StatelessWidget {
                       hintText: "Example: Want some sample",
                       hintStyle: TextStyle(
                         fontSize: Converts.c20, // Hint text size
-                        color: Colors.grey, // Hint text color
+                        color: Palette.semiTv, // Hint text color
                       ),
                     ),
                   ),
@@ -67,8 +67,9 @@ class CreateInquiryScreen extends StatelessWidget {
                   TextViewCustom(
                       text: Strings.description,
                       fontSize: Converts.c16,
-                      tvColor: Colors.black,
-                      isBold: false),
+                      tvColor: Palette.normalTv,
+                      isRubik: false,
+                      isBold: true),
                   SizedBox(
                     height: Converts.c8,
                   ),
@@ -76,13 +77,13 @@ class CreateInquiryScreen extends StatelessWidget {
                     maxLines: 5,
                     style: TextStyle(
                       fontSize: Converts.c16, // Text size
-                      color: Colors.black, // Text color
+                      color: Palette.normalTv, // Text color
                     ),
                     decoration: InputDecoration(
                       hintText: Strings.enter_brief_description,
                       hintStyle: TextStyle(
                         fontSize: Converts.c16, // Hint text size
-                        color: Colors.grey, // Hint text color
+                        color: Palette.semiTv, // Hint text color
                       ),
                       border: const OutlineInputBorder(), // Border style
                       enabledBorder: const OutlineInputBorder(
@@ -100,8 +101,9 @@ class CreateInquiryScreen extends StatelessWidget {
                   TextViewCustom(
                       text: Strings.buyer_customer,
                       fontSize: Converts.c16,
-                      tvColor: Colors.black,
-                      isBold: false),
+                      tvColor: Palette.normalTv,
+                      isRubik: false,
+                      isBold: true),
                   SizedBox(
                     height: Converts.c8,
                   ),
@@ -115,8 +117,9 @@ class CreateInquiryScreen extends StatelessWidget {
                   TextViewCustom(
                       text: Strings.company,
                       fontSize: Converts.c16,
-                      tvColor: Colors.black,
-                      isBold: false),
+                      tvColor: Palette.normalTv,
+                      isRubik: false,
+                      isBold: true),
                   SizedBox(
                     height: Converts.c8,
                   ),
@@ -132,8 +135,9 @@ class CreateInquiryScreen extends StatelessWidget {
                   TextViewCustom(
                       text: Strings.inquiry_type,
                       fontSize: Converts.c16,
-                      tvColor: Colors.black,
-                      isBold: false),
+                      tvColor: Palette.normalTv,
+                      isRubik: false,
+                      isBold: true),
                   SizedBox(
                     height: Converts.c8,
                   ),
@@ -149,8 +153,9 @@ class CreateInquiryScreen extends StatelessWidget {
                   TextViewCustom(
                       text: Strings.end_date,
                       fontSize: Converts.c16,
-                      tvColor: Colors.black,
-                      isBold: false),
+                      tvColor: Palette.normalTv,
+                      isRubik: false,
+                      isBold: true),
 
                   SizedBox(
                     height: Converts.c8,
@@ -166,8 +171,9 @@ class CreateInquiryScreen extends StatelessWidget {
                   TextViewCustom(
                       text: Strings.attachment,
                       fontSize: Converts.c16,
-                      tvColor: Colors.black,
-                      isBold: false),
+                      tvColor: Palette.normalTv,
+                      isRubik: false,
+                      isBold: true),
                   SizedBox(
                     height: Converts.c8,
                   ),
@@ -176,14 +182,15 @@ class CreateInquiryScreen extends StatelessWidget {
                   SizedBox(
                     height: Converts.c16,
                   ),
+
                   /// create button
                   ButtonCustom1(
                     btnText: Strings.create_new,
                     btnHeight: Converts.c48,
-                    bgColor: Colors.redAccent,
+                    bgColor: Palette.mainColor,
                     btnWidth: double.infinity,
                     cornerRadius: 4,
-                    stockColor: Colors.redAccent,
+                    stockColor: Palette.mainColor,
                     onTap: () {},
                   ),
                   SizedBox(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
@@ -69,14 +70,14 @@ class FileAttachment extends StatelessWidget {
           Radius.circular(Converts.c16),
         ),
         border: Border.all(
-          color: Colors.orange, // Border color
+          color: Palette.tabColor, // Border color
           width: 1.0, // Border width
         ),
       ),
       child: Icon(
         Icons.add_a_photo,
         size: Converts.c24,
-        color: Colors.orange,
+        color: Palette.tabColor,
       ),
     );
   }

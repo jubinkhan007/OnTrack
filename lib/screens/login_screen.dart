@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/strings.dart';
+import 'package:tmbi/screens/home_screen.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = '/login_screen';
+
   const LoginScreen({super.key});
 
   @override
@@ -125,7 +127,12 @@ class _LoginOperationState extends State<LoginOperation> {
               btnWidth: double.infinity,
               cornerRadius: 4,
               stockColor: Palette.mainColor,
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  HomeScreen.routeName,
+                );
+              },
             ),
             SizedBox(
               height: Converts.c32,

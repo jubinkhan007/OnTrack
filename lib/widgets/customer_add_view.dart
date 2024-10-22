@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
@@ -23,11 +24,12 @@ class CustomerAddView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(Converts.c8),
       decoration: BoxDecoration(
+        color: Palette.tabColor.withOpacity(0.5),
         borderRadius: BorderRadius.all(
           Radius.circular(Converts.c20),
         ),
         border: Border.all(
-          color: Colors.orange, // Border color
+          color: Palette.tabColor, // Border color
           width: 1.0, // Border width
         ),
       ),
@@ -35,7 +37,7 @@ class CustomerAddView extends StatelessWidget {
         children: [
           Icon(
             Icons.account_circle,
-            color: Colors.black54,
+            color: Palette.semiTv,
             size: Converts.c20,
           ),
           SizedBox(
@@ -44,14 +46,14 @@ class CustomerAddView extends StatelessWidget {
           TextViewCustom(
               text: "Md. Akash",
               fontSize: Converts.c16,
-              tvColor: Colors.black54,
+              tvColor: Palette.semiTv,
               isBold: false),
           SizedBox(
             width: Converts.c8,
           ),
           Icon(
             Icons.close,
-            color: Colors.black54,
+            color: Palette.semiTv,
             size: Converts.c20,
           ),
         ],
@@ -64,12 +66,12 @@ class CustomerAddView extends StatelessWidget {
       width: Converts.c48,
       height: Converts.c48,
       decoration: BoxDecoration(
-        color: Colors.orange,
+        color: Palette.tabColor,
         borderRadius: BorderRadius.all(
           Radius.circular(Converts.c24),
         ),
         border: Border.all(
-          color: Colors.white, // Border color
+          color: Palette.tabColor, // Border color
           width: 1.0, // Border width
         ),
       ),

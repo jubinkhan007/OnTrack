@@ -12,6 +12,7 @@ class ButtonCircularIcon extends StatelessWidget {
   final double iconSize;
   final double fontSize;
   final bool hasOpacity;
+  final bool isTvBold;
   final VoidCallback onTap;
 
   const ButtonCircularIcon({
@@ -26,6 +27,7 @@ class ButtonCircularIcon extends StatelessWidget {
     this.iconSize = 16,
     this.fontSize = 16,
     this.hasOpacity = true,
+    this.isTvBold = false,
     required this.onTap,
   });
 
@@ -60,7 +62,7 @@ class ButtonCircularIcon extends StatelessWidget {
                   fontSize: fontSize,
                   tvColor: tvColor != null ? tvColor! : bgColor,
                   isTextAlignCenter: false,
-                  isBold: false)
+                  isBold: isTvBold)
               : const SizedBox.shrink(),
         ],
       ),
