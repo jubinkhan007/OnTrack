@@ -113,7 +113,6 @@ class CreateInquiryScreen extends StatelessWidget {
                   ),
 
                   /// company name
-
                   TextViewCustom(
                       text: Strings.company,
                       fontSize: Converts.c16,

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/palette.dart';
-import 'package:tmbi/config/size_config.dart';
-import 'package:tmbi/screens/home_screen.dart';
 import 'package:tmbi/screens/screens.dart';
 
 import 'config/router.dart';
+import 'config/size_config.dart';
 
 void main() {
   runApp(const MyApp());

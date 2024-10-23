@@ -86,7 +86,7 @@ class InquiryList extends StatelessWidget {
                   inquiryResponse.buyerInfo.isVerified
                       ? Icon(
                           Icons.verified_user_rounded,
-                          color: Palette.mainColor,
+                          color: Palette.iconColor,
                           size: Converts.c16,
                         )
                       : const SizedBox.shrink(),
@@ -121,7 +121,7 @@ class InquiryList extends StatelessWidget {
                   TextViewCustom(
                       text: inquiryResponse.company,
                       fontSize: Converts.c16,
-                      tvColor: Palette.tabColor,
+                      tvColor: Palette.iconColor,
                       isTextAlignCenter: false,
                       isBold: false),
                 ],

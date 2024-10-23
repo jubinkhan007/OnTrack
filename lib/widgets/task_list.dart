@@ -79,7 +79,7 @@ class TaskList extends StatelessWidget {
                               : Colors.purple
                           : task.isUpdated
                               ? Colors.green
-                              : Palette.tabColor,
+                              : Palette.iconColor,
                       hasOpacity: false,
                       tvColor: Colors.white,
                       fontSize: 14,

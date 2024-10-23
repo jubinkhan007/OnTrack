@@ -37,7 +37,7 @@ class ButtonCircularIcon extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: hasOpacity ? bgColor.withOpacity(0.1) : bgColor,
+        color: hasOpacity ? bgColor.withOpacity(0.5) : bgColor,
         borderRadius: BorderRadius.all(
           Radius.circular(radius),
         ),

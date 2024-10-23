@@ -87,7 +87,7 @@ class InquiryView extends StatelessWidget {
                           height: Converts.c32,
                           width: Converts.c96,
                           radius: 8,
-                          bgColor: Palette.tabColor,
+                          bgColor: Palette.iconColor,
                           hasOpacity: false,
                           text: Strings.pending,
                           fontSize: Converts.c16,
@@ -145,7 +145,7 @@ class InquiryView extends StatelessWidget {
                           hasOpacity: false,
                           text: "2/3",
                           fontSize: Converts.c12,
-                          tvColor: Colors.black,
+                          tvColor: Colors.white,
                           isTvBold: true,
                           onTap: () {})
                     ],

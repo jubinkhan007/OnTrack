@@ -154,25 +154,49 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          SliverList(
-              delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              final inquiryResponse = _getDemoTasks()[index];
+          _getDemoTasks().isNotEmpty
+              ? SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      final inquiryResponse = _getDemoTasks()[index];
 
-              return InquiryList(
-                inquiryResponse: inquiryResponse,
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    InquiryView.routeName,
-                    arguments: inquiryResponse, // Pass the list as arguments
-                  );
-                },
-              );
-            },
-            childCount:
-                _getDemoTasks().length, // Provide the total count of items
-          )),
+                      return InquiryList(
+                        inquiryResponse: inquiryResponse,
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            InquiryView.routeName,
+                            arguments:
+                                inquiryResponse, // Pass the list as arguments
+                          );
+                        },
+                      );
+                    },
+                    childCount: _getDemoTasks()
+                        .length, // Provide the total count of items
+                  ),
+                )
+              : SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: Converts.c96),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            'assets/ic_empty_2.png',
+                            height: Converts.c120,
+                            width: Converts.c120,
+                          ),
+                          TextViewCustom(
+                              text: Strings.no_data_found,
+                              fontSize: Converts.c16,
+                              tvColor: Palette.semiTv,
+                              isBold: false)
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
           SliverPadding(
             padding: EdgeInsets.only(bottom: Converts.c24),
           ),
@@ -182,6 +206,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   List<InquiryResponse> _getDemoTasks() {
+    //const jsonString = "[]";
     const jsonString = '''[
     {
         "id": "123C321",

@@ -42,4 +42,5 @@ class Strings {
   static const String end_date = 'End date';
   static const String select_company = 'Select Company';
   static const String select_a_date = 'Select a Date';
+  static const String no_data_found = '(no data found)';
 }

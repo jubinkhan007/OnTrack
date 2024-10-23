@@ -46,7 +46,7 @@ class _FeatureStatusState extends State<FeatureStatus> {
               decoration: BoxDecoration(
                   color: widget.homeFlags[index].isSelected
                       ? Palette.tabColor
-                      : Palette.tabColor.withOpacity(0.5),
+                      : Palette.tabColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
                       color: widget.homeFlags[index].isSelected
