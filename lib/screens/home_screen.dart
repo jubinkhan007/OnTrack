@@ -68,6 +68,7 @@ class HomeScreen extends StatelessWidget {
           SliverAppBar(
             centerTitle: false,
             backgroundColor: Palette.mainColor,
+            automaticallyImplyLeading: false,
             title: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
