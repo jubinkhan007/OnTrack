@@ -43,4 +43,10 @@ class Strings {
   static const String select_company = 'Select Company';
   static const String select_a_date = 'Select a Date';
   static const String no_data_found = '(no data found)';
+  static const String connection_timeout = 'Connection timeout, Please try again later.';
+  static const String unknown_error_occured = 'Unknown error occurred, Please try again later.';
+  static const String no_internet_connection = 'No internet detected, please check your connection.';
+  static const String something_went_wrong = 'Something went wrong, please check your connection.';
+  static const String login_validation_error = 'User not found or ID and password do not match.';
+  static const String required = '*required';
 }
