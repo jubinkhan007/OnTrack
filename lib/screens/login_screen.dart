@@ -172,6 +172,7 @@ class _LoginOperationState extends State<LoginOperation> {
   }
 
   _showMessage(String message) {
+    // this is snack bar
     final snackBar = SnackBar(
       content: TextViewCustom(
         text: message,
