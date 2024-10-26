@@ -23,8 +23,8 @@ jobs:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
           # Set up Git user information
-          git config --global user.email "your_email@example.com"
-          git config --global user.name "Your Name"
+          git config --global user.email "mis93@mis.prangroup.com"
+          git config --global user.name "Md. Salauddin"
 
           # Check if we can add the remote
           git remote add gitlab https://oauth2:${GITLAB_TOKEN}@gl.sihirbox.com/175883/kick_track.git || {
