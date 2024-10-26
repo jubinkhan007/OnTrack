@@ -22,6 +22,7 @@ class LoginRepo {
         "getall",
         options: Options(headers: headers),
       );
+      debugPrint("RESPONSE#${response.data}");
       return UserResponse.fromJson(response.data);
     } on DioException catch (error) {
       throw Exception(error);

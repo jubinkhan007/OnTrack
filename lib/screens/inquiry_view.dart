@@ -205,4 +205,5 @@ class InquiryView extends StatelessWidget {
       ],
     );
   }
+
 }

@@ -3,12 +3,18 @@ import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
+import '../models/models.dart';
+
 class ComboBoxCustom extends StatelessWidget {
   final String hintName;
-  final List<String> items;
+  final List<Company> items;
+  final Function(String) onChanged;
 
   const ComboBoxCustom(
-      {super.key, required this.hintName, required this.items});
+      {super.key,
+      required this.hintName,
+      required this.items,
+      required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -31,17 +37,19 @@ class ComboBoxCustom extends StatelessWidget {
           fontSize: Converts.c16,
           isBold: false,
         ),
-        items: items.map((String item) {
+        items: items.map((Company company) {
           return DropdownMenuItem<String>(
-            value: item,
+            value: company.id,
             child: TextViewCustom(
-              text: item,
+              text: company.name ?? "",
               tvColor: Palette.normalTv,
               fontSize: Converts.c16,
               isBold: false,
             ),
           );
         }).toList(),
-        onChanged: (value) {});
+        onChanged: (value) {
+          onChanged(value ?? "");
+        });
   }
 }
