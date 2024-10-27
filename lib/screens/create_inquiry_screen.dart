@@ -24,7 +24,10 @@ class CreateInquiryScreen extends StatelessWidget {
     });
 
     // customer list
-    List<Customer> _customers = [];
+    List<Customer> customers = [];
+    // title & description
+    final TextEditingController titleController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -66,20 +69,12 @@ class CreateInquiryScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// title
-                    TextField(
-                      style: TextStyle(
-                        fontSize: Converts.c20, // Text size
-                        color: Colors.black, // Text color
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "Example: Want some sample",
-                        hintStyle: TextStyle(
-                          fontSize: Converts.c20, // Hint text size
-                          color: Palette.semiTv, // Hint text color
-                        ),
-                      ),
-                    ),
-
+                    TextFieldInquiry(
+                        fontSize: Converts.c20,
+                        fontColor: Colors.black,
+                        hintColor: Palette.semiTv,
+                        hint: "Example: Want some sample",
+                        controller: titleController),
                     SizedBox(
                       height: Converts.c16,
                     ),
@@ -94,26 +89,14 @@ class CreateInquiryScreen extends StatelessWidget {
                     SizedBox(
                       height: Converts.c8,
                     ),
-                    TextField(
-                      maxLines: 5,
-                      style: TextStyle(
-                        fontSize: Converts.c16, // Text size
-                        color: Palette.normalTv, // Text color
-                      ),
-                      decoration: InputDecoration(
-                        hintText: Strings.enter_brief_description,
-                        hintStyle: TextStyle(
-                          fontSize: Converts.c16, // Hint text size
-                          color: Palette.semiTv, // Hint text color
-                        ),
-                        border: const OutlineInputBorder(),
-                        // Border style
-                        enabledBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0), // Enabled border style
-                        ),
-                      ),
+                    TextFieldInquiry(
+                      fontSize: Converts.c16,
+                      fontColor: Palette.normalTv,
+                      hintColor: Palette.semiTv,
+                      hint: Strings.enter_brief_description,
+                      controller: descriptionController,
+                      maxLine: 5,
+                      hasBorder: true,
                     ),
                     SizedBox(
                       height: Converts.c8,
@@ -137,8 +120,8 @@ class CreateInquiryScreen extends StatelessWidget {
                               : []
                           : [],
                       onChanged: (companyId) {
-                        if (_customers.isNotEmpty) _customers.clear();
-                        _customers.addAll(_getCustomers(
+                        if (customers.isNotEmpty) customers.clear();
+                        customers.addAll(_getCustomers(
                             inquiryViewModel.initDataCreateInq!.company!,
                             companyId));
                         debugPrint("COMPANY_ID# $companyId");
@@ -159,7 +142,7 @@ class CreateInquiryScreen extends StatelessWidget {
                       height: Converts.c8,
                     ),
                     CustomerAddView(
-                      customers: _customers,
+                      customers: customers,
                       onCustomerSelected: (customer) {
                         if (customer != null) {
                           debugPrint("CUSTOMER#${customer.name}");
@@ -210,10 +193,9 @@ class CreateInquiryScreen extends StatelessWidget {
                     ComboBoxPriority(
                       hintName: Strings.select_priority,
                       items: inquiryViewModel.initDataCreateInq != null
-                          ? inquiryViewModel.initDataCreateInq!.priority !=
-                          null
-                          ? inquiryViewModel.initDataCreateInq!.priority!
-                          : []
+                          ? inquiryViewModel.initDataCreateInq!.priority != null
+                              ? inquiryViewModel.initDataCreateInq!.priority!
+                              : []
                           : [],
                       onChanged: (priorityId) {
                         debugPrint("PRIORITY_ID# $priorityId");
@@ -265,7 +247,10 @@ class CreateInquiryScreen extends StatelessWidget {
                       btnWidth: double.infinity,
                       cornerRadius: 4,
                       stockColor: Palette.mainColor,
-                      onTap: () {},
+                      onTap: () {
+                        debugPrint("TITLE#${titleController.text}");
+                        debugPrint("DESCRIPTION#${descriptionController.text}");
+                      },
                     ),
                     SizedBox(
                       height: Converts.c16,

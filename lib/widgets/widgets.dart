@@ -12,3 +12,4 @@ export 'text_field_custom.dart';
 export 'text_view_custom.dart';
 export 'customer_search_dialog.dart';
 export 'combo_box_priority.dart';
+export 'text_field_inquiry.dart';
