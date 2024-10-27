@@ -146,11 +146,16 @@ class _LoginOperationState extends State<LoginOperation> {
                       _showMessage(loginViewModel.message.toString());
                     } else if (loginViewModel.uiState == UiState.success) {
                       if (loginViewModel.userResponse != null) {
-                        if (loginViewModel.userResponse!.users.isNotEmpty) {
-                          Navigator.pushNamed(
-                            context,
-                            HomeScreen.routeName,
-                          );
+                        if (loginViewModel.userResponse!.users != null) {
+                          if (loginViewModel.userResponse!.users!.isNotEmpty) {
+                            Navigator.pushNamed(
+                              context,
+                              HomeScreen.routeName,
+                            );
+                          } else {
+                            _showMessage(
+                                loginViewModel.userResponse!.status!.message!);
+                          }
                         } else {
                           _showMessage(Strings.login_validation_error);
                         }

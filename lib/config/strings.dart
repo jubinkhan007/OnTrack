@@ -34,19 +34,28 @@ class Strings {
   static const String date = 'Date';
   static const String company = 'Company';
   static const String inquiry_type = 'Inquiry type';
+  static const String priority = 'Priority';
+  static const String select_priority = 'Select priority';
   static const String tasks = 'Tasks';
   static const String create_new = 'Create New';
   static const String description = 'Description';
   static const String enter_brief_description = 'Enter Brief Description';
-  static const String buyer_customer = 'Buyer/Customer';
+  static const String buyer_customer = 'Customer';
   static const String end_date = 'End date';
   static const String select_company = 'Select Company';
   static const String select_a_date = 'Select a Date';
   static const String no_data_found = '(no data found)';
-  static const String connection_timeout = 'Connection timeout, Please try again later.';
-  static const String unknown_error_occured = 'Unknown error occurred, Please try again later.';
-  static const String no_internet_connection = 'No internet detected, please check your connection.';
-  static const String something_went_wrong = 'Something went wrong, please check your connection.';
-  static const String login_validation_error = 'User not found or ID and password do not match.';
+  static const String connection_timeout =
+      'Connection timeout, Please try again later.';
+  static const String unknown_error_occured =
+      'Unknown error occurred, Please try again later.';
+  static const String no_internet_connection =
+      'No internet detected, please check your connection.';
+  static const String something_went_wrong =
+      'Something went wrong, please check your connection.';
+  static const String login_validation_error =
+      'User not found or ID and password do not match.';
   static const String required = '*required';
+  static const String search_customer = 'Search Customer';
+  static const String select_customer = 'Select Customer';
 }

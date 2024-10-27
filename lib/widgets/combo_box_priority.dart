@@ -5,12 +5,12 @@ import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../models/models.dart';
 
-class ComboBoxCustom extends StatelessWidget {
+class ComboBoxPriority extends StatelessWidget {
   final String hintName;
-  final List<Company> items;
+  final List<Priority> items;
   final Function(String) onChanged;
 
-  const ComboBoxCustom(
+  const ComboBoxPriority(
       {super.key,
       required this.hintName,
       required this.items,
@@ -37,11 +37,11 @@ class ComboBoxCustom extends StatelessWidget {
           fontSize: Converts.c16,
           isBold: false,
         ),
-        items: items.map((Company company) {
+        items: items.map((Priority priority) {
           return DropdownMenuItem<String>(
-            value: company.id,
+            value: priority.id.toString(),
             child: TextViewCustom(
-              text: company.name ?? "",
+              text: priority.name ?? "",
               tvColor: Palette.normalTv,
               fontSize: Converts.c16,
               isBold: false,

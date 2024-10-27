@@ -23,6 +23,9 @@ class CreateInquiryScreen extends StatelessWidget {
       inquiryViewModel.getInitDataForCreateInquiry();
     });
 
+    // customer list
+    List<Customer> _customers = [];
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Consumer<InquiryViewModel>(
@@ -116,21 +119,6 @@ class CreateInquiryScreen extends StatelessWidget {
                       height: Converts.c8,
                     ),
 
-                    /// buyer/customer
-                    TextViewCustom(
-                        text: Strings.buyer_customer,
-                        fontSize: Converts.c16,
-                        tvColor: Palette.normalTv,
-                        isRubik: false,
-                        isBold: true),
-                    SizedBox(
-                      height: Converts.c8,
-                    ),
-                    const CustomerAddView(),
-                    SizedBox(
-                      height: Converts.c8,
-                    ),
-
                     /// company name
                     TextViewCustom(
                         text: Strings.company,
@@ -141,7 +129,7 @@ class CreateInquiryScreen extends StatelessWidget {
                     SizedBox(
                       height: Converts.c8,
                     ),
-                    ComboBoxCustom(
+                    ComboBoxCompany(
                       hintName: Strings.select_company,
                       items: inquiryViewModel.initDataCreateInq != null
                           ? inquiryViewModel.initDataCreateInq!.company != null
@@ -149,7 +137,34 @@ class CreateInquiryScreen extends StatelessWidget {
                               : []
                           : [],
                       onChanged: (companyId) {
+                        if (_customers.isNotEmpty) _customers.clear();
+                        _customers.addAll(_getCustomers(
+                            inquiryViewModel.initDataCreateInq!.company!,
+                            companyId));
                         debugPrint("COMPANY_ID# $companyId");
+                      },
+                    ),
+                    SizedBox(
+                      height: Converts.c8,
+                    ),
+
+                    /// buyer/customer
+                    TextViewCustom(
+                        text: Strings.buyer_customer,
+                        fontSize: Converts.c16,
+                        tvColor: Palette.normalTv,
+                        isRubik: false,
+                        isBold: true),
+                    SizedBox(
+                      height: Converts.c8,
+                    ),
+                    CustomerAddView(
+                      customers: _customers,
+                      onCustomerSelected: (customer) {
+                        if (customer != null) {
+                          debugPrint("CUSTOMER#${customer.name}");
+                        }
+                        //_showCustomerDialog(context, _customers);
                       },
                     ),
                     SizedBox(
@@ -166,10 +181,44 @@ class CreateInquiryScreen extends StatelessWidget {
                     SizedBox(
                       height: Converts.c8,
                     ),
-                    /*const ComboBoxCustom(
+                    ComboBoxInquiryType(
                       hintName: Strings.inquiry_type,
-                      items: ["Sample", "Query"],
-                    ),*/
+                      items: inquiryViewModel.initDataCreateInq != null
+                          ? inquiryViewModel.initDataCreateInq!.inquiryType !=
+                                  null
+                              ? inquiryViewModel.initDataCreateInq!.inquiryType!
+                              : []
+                          : [],
+                      onChanged: (inquiryId) {
+                        debugPrint("COMPANY_ID# $inquiryId");
+                      },
+                    ),
+                    SizedBox(
+                      height: Converts.c8,
+                    ),
+
+                    /// priority
+                    TextViewCustom(
+                        text: Strings.priority,
+                        fontSize: Converts.c16,
+                        tvColor: Palette.normalTv,
+                        isRubik: false,
+                        isBold: true),
+                    SizedBox(
+                      height: Converts.c8,
+                    ),
+                    ComboBoxPriority(
+                      hintName: Strings.select_priority,
+                      items: inquiryViewModel.initDataCreateInq != null
+                          ? inquiryViewModel.initDataCreateInq!.priority !=
+                          null
+                          ? inquiryViewModel.initDataCreateInq!.priority!
+                          : []
+                          : [],
+                      onChanged: (priorityId) {
+                        debugPrint("PRIORITY_ID# $priorityId");
+                      },
+                    ),
                     SizedBox(
                       height: Converts.c8,
                     ),
@@ -231,11 +280,14 @@ class CreateInquiryScreen extends StatelessWidget {
     );
   }
 
-  List<String> _getCompanyName(List<Company> companies) {
-    List<String> names = [];
+  List<Customer> _getCustomers(List<Company> companies, String companyId) {
+    List<Customer> customers = [];
     for (var company in companies) {
-      names.add(company.name ?? "");
+      if (company.id.toString() == companyId) {
+        customers.addAll(company.customer!);
+        break;
+      }
     }
-    return names;
+    return customers;
   }
 }

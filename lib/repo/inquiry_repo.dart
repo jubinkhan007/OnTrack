@@ -10,8 +10,19 @@ class InquiryRepo {
 
   Future<InitDataCreateInq> getInitDataForCreateInquiry() async {
     try {
-      final response = await dio.get(
+      /*final response = await dio.get(
         "",
+      );*/
+      final headers = {
+        'vm': 'COMP',
+        'va': '5',
+        'vb': '340553',
+        'vc': '123456',
+        'vd': 'company',
+      };
+      final response = await dio.get(
+        "getall",
+        options: Options(headers: headers),
       );
       debugPrint("RESPONSE#${response.data}");
       return InitDataCreateInq.fromJson(response.data);

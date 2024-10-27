@@ -1,17 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
-import 'package:tmbi/widgets/text_view_custom.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
-class CustomerAddView extends StatelessWidget {
-  const CustomerAddView({super.key});
+import '../config/strings.dart';
+import '../models/models.dart';
+
+class CustomerAddView extends StatefulWidget {
+  final List<Customer> customers;
+  final Function(Customer?) onCustomerSelected;
+
+  const CustomerAddView(
+      {super.key, required this.onCustomerSelected, required this.customers});
+
+  @override
+  State<CustomerAddView> createState() => _CustomerAddViewState();
+}
+
+class _CustomerAddViewState extends State<CustomerAddView> {
+  bool _isCustomerViewVisible = false;
+  Customer? customer;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _customerView(),
+        _isCustomerViewVisible ? _customerView() : const SizedBox.shrink(),
         SizedBox(
           width: Converts.c16,
         ),
@@ -44,17 +58,33 @@ class CustomerAddView extends StatelessWidget {
             width: Converts.c8,
           ),
           TextViewCustom(
-              text: "Md. Akash",
+              text: customer != null
+                  ? customer!.name != null
+                      ? customer!.name!
+                      : ""
+                  : "",
               fontSize: Converts.c16,
               tvColor: Palette.semiTv,
-              isBold: false),
+              isBold: true),
           SizedBox(
             width: Converts.c8,
           ),
-          Icon(
-            Icons.close,
-            color: Palette.semiTv,
-            size: Converts.c20,
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                customer = null;
+                _isCustomerViewVisible = false;
+              });
+              widget.onCustomerSelected(null);
+            },
+            child: Padding(
+              padding: EdgeInsets.all(Converts.c8),
+              child: Icon(
+                Icons.close,
+                color: Palette.semiTv,
+                size: Converts.c20,
+              ),
+            ),
           ),
         ],
       ),
@@ -62,24 +92,59 @@ class CustomerAddView extends StatelessWidget {
   }
 
   Widget _addButton() {
-    return Container(
-      width: Converts.c48,
-      height: Converts.c48,
-      decoration: BoxDecoration(
-        color: Palette.tabColor,
-        borderRadius: BorderRadius.all(
-          Radius.circular(Converts.c24),
+    return GestureDetector(
+      onTap: () {
+        _showCustomerDialog(context, widget.customers);
+        //onTap();
+      },
+      child: Container(
+        width: Converts.c48,
+        height: Converts.c48,
+        decoration: BoxDecoration(
+          color: Palette.tabColor,
+          borderRadius: BorderRadius.all(
+            Radius.circular(Converts.c24),
+          ),
+          border: Border.all(
+            color: Palette.tabColor, // Border color
+            width: 1.0, // Border width
+          ),
         ),
-        border: Border.all(
-          color: Palette.tabColor, // Border color
-          width: 1.0, // Border width
+        child: Icon(
+          Icons.add,
+          size: Converts.c24,
+          color: Colors.white,
         ),
-      ),
-      child: Icon(
-        Icons.add,
-        size: Converts.c24,
-        color: Colors.white,
       ),
     );
+  }
+
+  void _showCustomerDialog(BuildContext context, List<Customer> customers) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: TextViewCustom(
+                text: Strings.select_customer,
+                fontSize: Converts.c16,
+                tvColor: Palette.normalTv,
+                isTextAlignCenter: false,
+                isRubik: false,
+                isBold: true),
+            content: CustomerSearchDialog(
+                customers: customers,
+                onCustomerSelected: (customer) {
+                  if (customer != null) {
+                    setState(() {
+                      this.customer = customer;
+                      _isCustomerViewVisible = true;
+                    });
+                  }
+                  widget.onCustomerSelected(customer);
+                  debugPrint("CUSTOMER_ID# ${customer.id}");
+                  Navigator.of(context).pop();
+                }),
+          );
+        });
   }
 }
