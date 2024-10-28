@@ -25,9 +25,11 @@ class CreateInquiryScreen extends StatelessWidget {
 
     // customer list
     List<Customer> customers = [];
-    // title & description
+    // title & description & customer name
     final TextEditingController titleController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
+    final TextEditingController customerNameController =
+        TextEditingController();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -143,6 +145,7 @@ class CreateInquiryScreen extends StatelessWidget {
                     ),
                     CustomerAddView(
                       customers: customers,
+                      controller: customerNameController,
                       onCustomerSelected: (customer) {
                         if (customer != null) {
                           debugPrint("CUSTOMER#${customer.name}");
@@ -250,6 +253,8 @@ class CreateInquiryScreen extends StatelessWidget {
                       onTap: () {
                         debugPrint("TITLE#${titleController.text}");
                         debugPrint("DESCRIPTION#${descriptionController.text}");
+                        debugPrint(
+                            "CUSTOMER_NAME#${customerNameController.text}");
                       },
                     ),
                     SizedBox(

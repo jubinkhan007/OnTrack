@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:tmbi/network/custom_interceptor.dart';
 
 class ApiService {
-  final _baseUrl = "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/";
-  //final _baseUrl = "https://api.npoint.io/6a2a424e53a984ad4ea3";
+  //final _baseUrl = "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/";
+  final _baseUrl = "https://api.npoint.io/6a2a424e53a984ad4ea3";
   final _receiveTimeout = const Duration(seconds: 30);
   final _connectTimeout = const Duration(seconds: 30);
   final _sendTimeout = const Duration(seconds: 30);

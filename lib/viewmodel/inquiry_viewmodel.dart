@@ -19,6 +19,11 @@ class InquiryViewModel extends ChangeNotifier {
 
   InitDataCreateInq? get initDataCreateInq => _initDataCreateInq;
 
+  /// inquiry list
+  List<InquiryResponse>? _inquiries;
+
+  List<InquiryResponse>? get inquiries => _inquiries;
+
   /// ui state
   UiState _uiState = UiState.init;
 
@@ -32,6 +37,23 @@ class InquiryViewModel extends ChangeNotifier {
     try {
       final response = await inquiryRepo.getInitDataForCreateInquiry();
       _initDataCreateInq = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> getInquiries() async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.getInquiries();
+      _inquiries = response;
       _uiState = UiState.success;
     } catch (error) {
       _uiState = UiState.error;

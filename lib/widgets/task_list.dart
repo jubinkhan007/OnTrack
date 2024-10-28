@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tmbi/data/inquiry_response.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
+import '../models/models.dart';
 
 class TaskList extends StatelessWidget {
   final Task task;

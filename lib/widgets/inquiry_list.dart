@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/palette.dart';
-import 'package:tmbi/data/inquiry_response.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
+import '../models/models.dart';
 
 class InquiryList extends StatelessWidget {
   final InquiryResponse inquiryResponse;
@@ -74,7 +74,7 @@ class InquiryList extends StatelessWidget {
                     width: Converts.c8,
                   ),
                   TextViewCustom(
-                    text: inquiryResponse.buyerInfo.name,
+                    text: inquiryResponse.customer != null ? inquiryResponse.customer!.name! :"",
                     fontSize: Converts.c16,
                     tvColor: Palette.semiTv,
                     isTextAlignCenter: false,
@@ -83,7 +83,7 @@ class InquiryList extends StatelessWidget {
                   const SizedBox(
                     width: 4,
                   ),
-                  inquiryResponse.buyerInfo.isVerified
+                  inquiryResponse.customer!.isVerified!
                       ? Icon(
                           Icons.verified_user_rounded,
                           color: Palette.iconColor,

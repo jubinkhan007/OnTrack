@@ -3,7 +3,7 @@ import 'package:tmbi/config/strings.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
-import '../data/inquiry_response.dart';
+import '../models/models.dart';
 import '../widgets/widgets.dart';
 
 class InquiryView extends StatelessWidget {
@@ -53,7 +53,7 @@ class InquiryView extends StatelessWidget {
                     height: 4,
                   ),
                   _iconView(Icons.account_circle_outlined, "${Strings.owner}:",
-                      "${inquiryResponse.postedBy.name} & ${inquiryResponse.buyerInfo.name}"),
+                      "${inquiryResponse.postedBy.name} & ${inquiryResponse.customer.name}"),
                   const SizedBox(
                     height: 4,
                   ),

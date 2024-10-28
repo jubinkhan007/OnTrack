@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tmbi/data/inquiry_response.dart';
+import 'package:tmbi/models/models.dart';
 
 import '../screens/screens.dart';
 

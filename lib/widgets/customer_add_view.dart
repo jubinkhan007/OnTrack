@@ -8,10 +8,14 @@ import '../models/models.dart';
 
 class CustomerAddView extends StatefulWidget {
   final List<Customer> customers;
+  final TextEditingController controller;
   final Function(Customer?) onCustomerSelected;
 
   const CustomerAddView(
-      {super.key, required this.onCustomerSelected, required this.customers});
+      {super.key,
+      required this.onCustomerSelected,
+      required this.customers,
+      required this.controller});
 
   @override
   State<CustomerAddView> createState() => _CustomerAddViewState();
@@ -19,13 +23,27 @@ class CustomerAddView extends StatefulWidget {
 
 class _CustomerAddViewState extends State<CustomerAddView> {
   bool _isCustomerViewVisible = false;
+  bool _isOtherCustomerViewVisible = false;
   Customer? customer;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _isCustomerViewVisible ? _customerView() : const SizedBox.shrink(),
+        _isCustomerViewVisible
+            ? _isOtherCustomerViewVisible
+                ? SizedBox(
+                    width: Converts.c200,
+                    child: TextFieldInquiry(
+                        fontSize: Converts.c16,
+                        fontColor: Palette.normalTv,
+                        hintColor: Palette.semiTv,
+                        hint: Strings.customer_name,
+                        hasBorder: true,
+                        controller: widget.controller),
+                  )
+                : _customerView()
+            : const SizedBox.shrink(),
         SizedBox(
           width: Converts.c16,
         ),
@@ -138,6 +156,11 @@ class _CustomerAddViewState extends State<CustomerAddView> {
                     setState(() {
                       this.customer = customer;
                       _isCustomerViewVisible = true;
+                      if (customer.id == 0) {
+                        _isOtherCustomerViewVisible = true;
+                      } else {
+                        _isOtherCustomerViewVisible = false;
+                      }
                     });
                   }
                   widget.onCustomerSelected(customer);

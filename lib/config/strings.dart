@@ -41,6 +41,7 @@ class Strings {
   static const String description = 'Description';
   static const String enter_brief_description = 'Enter Brief Description';
   static const String buyer_customer = 'Customer';
+  static const String customer_name = 'Customer name';
   static const String end_date = 'End date';
   static const String select_company = 'Select Company';
   static const String select_a_date = 'Select a Date';

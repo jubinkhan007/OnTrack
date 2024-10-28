@@ -10,9 +10,6 @@ class InquiryRepo {
 
   Future<InitDataCreateInq> getInitDataForCreateInquiry() async {
     try {
-      /*final response = await dio.get(
-        "",
-      );*/
       final headers = {
         'vm': 'COMP',
         'va': '5',
@@ -27,6 +24,39 @@ class InquiryRepo {
       debugPrint("RESPONSE#${response.data}");
       return InitDataCreateInq.fromJson(response.data);
     } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
+  /*Future<InquiryResponse> getInquiries() async {
+    try {
+      final response = await dio.get(
+        "",
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return InquiryResponse.fromJson(response.data);
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }*/
+
+  Future<List<InquiryResponse>> getInquiries() async {
+    try {
+      final response = await dio.get("");
+      debugPrint("RESPONSE#${response.data}");
+      // check if the response data is a Map and contains 'queries'
+      if (response.data is Map<String, dynamic> &&
+          response.data.containsKey('queries')) {
+        final List<dynamic> inquiriesJson = response.data['queries'] ?? [];
+        // map the list of JSON objects to InquiryResponse objects
+        return inquiriesJson
+            .map((json) => InquiryResponse.fromJson(json))
+            .toList();
+      } else {
+        return [];
+      }
+    } on DioException catch (error) {
+      debugPrint("error fetching inquiries: $error");
       throw Exception(error);
     }
   }

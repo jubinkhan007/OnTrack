@@ -203,7 +203,7 @@ class Company {
 }
 
 class Customer {
-  int? id; // Changed type to int
+  String? id; // Changed type to int
   String? name;
   bool? isVerified; // Changed type to bool
 
