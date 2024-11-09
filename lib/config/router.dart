@@ -25,6 +25,14 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
     case CreateInquiryScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const CreateInquiryScreen());
+    case CommentScreen.routeName:
+      final args = routeSettings.arguments as String;
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => CommentScreen(
+          commentId: args,
+        ),
+      );
     default:
       return MaterialPageRoute(
           settings: routeSettings,

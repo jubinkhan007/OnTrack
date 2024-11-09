@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -5,8 +7,9 @@ import '../models/models.dart';
 
 class InquiryRepo {
   final Dio dio;
+  final Dio fileDio;
 
-  InquiryRepo({required this.dio});
+  InquiryRepo({required this.fileDio, required this.dio});
 
   Future<InitDataCreateInq> getInitDataForCreateInquiry() async {
     try {
@@ -57,6 +60,47 @@ class InquiryRepo {
       }
     } on DioException catch (error) {
       debugPrint("error fetching inquiries: $error");
+      throw Exception(error);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> saveImages(
+      List<Uint8List> files, List<String> paths,
+      {String id = "XXXX", String dbId = "XXX"}) async {
+    final formData = FormData();
+    formData.fields.add(MapEntry('challanno', id));
+    formData.fields.add(MapEntry('dbid', dbId));
+
+    for (var i = 0; i < files.length; i++) {
+      formData.files.add(MapEntry(
+        'files',
+        MultipartFile.fromBytes(
+          files[i],
+          filename: paths[i], // Provide a unique filename for each file
+        ),
+      ));
+    }
+    // save image into server
+    try {
+      final response = await fileDio.post("ImageUpload/upload", data: formData);
+      debugPrint("RESPONSE#${response.data}");
+
+      if (response.statusCode == 200) {
+        // ensure response.data is a List<dynamic>
+        if (response.data is List) {
+          // map the response to List<Map<String, dynamic>>
+          return (response.data as List)
+              .map((item) => Map<String, dynamic>.from(item))
+              .toList();
+        } else {
+          throw Exception('Unexpected response format:: ${response.data}');
+        }
+      } else {
+        throw Exception('Received an error with status code:: ${response.data}');
+      }
+
+    } on DioException catch (error) {
+      debugPrint("File upload failed:: $error");
       throw Exception(error);
     }
   }

@@ -7,7 +7,8 @@ import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
 
 class FileAttachment extends StatefulWidget {
-  const FileAttachment({super.key});
+  final Function(List<XFile>?) onFileAttached;
+  const FileAttachment({super.key, required this.onFileAttached});
 
   @override
   State<FileAttachment> createState() => _FileAttachmentState();
@@ -57,6 +58,8 @@ class _FileAttachmentState extends State<FileAttachment> {
                     onTap: () {
                       setState(() {
                         _imageFiles.removeAt(index);
+                        // pass files
+                        widget.onFileAttached(_imageFiles);
                       });
                     },
                     child: Container(
@@ -127,6 +130,8 @@ class _FileAttachmentState extends State<FileAttachment> {
       if (image != null) {
         setState(() {
           _imageFiles.add(image);
+          // pass files
+          widget.onFileAttached(_imageFiles);
         });
       }
     }
@@ -138,6 +143,8 @@ class _FileAttachmentState extends State<FileAttachment> {
       if (selectedImages != null) {
         setState(() {
           _imageFiles.addAll(selectedImages);
+          // pass files
+          widget.onFileAttached(_imageFiles);
         });
       }
     }

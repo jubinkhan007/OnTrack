@@ -33,38 +33,41 @@ class ButtonCircularIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: hasOpacity ? bgColor.withOpacity(0.5) : bgColor,
-        borderRadius: BorderRadius.all(
-          Radius.circular(radius),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          iconData != null
-              ? Icon(
-                  iconData,
-                  color: tvColor != null ? tvColor! : bgColor,
-                  size: iconSize,
-                )
-              : const SizedBox.shrink(),
-          const SizedBox(
-            width: 4,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: hasOpacity ? bgColor.withOpacity(0.5) : bgColor,
+          borderRadius: BorderRadius.all(
+            Radius.circular(radius),
           ),
-          text != null
-              ? TextViewCustom(
-                  text: text!,
-                  fontSize: fontSize,
-                  tvColor: tvColor != null ? tvColor! : bgColor,
-                  isTextAlignCenter: false,
-                  isBold: isTvBold)
-              : const SizedBox.shrink(),
-        ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            iconData != null
+                ? Icon(
+                    iconData,
+                    color: tvColor != null ? tvColor! : bgColor,
+                    size: iconSize,
+                  )
+                : const SizedBox.shrink(),
+            const SizedBox(
+              width: 4,
+            ),
+            text != null
+                ? TextViewCustom(
+                    text: text!,
+                    fontSize: fontSize,
+                    tvColor: tvColor != null ? tvColor! : bgColor,
+                    isTextAlignCenter: false,
+                    isBold: isTvBold)
+                : const SizedBox.shrink(),
+          ],
+        ),
       ),
     );
   }

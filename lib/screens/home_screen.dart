@@ -6,6 +6,7 @@ import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/data/counter_item.dart';
+import 'package:tmbi/screens/comment_screen.dart';
 import 'package:tmbi/screens/create_inquiry_screen.dart';
 import 'package:tmbi/screens/inquiry_view.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
@@ -72,108 +73,123 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Consumer<InquiryViewModel>(
-          builder: (context, inquiryViewModel, child) {
-        if (inquiryViewModel.uiState == UiState.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (inquiryViewModel.uiState == UiState.error) {
-          return Center(child: Text("Error: ${inquiryViewModel.message}"));
-        }
-
-        return CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              centerTitle: false,
-              backgroundColor: Palette.mainColor,
-              automaticallyImplyLeading: false,
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextViewCustom(
-                    text: "Good Morning Salauddin",
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            centerTitle: false,
+            backgroundColor: Palette.mainColor,
+            automaticallyImplyLeading: false,
+            title: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextViewCustom(
+                  text: "Good Morning Salauddin",
+                  fontSize: Converts.c20,
+                  tvColor: Colors.white,
+                  isRubik: false,
+                  isTextAlignCenter: false,
+                  isBold: true,
+                ),
+                TextViewCustom(
+                  text: "08 Oct,2024",
+                  fontSize: Converts.c16,
+                  isTextAlignCenter: false,
+                  tvColor: Colors.white,
+                  isBold: false,
+                ),
+              ],
+            ),
+            floating: true,
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.notifications,
+                  color: Colors.white,
+                  size: Converts.c20,
+                ),
+              )
+            ],
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: Converts.c16,
+                    top: Converts.c24,
+                  ),
+                  child: TextViewCustom(
+                    text: Strings.summary,
                     fontSize: Converts.c20,
-                    tvColor: Colors.white,
-                    isRubik: false,
-                    isTextAlignCenter: false,
+                    tvColor: Colors.black,
                     isBold: true,
                   ),
-                  TextViewCustom(
-                    text: "08 Oct,2024",
-                    fontSize: Converts.c16,
-                    isTextAlignCenter: false,
-                    tvColor: Colors.white,
-                    isBold: false,
+                ),
+                CounterCard(
+                  counters: CounterItem().counters,
+                ),
+              ],
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: Converts.c16,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: Converts.c16,
+                    top: Converts.c24,
                   ),
-                ],
-              ),
-              floating: true,
-              actions: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.notifications,
-                    color: Colors.white,
-                    size: Converts.c20,
+                  child: TextViewCustom(
+                    text: Strings.inquiry,
+                    fontSize: Converts.c20,
+                    tvColor: Colors.black,
+                    isBold: true,
                   ),
+                ),
+                SizedBox(
+                  height: Converts.c16,
+                ),
+                FeatureStatus(
+                  homeFlags: HomeFlagItem().homeFlagItems,
+                  onPressed: (value) async {
+                    await _getInquiries(inquiryViewModel);
+                    debugPrint(value);
+                  },
                 )
               ],
             ),
-            SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: Converts.c16,
-                      top: Converts.c24,
+          ),
+          Consumer<InquiryViewModel>(
+              builder: (context, inquiryViewModel, child) {
+            if (inquiryViewModel.uiState == UiState.loading) {
+              return SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: Converts.c120,
                     ),
-                    child: TextViewCustom(
-                      text: Strings.summary,
-                      fontSize: Converts.c20,
-                      tvColor: Colors.black,
-                      isBold: true,
+                    const Center(
+                      child: CircularProgressIndicator(),
                     ),
-                  ),
-                  CounterCard(
-                    counters: CounterItem().counters,
-                  ),
-                ],
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: Converts.c16,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: Converts.c16,
-                      top: Converts.c24,
-                    ),
-                    child: TextViewCustom(
-                      text: Strings.inquiry,
-                      fontSize: Converts.c20,
-                      tvColor: Colors.black,
-                      isBold: true,
-                    ),
-                  ),
-                  SizedBox(
-                    height: Converts.c16,
-                  ),
-                  FeatureStatus(
-                    homeFlags: HomeFlagItem().homeFlagItems,
-                    onPressed: (value) async {
-                      //await _getInquiries(inquiryViewModel);
-                      debugPrint(value);
-                    },
-                  )
-                ],
-              ),
-            ),
-            inquiryViewModel.inquiries != null &&
+                  ],
+                ),
+              );
+            }
+            else if (inquiryViewModel.uiState == UiState.error) {
+              return SliverToBoxAdapter(
+                child: Center(
+                  child: Text("Error: ${inquiryViewModel.message}"),
+                ),
+              );
+            }
+            return inquiryViewModel.inquiries != null &&
                     inquiryViewModel.inquiries!.isNotEmpty
                 ? SliverList(
                     delegate: SliverChildBuilderDelegate(
@@ -191,6 +207,14 @@ class HomeScreen extends StatelessWidget {
                                   inquiryResponse, // Pass the list as arguments
                             );
                           },
+                          onCommentTap: (id) {
+                            Navigator.pushNamed(
+                              context,
+                              CommentScreen.routeName,
+                              arguments: id, // Pass the list as arguments
+                            );
+                          },
+                          onAttachmentTap: (id) {},
                         );
                       },
                       childCount: inquiryViewModel.inquiries!
@@ -199,7 +223,9 @@ class HomeScreen extends StatelessWidget {
                   )
                 : SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.only(top: Converts.c96),
+                      padding: EdgeInsets.only(
+                        top: Converts.c120,
+                      ),
                       child: Center(
                         child: Column(
                           children: [
@@ -217,13 +243,13 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
-            SliverPadding(
-              padding: EdgeInsets.only(bottom: Converts.c24),
-            ),
-          ],
-        );
-      }),
+                  );
+          }),
+          SliverPadding(
+            padding: EdgeInsets.only(bottom: Converts.c24),
+          ),
+        ],
+      ),
     );
   }
 

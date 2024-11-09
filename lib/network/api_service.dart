@@ -2,8 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:tmbi/network/custom_interceptor.dart';
 
 class ApiService {
-  //final _baseUrl = "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/";
-  final _baseUrl = "https://api.npoint.io/6a2a424e53a984ad4ea3";
+  final _baseUrl = "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/";
+  final _baseUrlFile = "http://swift.prangroup.com:8521/alpha/";
+  //final _baseUrl = "https://api.npoint.io/6a2a424e53a984ad4ea3";
   final _receiveTimeout = const Duration(seconds: 30);
   final _connectTimeout = const Duration(seconds: 30);
   final _sendTimeout = const Duration(seconds: 30);
@@ -43,4 +44,23 @@ class ApiService {
 
     return _dio;
   }
+
+  Dio fileUploadDio() {
+    BaseOptions baseOptions = BaseOptions(
+      baseUrl: _baseUrlFile,
+      receiveTimeout: _receiveTimeout,
+      connectTimeout: _connectTimeout,
+      sendTimeout: _sendTimeout,
+    );
+
+    Interceptor customInterceptor = CustomInterceptor();
+    _dio = Dio(baseOptions);
+    //_dio.interceptors.addAll({prettyDioLogger, customInterceptor});
+    _dio.interceptors.add(customInterceptor);
+
+    return _dio;
+  }
+
+
+
 }

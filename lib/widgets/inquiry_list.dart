@@ -8,9 +8,15 @@ import '../models/models.dart';
 class InquiryList extends StatelessWidget {
   final InquiryResponse inquiryResponse;
   final VoidCallback onTap;
+  final Function(String) onCommentTap;
+  final Function(String) onAttachmentTap;
 
   const InquiryList(
-      {super.key, required this.inquiryResponse, required this.onTap});
+      {super.key,
+      required this.inquiryResponse,
+      required this.onTap,
+      required this.onCommentTap,
+      required this.onAttachmentTap});
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +80,9 @@ class InquiryList extends StatelessWidget {
                     width: Converts.c8,
                   ),
                   TextViewCustom(
-                    text: inquiryResponse.customer != null ? inquiryResponse.customer!.name! :"",
+                    text: inquiryResponse.customer != null
+                        ? inquiryResponse.customer!.name!
+                        : "",
                     fontSize: Converts.c16,
                     tvColor: Palette.semiTv,
                     isTextAlignCenter: false,
@@ -162,7 +170,9 @@ class InquiryList extends StatelessWidget {
                     bgColor: Palette.iconColor,
                     hasOpacity: false,
                     tvColor: Colors.white,
-                    onTap: () {},
+                    onTap: () {
+                      onCommentTap(inquiryResponse.id);
+                    },
                   ),
                   SizedBox(
                     width: Converts.c8,
@@ -176,7 +186,9 @@ class InquiryList extends StatelessWidget {
                     bgColor: Palette.iconColor,
                     hasOpacity: false,
                     tvColor: Colors.white,
-                    onTap: () {},
+                    onTap: () {
+                      onAttachmentTap(inquiryResponse.id);
+                    },
                   ),
                 ],
               )

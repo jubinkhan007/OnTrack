@@ -130,7 +130,7 @@ class Priority {
     return data;
   }
 }*/
-class InitDataCreateInq {
+/*class InitDataCreateInq {
   List<Company>? company;
   List<InquiryType>? inquiryType;
   List<Priority>? priority;
@@ -260,5 +260,137 @@ class Priority {
     data['NAME'] = name; // Fixed key to match JSON
     return data;
   }
+}*/
+class InitDataCreateInq {
+  List<Company>? company;
+  List<InquiryType>? inquiryType;
+  List<Priority>? priority;
+
+  InitDataCreateInq({this.company, this.inquiryType, this.priority});
+
+  InitDataCreateInq.fromJson(Map<String, dynamic> json) {
+    if (json['company'] != null) {
+      company = <Company>[];
+      json['company'].forEach((v) {
+        company!.add(Company.fromJson(v));
+      });
+    }
+    if (json['inquery'] != null) {
+      inquiryType = <InquiryType>[];
+      json['inquery'].forEach((v) {
+        inquiryType!.add(InquiryType.fromJson(v));
+      });
+    }
+    if (json['priority'] != null) {
+      priority = <Priority>[];
+      json['priority'].forEach((v) {
+        priority!.add(Priority.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (company != null) {
+      data['company'] = company!.map((v) => v.toJson()).toList();
+    }
+    if (inquiryType != null) {
+      data['inquery'] = inquiryType!.map((v) => v.toJson()).toList();
+    }
+    if (priority != null) {
+      data['priority'] = priority!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }
+
+class Company {
+  int? id; // Changed to int
+  String? name;
+  List<Customer>? customer;
+
+  Company({this.id, this.name, this.customer});
+
+  Company.fromJson(Map<String, dynamic> json) {
+    id = json['ID']; // Ensure this is an integer in JSON
+    name = json['NAME'];
+    if (json['CUSTOMER'] != null) {
+      customer = <Customer>[];
+      json['CUSTOMER'].forEach((v) {
+        customer!.add(Customer.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['ID'] = id;
+    data['NAME'] = name;
+    if (customer != null) {
+      data['CUSTOMER'] = customer!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Customer {
+  int? id; // Changed to int
+  String? name;
+  bool? isVerified;
+
+  Customer({this.id, this.name, this.isVerified});
+
+  Customer.fromJson(Map<String, dynamic> json) {
+    id = json['ID']; // Ensure this is an integer in JSON
+    name = json['NAME'];
+    isVerified = json['IS_VERIFIED'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['ID'] = id;
+    data['NAME'] = name;
+    data['IS_VERIFIED'] = isVerified;
+    return data;
+  }
+}
+
+class InquiryType {
+  int? id; // Changed to int
+  String? name;
+
+  InquiryType({this.id, this.name});
+
+  InquiryType.fromJson(Map<String, dynamic> json) {
+    id = json['INQR_ID']; // Ensure this is an integer in JSON
+    name = json['INQR_TYPE'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['INQR_ID'] = id;
+    data['INQR_TYPE'] = name;
+    return data;
+  }
+}
+
+class Priority {
+  int? id; // Changed to int
+  String? name;
+
+  Priority({this.id, this.name});
+
+  Priority.fromJson(Map<String, dynamic> json) {
+    id = json['ID']; // Ensure this is an integer in JSON
+    name = json['NAME'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['ID'] = id;
+    data['NAME'] = name;
+    return data;
+  }
+}
+
 

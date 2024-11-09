@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/models/init_data_create_inq.dart';
-import 'package:tmbi/viewmodel/inquiry_viewmodel.dart';
+import 'package:tmbi/viewmodel/inquiry_create_viewmodel.dart';
 import 'package:tmbi/widgets/date_selection_view.dart';
 
 import '../config/converts.dart';
@@ -18,7 +18,7 @@ class CreateInquiryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inquiryViewModel =
-        Provider.of<InquiryViewModel>(context, listen: false);
+        Provider.of<InquiryCreateViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       inquiryViewModel.getInitDataForCreateInquiry();
     });
@@ -33,7 +33,7 @@ class CreateInquiryScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Consumer<InquiryViewModel>(
+      body: Consumer<InquiryCreateViewModel>(
           builder: (context, inquiryViewModel, child) {
         if (inquiryViewModel.uiState == UiState.loading) {
           return const Center(child: CircularProgressIndicator());
@@ -71,11 +71,16 @@ class CreateInquiryScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// title
+                    SizedBox(
+                      height: Converts.c8,
+                    ),
+
                     TextFieldInquiry(
                         fontSize: Converts.c20,
                         fontColor: Colors.black,
                         hintColor: Palette.semiTv,
-                        hint: "Example: Want some sample",
+                        hasBorder: true,
+                        hint: "Type Title Here; Example: Need Sample ...",
                         controller: titleController),
                     SizedBox(
                       height: Converts.c16,
@@ -237,7 +242,13 @@ class CreateInquiryScreen extends StatelessWidget {
                       height: Converts.c8,
                     ),
 
-                    const FileAttachment(),
+                    FileAttachment(
+                      onFileAttached: (files) {
+                        if (files != null) {
+                          debugPrint(files.length.toString());
+                        }
+                      },
+                    ),
                     SizedBox(
                       height: Converts.c16,
                     ),
@@ -250,11 +261,12 @@ class CreateInquiryScreen extends StatelessWidget {
                       btnWidth: double.infinity,
                       cornerRadius: 4,
                       stockColor: Palette.mainColor,
-                      onTap: () {
+                      onTap: () async {
                         debugPrint("TITLE#${titleController.text}");
                         debugPrint("DESCRIPTION#${descriptionController.text}");
                         debugPrint(
                             "CUSTOMER_NAME#${customerNameController.text}");
+                        await inquiryViewModel.getInitDataForCreateInquiry();
                       },
                     ),
                     SizedBox(
@@ -263,7 +275,7 @@ class CreateInquiryScreen extends StatelessWidget {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         );
       }),

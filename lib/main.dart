@@ -30,8 +30,17 @@ class MyApp extends StatelessWidget {
               ),
             ),
             ChangeNotifierProvider(
+              create: (_) => InquiryCreateViewModel(
+                inquiryRepo: InquiryRepo(
+                    fileDio: ApiService().fileUploadDio(),
+                    dio: ApiService().provideDio()),
+              ),
+            ),
+            ChangeNotifierProvider(
               create: (_) => InquiryViewModel(
-                inquiryRepo: InquiryRepo(dio: ApiService().provideDio()),
+                inquiryRepo: InquiryRepo(
+                    fileDio: ApiService().fileUploadDio(),
+                    dio: ApiService().provideDio()),
               ),
             ),
           ],
