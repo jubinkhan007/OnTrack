@@ -61,4 +61,9 @@ class Strings {
   static const String select_customer = 'Select Customer';
   static const String post_comment = 'Post Comment';
   static const String type_a_comment = 'Type a comment ...';
+  static const String data_saved_successfully = 'Data saved successfully';
+  static const String failed_to_save_the_data = 'Failed to save the data';
+  static const String data_is_missing = 'Data is missing or null';
+  static const String some_values_are_missing = 'Some values are missing. Please make sure all fields are filled in';
+  static const String is_sample = 'Is Sample';
 }

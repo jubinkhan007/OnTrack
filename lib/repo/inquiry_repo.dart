@@ -1,7 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:tmbi/widgets/file_attachment.dart';
 
 import '../models/models.dart';
 
@@ -26,6 +25,49 @@ class InquiryRepo {
       );
       debugPrint("RESPONSE#${response.data}");
       return InitDataCreateInq.fromJson(response.data);
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
+  Future<bool> saveInquiry(
+      String companyId,
+      String inquiryId,
+      String inquiryName,
+      String inquiryDesc,
+      String isSample,
+      String neededDate,
+      String priorityId,
+      String customerId,
+      String customerName,
+      String userId,
+      List<String> fileNames) async {
+    try {
+      final headers = {
+        "compid": companyId,
+        "custid": customerId,
+        "inqrid": inquiryId,
+        "inqrname": inquiryName,
+        "inqrdesc": inquiryDesc,
+        "salmpleflag": isSample,
+        "needdate": neededDate,
+        "userid": userId,
+        "custname": customerName,
+        "priorityid": priorityId,
+        "files": fileNames.length
+      };
+
+      // set file names
+      for (var i = 0; i < fileNames.length; i++) {
+        headers['picture${i + 1}'] = fileNames[i];
+      }
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
     } on DioException catch (error) {
       throw Exception(error);
     }
@@ -64,8 +106,7 @@ class InquiryRepo {
     }
   }
 
-  Future<List<Map<String, dynamic>>> saveImages(
-      List<Uint8List> files, List<String> paths,
+  Future<List<Map<String, dynamic>>> saveImages(List<ImageFile> files,
       {String id = "XXXX", String dbId = "XXX"}) async {
     final formData = FormData();
     formData.fields.add(MapEntry('challanno', id));
@@ -75,8 +116,8 @@ class InquiryRepo {
       formData.files.add(MapEntry(
         'files',
         MultipartFile.fromBytes(
-          files[i],
-          filename: paths[i], // Provide a unique filename for each file
+          files[i].file,
+          filename: files[i].name, // Provide a unique filename for each file
         ),
       ));
     }
@@ -96,9 +137,9 @@ class InquiryRepo {
           throw Exception('Unexpected response format:: ${response.data}');
         }
       } else {
-        throw Exception('Received an error with status code:: ${response.data}');
+        throw Exception(
+            'Received an error with status code:: ${response.data}');
       }
-
     } on DioException catch (error) {
       debugPrint("File upload failed:: $error");
       throw Exception(error);

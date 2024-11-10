@@ -6,7 +6,9 @@ import 'package:tmbi/widgets/text_view_custom.dart';
 import '../config/strings.dart';
 
 class DateSelectionView extends StatefulWidget {
-  const DateSelectionView({super.key});
+  final Function(String?) onDateSelected;
+
+  const DateSelectionView({super.key, required this.onDateSelected});
 
   @override
   State<DateSelectionView> createState() => _DateSelectionViewState();
@@ -38,7 +40,11 @@ class _DateSelectionViewState extends State<DateSelectionView> {
                   isTextAlignCenter: false,
                   isBold: false),
             ),
-             Icon(Icons.calendar_today, color: Palette.semiTv, size: Converts.c16,),
+            Icon(
+              Icons.calendar_today,
+              color: Palette.semiTv,
+              size: Converts.c16,
+            ),
           ],
         ),
       ),
@@ -56,6 +62,7 @@ class _DateSelectionViewState extends State<DateSelectionView> {
       setState(() {
         _selectedDate =
             "${pickedDate.toLocal()}".split(' ')[0]; // Format the date
+        widget.onDateSelected(_selectedDate);
       });
     }
   }

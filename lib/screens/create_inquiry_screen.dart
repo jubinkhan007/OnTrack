@@ -30,6 +30,42 @@ class CreateInquiryScreen extends StatelessWidget {
     final TextEditingController descriptionController = TextEditingController();
     final TextEditingController customerNameController =
         TextEditingController();
+    // selected date
+    String isSample = "N";
+    String selectedDate = "";
+    String mCompanyId = "";
+    String mInquiryId = "";
+    String mPriorityId = "";
+    Customer? mCustomer;
+    // files
+    final List<ImageFile> imageFiles = [];
+    // methods
+    showMessage(String message) {
+      final snackBar = SnackBar(
+        content: TextViewCustom(
+          text: message,
+          tvColor: Colors.white,
+          fontSize: Converts.c16,
+          isBold: false,
+          isRubik: true,
+          isTextAlignCenter: false,
+        ),
+        action: SnackBarAction(
+          label: 'Ok',
+          onPressed: () {},
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
+    resetFields() {
+      isSample = "N";
+      selectedDate = "";
+      mCompanyId = "";
+      mInquiryId = "";
+      mPriorityId = "";
+      mCustomer = null;
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -38,7 +74,10 @@ class CreateInquiryScreen extends StatelessWidget {
         if (inquiryViewModel.uiState == UiState.loading) {
           return const Center(child: CircularProgressIndicator());
         } else if (inquiryViewModel.uiState == UiState.error) {
-          return Center(child: Text("Error: ${inquiryViewModel.message}"));
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showMessage("Error: ${inquiryViewModel.message}");
+          });
+          //return Center(child: Text("Error: ${inquiryViewModel.message}"));
         }
 
         return CustomScrollView(
@@ -82,6 +121,9 @@ class CreateInquiryScreen extends StatelessWidget {
                         hasBorder: true,
                         hint: "Type Title Here; Example: Need Sample ...",
                         controller: titleController),
+                    CheckBox(onChecked: (value) {
+                      isSample = value ?? "N";
+                    }),
                     SizedBox(
                       height: Converts.c16,
                     ),
@@ -132,6 +174,7 @@ class CreateInquiryScreen extends StatelessWidget {
                             inquiryViewModel.initDataCreateInq!.company!,
                             companyId));
                         debugPrint("COMPANY_ID# $companyId");
+                        mCompanyId = companyId;
                       },
                     ),
                     SizedBox(
@@ -154,6 +197,7 @@ class CreateInquiryScreen extends StatelessWidget {
                       onCustomerSelected: (customer) {
                         if (customer != null) {
                           debugPrint("CUSTOMER#${customer.name}");
+                          mCustomer = customer;
                         }
                         //_showCustomerDialog(context, _customers);
                       },
@@ -182,6 +226,7 @@ class CreateInquiryScreen extends StatelessWidget {
                           : [],
                       onChanged: (inquiryId) {
                         debugPrint("COMPANY_ID# $inquiryId");
+                        mInquiryId = inquiryId;
                       },
                     ),
                     SizedBox(
@@ -207,6 +252,7 @@ class CreateInquiryScreen extends StatelessWidget {
                           : [],
                       onChanged: (priorityId) {
                         debugPrint("PRIORITY_ID# $priorityId");
+                        mPriorityId = priorityId;
                       },
                     ),
                     SizedBox(
@@ -225,7 +271,13 @@ class CreateInquiryScreen extends StatelessWidget {
                       height: Converts.c8,
                     ),
 
-                    const DateSelectionView(),
+                    DateSelectionView(
+                      onDateSelected: (date) {
+                        if (date != null) {
+                          selectedDate = date;
+                        }
+                      },
+                    ),
 
                     SizedBox(
                       height: Converts.c8,
@@ -245,7 +297,11 @@ class CreateInquiryScreen extends StatelessWidget {
                     FileAttachment(
                       onFileAttached: (files) {
                         if (files != null) {
-                          debugPrint(files.length.toString());
+                          if (imageFiles.isNotEmpty) {
+                            imageFiles.clear();
+                          }
+                          imageFiles.addAll(files);
+                          debugPrint(imageFiles.length.toString());
                         }
                       },
                     ),
@@ -262,11 +318,49 @@ class CreateInquiryScreen extends StatelessWidget {
                       cornerRadius: 4,
                       stockColor: Palette.mainColor,
                       onTap: () async {
-                        debugPrint("TITLE#${titleController.text}");
-                        debugPrint("DESCRIPTION#${descriptionController.text}");
-                        debugPrint(
-                            "CUSTOMER_NAME#${customerNameController.text}");
-                        await inquiryViewModel.getInitDataForCreateInquiry();
+                        if (mCompanyId != "" &&
+                            mInquiryId != "" &&
+                            mPriorityId != "" &&
+                            selectedDate != "" &&
+                            titleController.value != null &&
+                            descriptionController.value != null &&
+                            mCustomer != null) {
+                          // upload files, if any are selected
+                          if (imageFiles.isNotEmpty) {
+                            await inquiryViewModel.saveFiles(imageFiles);
+                          }
+                          // save inquiry
+                          await inquiryViewModel.saveInquiry(
+                              mCompanyId,
+                              mInquiryId,
+                              titleController.text,
+                              descriptionController.text,
+                              isSample,
+                              selectedDate,
+                              mPriorityId,
+                              mCustomer!.id.toString(),
+                              mCustomer!.id != 0
+                                  ? mCustomer!.name.toString()
+                                  : customerNameController.text.toString(),
+                              "340553",
+                              inquiryViewModel.files);
+
+                          // check the status of the request
+                          if (inquiryViewModel.isSavedInquiry != null) {
+                            if (inquiryViewModel.isSavedInquiry!) {
+                              showMessage(Strings.data_saved_successfully);
+                              //Navigator.pop(context);
+                            } else {
+                              showMessage(Strings.failed_to_save_the_data);
+                            }
+                          } else {
+                            showMessage(Strings.data_is_missing);
+                          }
+                          // reset all values to default
+                          resetFields();
+                        } else {
+                          showMessage(Strings.some_values_are_missing);
+                        }
                       },
                     ),
                     SizedBox(
