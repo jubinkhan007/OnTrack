@@ -37,14 +37,27 @@ class ComboBoxInquiryType extends StatelessWidget {
           fontSize: Converts.c16,
           isBold: false,
         ),
+        isExpanded: true,
         items: items.map((InquiryType inquiryTYpe) {
           return DropdownMenuItem<String>(
             value: inquiryTYpe.id.toString(),
-            child: TextViewCustom(
+            child: /*TextViewCustom(
               text: inquiryTYpe.name ?? "",
               tvColor: Palette.normalTv,
               fontSize: Converts.c16,
               isBold: false,
+            ),*/
+                Text(
+              inquiryTYpe.name ?? "",
+              overflow: TextOverflow.ellipsis,
+              // Add this line to handle overflow
+              maxLines: 1,
+              softWrap: true,
+              // Optional: ensure only one line is shown
+              style: TextStyle(
+                color: Palette.normalTv,
+                fontSize: Converts.c16,
+              ),
             ),
           );
         }).toList(),

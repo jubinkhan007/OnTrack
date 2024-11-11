@@ -10,11 +10,10 @@ class ComboBoxCompany extends StatelessWidget {
   final List<Company> items;
   final Function(String) onChanged;
 
-  const ComboBoxCompany(
-      {super.key,
-      required this.hintName,
-      required this.items,
-      required this.onChanged});
+  const ComboBoxCompany({super.key,
+    required this.hintName,
+    required this.items,
+    required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +30,7 @@ class ComboBoxCompany extends StatelessWidget {
           filled: true, // Optional: background color
           fillColor: Colors.white, // Background color
         ),
+        isExpanded: true,
         hint: TextViewCustom(
           text: hintName,
           tvColor: Palette.semiTv,
@@ -40,11 +40,22 @@ class ComboBoxCompany extends StatelessWidget {
         items: items.map((Company company) {
           return DropdownMenuItem<String>(
             value: company.id.toString(),
-            child: TextViewCustom(
+            child: /*TextViewCustom(
               text: company.name ?? "",
               tvColor: Palette.normalTv,
               fontSize: Converts.c16,
               isBold: false,
+            )*/Text(
+              company.name ?? "",
+              overflow: TextOverflow.ellipsis,
+              // Add this line to handle overflow
+              maxLines: 1,
+              softWrap: true,
+              // Optional: ensure only one line is shown
+              style: TextStyle(
+                color: Palette.normalTv,
+                fontSize: Converts.c16,
+              ),
             ),
           );
         }).toList(),

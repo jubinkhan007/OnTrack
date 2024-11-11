@@ -88,7 +88,6 @@ class InquiryRepo {
   Future<List<InquiryResponse>> getInquiries() async {
     try {
       final response = await dio.get("");
-      debugPrint("RESPONSE#${response.data}");
       // check if the response data is a Map and contains 'queries'
       if (response.data is Map<String, dynamic> &&
           response.data.containsKey('queries')) {

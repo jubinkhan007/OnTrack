@@ -119,12 +119,12 @@ class _CustomerAddViewState extends State<CustomerAddView> {
         width: Converts.c48,
         height: Converts.c48,
         decoration: BoxDecoration(
-          color: Palette.tabColor,
+          color: Palette.mainColor,
           borderRadius: BorderRadius.all(
             Radius.circular(Converts.c24),
           ),
           border: Border.all(
-            color: Palette.tabColor, // Border color
+            color: Palette.mainColor, // Border color
             width: 1.0, // Border width
           ),
         ),

@@ -22,7 +22,7 @@ class _DateSelectionViewState extends State<DateSelectionView> {
     return GestureDetector(
       onTap: () => _selectDate(context),
       child: Container(
-        padding: EdgeInsets.all(Converts.c16),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           border: Border.all(
             color: Colors.grey, // Border color

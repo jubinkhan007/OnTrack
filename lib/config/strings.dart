@@ -65,5 +65,6 @@ class Strings {
   static const String failed_to_save_the_data = 'Failed to save the data';
   static const String data_is_missing = 'Data is missing or null';
   static const String some_values_are_missing = 'Some values are missing. Please make sure all fields are filled in';
-  static const String is_sample = 'Is Sample';
+  static const String is_sample = 'Sample';
+  static const String tap = 'Tap';
 }

@@ -81,7 +81,7 @@ class InquiryList extends StatelessWidget {
                   ),
                   TextViewCustom(
                     text: inquiryResponse.customer != null
-                        ? inquiryResponse.customer!.name!
+                        ? inquiryResponse.customer.name!
                         : "",
                     fontSize: Converts.c16,
                     tvColor: Palette.semiTv,
@@ -164,7 +164,7 @@ class InquiryList extends StatelessWidget {
                   ButtonCircularIcon(
                     height: Converts.c32,
                     width: Converts.c72,
-                    text: inquiryResponse.commentCount.toString(),
+                    text: inquiryResponse.comment.count.toString(),
                     iconData: Icons.chat,
                     radius: Converts.c20,
                     bgColor: Palette.iconColor,
@@ -180,7 +180,7 @@ class InquiryList extends StatelessWidget {
                   ButtonCircularIcon(
                     height: Converts.c32,
                     width: Converts.c72,
-                    text: inquiryResponse.attachmentCount.toString(),
+                    text: inquiryResponse.attachment.count.toString(),
                     iconData: Icons.attach_file,
                     radius: Converts.c20,
                     bgColor: Palette.iconColor,

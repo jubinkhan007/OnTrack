@@ -31,6 +31,7 @@ class ComboBoxPriority extends StatelessWidget {
           filled: true, // Optional: background color
           fillColor: Colors.white, // Background color
         ),
+        isExpanded: true,
         hint: TextViewCustom(
           text: hintName,
           tvColor: Palette.semiTv,
@@ -40,11 +41,23 @@ class ComboBoxPriority extends StatelessWidget {
         items: items.map((Priority priority) {
           return DropdownMenuItem<String>(
             value: priority.id.toString(),
-            child: TextViewCustom(
+            child: /*TextViewCustom(
               text: priority.name ?? "",
               tvColor: Palette.normalTv,
               fontSize: Converts.c16,
               isBold: false,
+            ),*/
+                Text(
+              priority.name ?? "",
+              overflow: TextOverflow.ellipsis,
+              // Add this line to handle overflow
+              maxLines: 1,
+              softWrap: true,
+              // Optional: ensure only one line is shown
+              style: TextStyle(
+                color: Palette.normalTv,
+                fontSize: Converts.c16,
+              ),
             ),
           );
         }).toList(),

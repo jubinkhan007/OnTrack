@@ -109,23 +109,29 @@ class CreateInquiryScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// title
                     SizedBox(
                       height: Converts.c8,
                     ),
+                    /// title & is sample
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFieldInquiry(
+                              fontSize: Converts.c20,
+                              fontColor: Colors.black,
+                              hintColor: Palette.semiTv,
+                              hasBorder: true,
+                              hint: "Type Title Here",
+                              controller: titleController),
+                        ),
+                        CheckBox(onChecked: (value) {
+                          isSample = value ?? "N";
+                        }),
+                      ],
+                    ),
 
-                    TextFieldInquiry(
-                        fontSize: Converts.c20,
-                        fontColor: Colors.black,
-                        hintColor: Palette.semiTv,
-                        hasBorder: true,
-                        hint: "Type Title Here; Example: Need Sample ...",
-                        controller: titleController),
-                    CheckBox(onChecked: (value) {
-                      isSample = value ?? "N";
-                    }),
                     SizedBox(
-                      height: Converts.c16,
+                      height: Converts.c8,
                     ),
 
                     /// description
@@ -151,34 +157,98 @@ class CreateInquiryScreen extends StatelessWidget {
                       height: Converts.c8,
                     ),
 
-                    /// company name
-                    TextViewCustom(
-                        text: Strings.company,
-                        fontSize: Converts.c16,
-                        tvColor: Palette.normalTv,
-                        isRubik: false,
-                        isBold: true),
-                    SizedBox(
-                      height: Converts.c8,
-                    ),
-                    ComboBoxCompany(
-                      hintName: Strings.select_company,
-                      items: inquiryViewModel.initDataCreateInq != null
-                          ? inquiryViewModel.initDataCreateInq!.company != null
-                              ? inquiryViewModel.initDataCreateInq!.company!
-                              : []
-                          : [],
-                      onChanged: (companyId) {
-                        if (customers.isNotEmpty) customers.clear();
-                        customers.addAll(_getCustomers(
-                            inquiryViewModel.initDataCreateInq!.company!,
-                            companyId));
-                        debugPrint("COMPANY_ID# $companyId");
-                        mCompanyId = companyId;
-                      },
-                    ),
-                    SizedBox(
-                      height: Converts.c8,
+                    /// company name && inquiry type
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          /// company name
+                          SizedBox(
+                            width: Converts.c192,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextViewCustom(
+                                    text: Strings.company,
+                                    fontSize: Converts.c16,
+                                    tvColor: Palette.normalTv,
+                                    isRubik: false,
+                                    isBold: true),
+                                SizedBox(
+                                  height: Converts.c8,
+                                ),
+                                ComboBoxCompany(
+                                  hintName: Strings.select_company,
+                                  items:
+                                      inquiryViewModel.initDataCreateInq != null
+                                          ? inquiryViewModel.initDataCreateInq!
+                                                      .company !=
+                                                  null
+                                              ? inquiryViewModel
+                                                  .initDataCreateInq!.company!
+                                              : []
+                                          : [],
+                                  onChanged: (companyId) {
+                                    if (customers.isNotEmpty) customers.clear();
+                                    customers.addAll(_getCustomers(
+                                        inquiryViewModel
+                                            .initDataCreateInq!.company!,
+                                        companyId));
+                                    debugPrint("COMPANY_ID# $companyId");
+                                    mCompanyId = companyId;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: Converts.c8,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: Converts.c8,
+                          ),
+
+                          /// inquiry type
+                          SizedBox(
+                            width: Converts.c192,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextViewCustom(
+                                    text: Strings.inquiry_type,
+                                    fontSize: Converts.c16,
+                                    tvColor: Palette.normalTv,
+                                    isRubik: false,
+                                    isBold: true),
+                                SizedBox(
+                                  height: Converts.c8,
+                                ),
+                                ComboBoxInquiryType(
+                                  hintName: Strings.inquiry_type,
+                                  items:
+                                      inquiryViewModel.initDataCreateInq != null
+                                          ? inquiryViewModel.initDataCreateInq!
+                                                      .inquiryType !=
+                                                  null
+                                              ? inquiryViewModel
+                                                  .initDataCreateInq!
+                                                  .inquiryType!
+                                              : []
+                                          : [],
+                                  onChanged: (inquiryId) {
+                                    debugPrint("COMPANY_ID# $inquiryId");
+                                    mInquiryId = inquiryId;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: Converts.c8,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                     /// buyer/customer
@@ -206,81 +276,83 @@ class CreateInquiryScreen extends StatelessWidget {
                       height: Converts.c8,
                     ),
 
-                    /// inquiry type
-                    TextViewCustom(
-                        text: Strings.inquiry_type,
-                        fontSize: Converts.c16,
-                        tvColor: Palette.normalTv,
-                        isRubik: false,
-                        isBold: true),
-                    SizedBox(
-                      height: Converts.c8,
-                    ),
-                    ComboBoxInquiryType(
-                      hintName: Strings.inquiry_type,
-                      items: inquiryViewModel.initDataCreateInq != null
-                          ? inquiryViewModel.initDataCreateInq!.inquiryType !=
-                                  null
-                              ? inquiryViewModel.initDataCreateInq!.inquiryType!
-                              : []
-                          : [],
-                      onChanged: (inquiryId) {
-                        debugPrint("COMPANY_ID# $inquiryId");
-                        mInquiryId = inquiryId;
-                      },
-                    ),
-                    SizedBox(
-                      height: Converts.c8,
-                    ),
+                    /// priority && end date
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          /// priority
+                          SizedBox(
+                            width: Converts.c192,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextViewCustom(
+                                    text: Strings.priority,
+                                    fontSize: Converts.c16,
+                                    tvColor: Palette.normalTv,
+                                    isRubik: false,
+                                    isBold: true),
+                                SizedBox(
+                                  height: Converts.c8,
+                                ),
+                                ComboBoxPriority(
+                                  hintName: Strings.select_priority,
+                                  items:
+                                      inquiryViewModel.initDataCreateInq != null
+                                          ? inquiryViewModel.initDataCreateInq!
+                                                      .priority !=
+                                                  null
+                                              ? inquiryViewModel
+                                                  .initDataCreateInq!.priority!
+                                              : []
+                                          : [],
+                                  onChanged: (priorityId) {
+                                    debugPrint("PRIORITY_ID# $priorityId");
+                                    mPriorityId = priorityId;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: Converts.c8,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: Converts.c8,
+                          ),
 
-                    /// priority
-                    TextViewCustom(
-                        text: Strings.priority,
-                        fontSize: Converts.c16,
-                        tvColor: Palette.normalTv,
-                        isRubik: false,
-                        isBold: true),
-                    SizedBox(
-                      height: Converts.c8,
-                    ),
-                    ComboBoxPriority(
-                      hintName: Strings.select_priority,
-                      items: inquiryViewModel.initDataCreateInq != null
-                          ? inquiryViewModel.initDataCreateInq!.priority != null
-                              ? inquiryViewModel.initDataCreateInq!.priority!
-                              : []
-                          : [],
-                      onChanged: (priorityId) {
-                        debugPrint("PRIORITY_ID# $priorityId");
-                        mPriorityId = priorityId;
-                      },
-                    ),
-                    SizedBox(
-                      height: Converts.c8,
-                    ),
-
-                    /// end date
-                    TextViewCustom(
-                        text: Strings.end_date,
-                        fontSize: Converts.c16,
-                        tvColor: Palette.normalTv,
-                        isRubik: false,
-                        isBold: true),
-
-                    SizedBox(
-                      height: Converts.c8,
-                    ),
-
-                    DateSelectionView(
-                      onDateSelected: (date) {
-                        if (date != null) {
-                          selectedDate = date;
-                        }
-                      },
-                    ),
-
-                    SizedBox(
-                      height: Converts.c8,
+                          /// end date
+                          SizedBox(
+                            width: Converts.c192,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextViewCustom(
+                                    text: Strings.end_date,
+                                    fontSize: Converts.c16,
+                                    tvColor: Palette.normalTv,
+                                    isRubik: false,
+                                    isBold: true),
+                                SizedBox(
+                                  height: Converts.c8,
+                                ),
+                                DateSelectionView(
+                                  onDateSelected: (date) {
+                                    if (date != null) {
+                                      selectedDate = date;
+                                    }
+                                  },
+                                ),
+                                SizedBox(
+                                  height: Converts.c8,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                     /// file
