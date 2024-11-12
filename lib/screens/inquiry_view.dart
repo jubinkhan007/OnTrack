@@ -12,6 +12,16 @@ class InquiryView extends StatelessWidget {
 
   const InquiryView({super.key, required this.inquiryResponse});
 
+  int _countPendingTask() {
+    int count = 0;
+    for (var value in inquiryResponse.tasks) {
+      if (value.isUpdated) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,7 +153,8 @@ class InquiryView extends StatelessWidget {
                           radius: 8,
                           bgColor: Palette.tabColor,
                           hasOpacity: false,
-                          text: "2/3",
+                          text:
+                              "${_countPendingTask()}/${inquiryResponse.tasks.length}",
                           fontSize: Converts.c12,
                           tvColor: Colors.white,
                           isTvBold: true,
@@ -205,5 +216,4 @@ class InquiryView extends StatelessWidget {
       ],
     );
   }
-
 }

@@ -36,8 +36,11 @@ class Strings {
   static const String inquiry_type = 'Inquiry type';
   static const String priority = 'Priority';
   static const String select_priority = 'Select priority';
+  static const String select = 'Select';
   static const String tasks = 'Tasks';
   static const String create_new = 'Create New';
+  static const String update_task = 'Update Task';
+  static const String update = 'Update';
   static const String description = 'Description';
   static const String enter_brief_description = 'Enter Brief Description';
   static const String buyer_customer = 'Customer';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tmbi/screens/dialog/update_task_dialog.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
@@ -9,6 +10,15 @@ class TaskList extends StatelessWidget {
   final Task task;
 
   const TaskList({super.key, required this.task});
+
+  _showDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return UpdateTaskDialog();
+        }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +100,11 @@ class TaskList extends StatelessWidget {
                           : task.isUpdated
                               ? "Complete"
                               : "Pending",
-                      onTap: () {}),
+                      onTap: () {
+                        if (task.hasAccess && !task.isUpdated) {
+                          _showDialog(context);
+                        }
+                      }),
                   SizedBox(
                     width: Converts.c8,
                   ),
@@ -130,5 +144,6 @@ class TaskList extends StatelessWidget {
         ],
       ),
     );
+
   }
 }
