@@ -33,6 +33,14 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
           commentId: args,
         ),
       );
+    case AttachmentViewScreen.routeName:
+      final args = routeSettings.arguments as String;
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => AttachmentViewScreen(
+          attachmentId: args,
+        ),
+      );
     default:
       return MaterialPageRoute(
           settings: routeSettings,

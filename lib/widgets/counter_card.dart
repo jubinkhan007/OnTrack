@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/models/counter.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../config/strings.dart';
+import '../network/ui_state.dart';
+import '../viewmodel/viewmodel.dart';
 
 class CounterCard extends StatefulWidget {
   final List<Counter> counters;
@@ -18,6 +21,8 @@ class CounterCard extends StatefulWidget {
 class _CounterCardState extends State<CounterCard> {
   @override
   Widget build(BuildContext context) {
+    final counterViewModel = Provider.of<CounterViewModel>(context);
+
     return SizedBox(
       height: Converts.c72,
       child: ListView.builder(
@@ -25,11 +30,59 @@ class _CounterCardState extends State<CounterCard> {
         scrollDirection: Axis.horizontal,
         itemCount: widget.counters.length,
         itemBuilder: (BuildContext context, int index) {
+          //String mCounter = widget.counters[index].count;
+          final counter = widget.counters[index];
           return GestureDetector(
-            onTap: () {
-              setState(() {
-                widget.counters[index].isSelected =  !widget.counters[index].isSelected;
+            onTap: () async {
+              /*setState(() {
+                widget.counters[index].isSelected = true;
+                //!widget.counters[index].isSelected;
+                widget.counters[index].isLoading = true;
               });
+              // after 3 seconds, set isLoading to false
+              Future.delayed(const Duration(seconds: 3), () {
+                setState(() {
+                  widget.counters[index].isLoading = false;
+                  if (widget.counters[index].isSelected) {
+                    // after 3 seconds, set isSelected to false
+                    Future.delayed(const Duration(seconds: 3), () {
+                      setState(() {
+                        widget.counters[index].isSelected = false;
+                      });
+                    });
+                  }
+                });
+              });*/
+              setState(() {
+                counter.isLoading = true;
+              });
+              // call the getCount function to fetch the count
+              await counterViewModel.getCount();
+
+              // update the state based on the uiState
+              if (counterViewModel.uiState == UiState.success &&
+                  counterViewModel.counter != null) {
+                setState(() {
+                  counter.isLoading = false;
+                  counter.isSelected = true;
+                  counter.count = counterViewModel.counter!;
+                  debugPrint("Total inquiries count: ${counter.count}");
+                  // hide counter value
+                  Future.delayed(const Duration(seconds: 3), () {
+                    setState(() {
+                      counter.isSelected = false;
+                    });
+                  });
+                });
+              } else {
+                setState(() {
+                  counter.isLoading = false;
+                  counter.isSelected = false;
+                  if (counterViewModel.uiState == UiState.error) {
+                    debugPrint("${counterViewModel.message}");
+                  }
+                });
+              }
             },
             child: Container(
               decoration: BoxDecoration(
@@ -56,32 +109,46 @@ class _CounterCardState extends State<CounterCard> {
                           : Palette.normalTv,
                       isRubik: false,
                       isBold: false),
-                  widget.counters[index].isSelected
-                      ? TextViewCustom(
-                          text: widget.counters[index].count.toString(),
-                          fontSize: Converts.c24,
-                          tvColor: widget.counters[index].isDelayed
-                              ? Colors.white
-                              : Palette.normalTv,
-                          isBold: true)
-                      : Row(
-                          children: [
-                            Icon(
-                              Icons.touch_app_outlined,
-                              size: Converts.c24,
-                              color: widget.counters[index].isDelayed
+                  counter.isLoading
+                      ? Padding(
+                          padding: EdgeInsets.all(Converts.c8),
+                          child: SizedBox(
+                            height: Converts.c16,
+                            width: Converts.c16,
+                            child: const CircularProgressIndicator(
+                              strokeWidth:
+                                  2, // Smaller stroke for a finer spinner
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          ),
+                        )
+                      : counter.isSelected
+                          ? TextViewCustom(
+                              text: counter.count,
+                              fontSize: Converts.c24,
+                              tvColor: counter.isDelayed
                                   ? Colors.white
                                   : Palette.normalTv,
-                            ),
-                            TextViewCustom(
-                                text: Strings.tap,
-                                fontSize: Converts.c24,
-                                tvColor: widget.counters[index].isDelayed
-                                    ? Colors.white
-                                    : Palette.normalTv,
-                                isBold: true),
-                          ],
-                        )
+                              isBold: true)
+                          : Row(
+                              children: [
+                                Icon(
+                                  Icons.touch_app_outlined,
+                                  size: Converts.c24,
+                                  color: counter.isDelayed
+                                      ? Colors.white
+                                      : Palette.normalTv,
+                                ),
+                                TextViewCustom(
+                                    text: Strings.tap,
+                                    fontSize: Converts.c24,
+                                    tvColor: counter.isDelayed
+                                        ? Colors.white
+                                        : Palette.normalTv,
+                                    isBold: true),
+                              ],
+                            )
                 ],
               ),
             ),

@@ -1,13 +1,15 @@
 class Counter {
   final String title;
-  final int count;
+  String count;
   bool isDelayed;
   bool isSelected;
+  bool isLoading;
 
   Counter({
     required this.title,
-    required this.count,
+    this.count = "0",
     this.isDelayed = false,
-    this.isSelected = false
+    this.isSelected = false,
+    this.isLoading = false
   });
 }

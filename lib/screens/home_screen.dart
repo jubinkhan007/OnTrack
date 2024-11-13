@@ -4,6 +4,7 @@ import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/data/counter_item.dart';
+import 'package:tmbi/screens/attachment_view_screen.dart';
 import 'package:tmbi/screens/comment_screen.dart';
 import 'package:tmbi/screens/create_inquiry_screen.dart';
 import 'package:tmbi/screens/inquiry_view.dart';
@@ -181,8 +182,14 @@ class HomeScreen extends StatelessWidget {
               );
             } else if (inquiryViewModel.uiState == UiState.error) {
               return SliverToBoxAdapter(
-                child: Center(
-                  child: Text("Error: ${inquiryViewModel.message}"),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: Converts.c120,
+                  ),
+                  child: ErrorContainer(
+                      message: inquiryViewModel.message != null
+                          ? inquiryViewModel.message!
+                          : Strings.something_went_wrong),
                 ),
               );
             }
@@ -210,7 +217,13 @@ class HomeScreen extends StatelessWidget {
                               arguments: id, // Pass the list as arguments
                             );
                           },
-                          onAttachmentTap: (id) {},
+                          onAttachmentTap: (id) {
+                            Navigator.pushNamed(
+                              context,
+                              AttachmentViewScreen.routeName,
+                              arguments: id, // Pass the list as arguments
+                            );
+                          },
                         );
                       },
                       childCount: inquiryViewModel.inquiries!
@@ -222,22 +235,10 @@ class HomeScreen extends StatelessWidget {
                       padding: EdgeInsets.only(
                         top: Converts.c120,
                       ),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              'assets/ic_empty_2.png',
-                              height: Converts.c120,
-                              width: Converts.c120,
-                            ),
-                            TextViewCustom(
-                                text: Strings.no_data_found,
-                                fontSize: Converts.c16,
-                                tvColor: Palette.semiTv,
-                                isBold: false)
-                          ],
-                        ),
-                      ),
+                      child: ErrorContainer(
+                          message: inquiryViewModel.message != null
+                              ? inquiryViewModel.message!
+                              : Strings.something_went_wrong),
                     ),
                   );
           }),

@@ -5,6 +5,7 @@ import 'package:tmbi/widgets/widgets.dart';
 import '../config/converts.dart';
 import '../config/palette.dart';
 import '../models/models.dart';
+import '../screens/attachment_view_screen.dart';
 
 class TaskList extends StatelessWidget {
   final Task task;
@@ -16,8 +17,7 @@ class TaskList extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return UpdateTaskDialog();
-        }
-    );
+        });
   }
 
   @override
@@ -124,18 +124,33 @@ class TaskList extends StatelessWidget {
               // icon
               Row(
                 children: [
-                  Icon(
-                    Icons.note,
-                    color: Colors.black,
-                    size: Converts.c20,
+                  Padding(
+                    padding: EdgeInsets.all(Converts.c8),
+                    child: Icon(
+                      Icons.note,
+                      color: Colors.black,
+                      size: Converts.c20,
+                    ),
                   ),
                   SizedBox(
-                    width: Converts.c8,
+                    width: Converts.c16,
                   ),
-                  Icon(
-                    Icons.attach_file,
-                    color: Colors.black,
-                    size: Converts.c20,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AttachmentViewScreen.routeName,
+                        arguments: task.id, // Pass the list as arguments
+                      );
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(Converts.c8),
+                      child: Icon(
+                        Icons.attach_file,
+                        color: Colors.black,
+                        size: Converts.c20,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -144,6 +159,5 @@ class TaskList extends StatelessWidget {
         ],
       ),
     );
-
   }
 }

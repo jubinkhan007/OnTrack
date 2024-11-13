@@ -43,6 +43,13 @@ class MyApp extends StatelessWidget {
                     dio: ApiService().provideDio()),
               ),
             ),
+            ChangeNotifierProvider(
+              create: (_) => CounterViewModel(
+                inquiryRepo: InquiryRepo(
+                    fileDio: ApiService().fileUploadDio(),
+                    dio: ApiService().provideDio()),
+              ),
+            ),
           ],
           child: MaterialApp(
               title: 'Kick Track',

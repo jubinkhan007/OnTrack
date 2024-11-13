@@ -73,38 +73,6 @@ class InquiryRepo {
     }
   }
 
-  /*Future<InquiryResponse> getInquiries() async {
-    try {
-      final response = await dio.get(
-        "",
-      );
-      debugPrint("RESPONSE#${response.data}");
-      return InquiryResponse.fromJson(response.data);
-    } on DioException catch (error) {
-      throw Exception(error);
-    }
-  }*/
-
-  Future<List<InquiryResponse>> getInquiries() async {
-    try {
-      final response = await dio.get("");
-      // check if the response data is a Map and contains 'queries'
-      if (response.data is Map<String, dynamic> &&
-          response.data.containsKey('queries')) {
-        final List<dynamic> inquiriesJson = response.data['queries'] ?? [];
-        // map the list of JSON objects to InquiryResponse objects
-        return inquiriesJson
-            .map((json) => InquiryResponse.fromJson(json))
-            .toList();
-      } else {
-        return [];
-      }
-    } on DioException catch (error) {
-      debugPrint("error fetching inquiries: $error");
-      throw Exception(error);
-    }
-  }
-
   Future<List<Map<String, dynamic>>> saveImages(List<ImageFile> files,
       {String id = "XXXX", String dbId = "XXX"}) async {
     final formData = FormData();
@@ -141,6 +109,56 @@ class InquiryRepo {
       }
     } on DioException catch (error) {
       debugPrint("File upload failed:: $error");
+      throw Exception(error);
+    }
+  }
+
+  /// DEMO API
+
+  Future<List<InquiryResponse>> getInquiries() async {
+    try {
+      final response = await dio.get("6a2a424e53a984ad4ea3");
+      // check if the response data is a Map and contains 'queries'
+      if (response.data is Map<String, dynamic> &&
+          response.data.containsKey('queries')) {
+        final List<dynamic> inquiriesJson = response.data['queries'] ?? [];
+        // map the list of JSON objects to InquiryResponse objects
+        return inquiriesJson
+            .map((json) => InquiryResponse.fromJson(json))
+            .toList();
+      } else {
+        return [];
+      }
+    } on DioException catch (error) {
+      debugPrint("Error fetching inquiries: $error");
+      throw Exception(error);
+    }
+  }
+
+  Future<String> getCount() async {
+    try {
+      final response = await dio.get("0b50f5fa2214288a80f0");
+      // check if the response data is a Map and contains the 'count' key
+      if (response.data is Map<String, dynamic> &&
+          response.data.containsKey('count')) {
+        // access the count value
+        final String count = response.data['count'];
+        return count;
+      } else {
+        return "0"; // return 0 if 'count' is not available
+      }
+    } on DioException catch (error) {
+      debugPrint("Error fetching count: $error");
+      throw Exception(error);
+    }
+  }
+
+  Future<AttachmentViewResponse> getAttachments() async {
+    try {
+      final response = await dio.get("5dedf78a78969c55cfb3");
+      debugPrint("RESPONSE#${response.data}");
+      return AttachmentViewResponse.fromJson(response.data);
+    } on DioException catch (error) {
       throw Exception(error);
     }
   }

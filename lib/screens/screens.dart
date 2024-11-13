@@ -6,3 +6,4 @@ export 'intro_screen.dart';
 export 'login_screen.dart';
 export 'comment_screen.dart';
 export 'dialog/update_task_dialog.dart';
+export 'attachment_view_screen.dart';

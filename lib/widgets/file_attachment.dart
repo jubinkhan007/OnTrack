@@ -149,7 +149,8 @@ class _FileAttachmentState extends State<FileAttachment> {
   }
 
   Future<void> _pickImages() async {
-    if (await _checkPermissions(Permission.storage)) {
+    //if (await _checkPermissions(Permission.storage)) {
+    if (await _checkPermissions(Permission.photos)) {
       final List<XFile>? selectedImages = await _picker.pickMultiImage();
       if (selectedImages != null && selectedImages.isNotEmpty) {
         // process selected image
