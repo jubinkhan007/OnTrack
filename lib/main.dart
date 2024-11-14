@@ -26,28 +26,35 @@ class MyApp extends StatelessWidget {
           providers: [
             ChangeNotifierProvider(
               create: (_) => LoginViewmodel(
-                loginRepo: LoginRepo(dio: ApiService().provideDio()),
+                //loginRepo: LoginRepo(dio: ApiService().provideDio()),
+                loginRepo: LoginRepo(dio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").provideDio()),
               ),
             ),
             ChangeNotifierProvider(
               create: (_) => InquiryCreateViewModel(
                 inquiryRepo: InquiryRepo(
-                    fileDio: ApiService().fileUploadDio(),
-                    dio: ApiService().provideDio()),
+                    //fileDio: ApiService().fileUploadDio(),
+                    fileDio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").fileUploadDio(),
+                    //dio: ApiService().provideDio()),
+                    dio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").provideDio()),
               ),
             ),
             ChangeNotifierProvider(
               create: (_) => InquiryViewModel(
                 inquiryRepo: InquiryRepo(
-                    fileDio: ApiService().fileUploadDio(),
-                    dio: ApiService().provideDio()),
+                    //fileDio: ApiService().fileUploadDio(),
+                    fileDio: ApiService("https://api.npoint.io/").fileUploadDio(),
+                    //dio: ApiService().provideDio()),
+                    dio: ApiService("https://api.npoint.io/").provideDio()),
               ),
             ),
             ChangeNotifierProvider(
               create: (_) => CounterViewModel(
                 inquiryRepo: InquiryRepo(
-                    fileDio: ApiService().fileUploadDio(),
-                    dio: ApiService().provideDio()),
+                    //fileDio: ApiService().fileUploadDio(),
+                    fileDio: ApiService("https://api.npoint.io/").fileUploadDio(),
+                    //dio: ApiService().provideDio()),
+                    dio: ApiService("https://api.npoint.io/").provideDio()),
               ),
             ),
           ],

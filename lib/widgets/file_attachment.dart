@@ -191,15 +191,19 @@ class _FileAttachmentState extends State<FileAttachment> {
   }
 
   Future<void> _pickImages() async {
-    // check for photo permission only for android version 33
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-
     bool isStoragePermission = true;
     bool isPhotosPermission = true;
 
-    if (androidInfo.version.sdkInt >= 33) {
-      isPhotosPermission = await _checkPermissions(Permission.photos);
+    // check for photo permission only for android version 33
+    if (Platform.isAndroid) {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+
+      if (androidInfo.version.sdkInt >= 33) {
+        isPhotosPermission = await _checkPermissions(Permission.photos);
+      } else {
+        isStoragePermission = await _checkPermissions(Permission.storage);
+      }
     } else {
       isStoragePermission = await _checkPermissions(Permission.storage);
     }
