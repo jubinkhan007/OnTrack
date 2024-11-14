@@ -70,4 +70,7 @@ class Strings {
   static const String some_values_are_missing = 'Some values are missing. Please make sure all fields are filled in';
   static const String is_sample = 'Sample';
   static const String tap = 'Tap';
+  static const String good_night = 'Good Night';
+  static const String good_afternoon = 'Good Afternoon';
+  static const String good_morning = 'Good Morning';
 }

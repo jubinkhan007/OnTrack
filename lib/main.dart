@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
                   useMaterial3: true,
                   scaffoldBackgroundColor: Palette.scaffold),
               home:
-                  /*const LoginScreen()*/ /*const IntroScreen()*/ const HomeScreen()),
+                  const LoginScreen() /*const IntroScreen()*/ /*const HomeScreen()*/),
         );
       },
     );

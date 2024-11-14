@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
+import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/network/ui_state.dart';
 import 'package:tmbi/screens/screens.dart';
@@ -144,10 +145,12 @@ class _LoginOperationState extends State<LoginOperation> {
                         _idTEController.text, _passwordTEController.text);
                     if (loginViewModel.uiState == UiState.error) {
                       _showMessage(loginViewModel.message.toString());
-                    } else if (loginViewModel.uiState == UiState.success) {
+                    }
+                    else if (loginViewModel.uiState == UiState.success) {
                       if (loginViewModel.userResponse != null) {
                         if (loginViewModel.userResponse!.users != null) {
                           if (loginViewModel.userResponse!.users!.isNotEmpty) {
+                            await SPHelper().saveUser(loginViewModel.userResponse!);
                             Navigator.pushNamed(
                               context,
                               HomeScreen.routeName,
@@ -160,7 +163,8 @@ class _LoginOperationState extends State<LoginOperation> {
                           _showMessage(Strings.login_validation_error);
                         }
                       }
-                    } else {
+                    }
+                    else {
                       _showMessage(Strings.something_went_wrong);
                     }
                   }
@@ -193,4 +197,5 @@ class _LoginOperationState extends State<LoginOperation> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
 }

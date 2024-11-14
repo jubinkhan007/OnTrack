@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
+import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/data/counter_item.dart';
+import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/screens/attachment_view_screen.dart';
 import 'package:tmbi/screens/comment_screen.dart';
 import 'package:tmbi/screens/create_inquiry_screen.dart';
@@ -82,16 +85,20 @@ class HomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                FutureBuilder<String>(
+                    future: _getUserName(),
+                    builder: (context, snapshot) {
+                      return TextViewCustom(
+                        text: "${getGreeting()} ${snapshot.data}",
+                        fontSize: Converts.c20,
+                        tvColor: Colors.white,
+                        isRubik: false,
+                        isTextAlignCenter: false,
+                        isBold: true,
+                      );
+                    }),
                 TextViewCustom(
-                  text: "Good Morning Salauddin",
-                  fontSize: Converts.c20,
-                  tvColor: Colors.white,
-                  isRubik: false,
-                  isTextAlignCenter: false,
-                  isBold: true,
-                ),
-                TextViewCustom(
-                  text: "08 Oct,2024",
+                  text: DateTime.now().toFormattedString(),
                   fontSize: Converts.c16,
                   isTextAlignCenter: false,
                   tvColor: Colors.white,
@@ -252,5 +259,29 @@ class HomeScreen extends StatelessWidget {
 
   Future<void> _getInquiries(InquiryViewModel inquiryViewModel) async {
     await inquiryViewModel.getInquiries();
+  }
+
+  Future<String> _getUserName() async {
+    try {
+      UserResponse? userResponse = await SPHelper().getUser();
+      String name =
+          userResponse != null ? userResponse.users![0].staffName! : "";
+      return name;
+    } catch (e) {
+      return "";
+    }
+  }
+
+  String getGreeting() {
+    // current hour of the day
+    int currentHour = DateTime.now().hour;
+    // determine the greeting based on the time of day
+    if (currentHour >= 5 && currentHour < 12) {
+      return Strings.good_morning;
+    } else if (currentHour >= 12 && currentHour < 18) {
+      return Strings.good_afternoon;
+    } else {
+      return Strings.good_night;
+    }
   }
 }

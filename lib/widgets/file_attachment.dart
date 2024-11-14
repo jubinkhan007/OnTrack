@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -8,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
+import 'package:tmbi/widgets/text_view_custom.dart';
 
 class FileAttachment extends StatefulWidget {
   final Function(List<ImageFile>?) onFileAttached;
@@ -22,6 +24,8 @@ class _FileAttachmentState extends State<FileAttachment> {
   final ImagePicker _picker = ImagePicker();
   final List<XFile> _imageFiles = [];
   final List<ImageFile> _imageFileList = [];
+  bool isMultipleImageSelected = false;
+  String totalImageSelected = "0";
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +70,7 @@ class _FileAttachmentState extends State<FileAttachment> {
                         _imageFileList.removeAt(index);
                         // pass files
                         widget.onFileAttached(_imageFileList);
+                        totalImageSelected = _imageFileList.length.toString();
                       });
                     },
                     child: Container(
@@ -92,9 +97,15 @@ class _FileAttachmentState extends State<FileAttachment> {
   Widget _attachmentButton() {
     return GestureDetector(
       onTap: () {
+        setState(() {
+          isMultipleImageSelected = true;
+        });
         _captureImage();
       },
       onDoubleTap: () {
+        setState(() {
+          isMultipleImageSelected = true;
+        });
         _pickImages();
       },
       child: Container(
@@ -110,11 +121,34 @@ class _FileAttachmentState extends State<FileAttachment> {
             width: 1.0, // Border width
           ),
         ),
-        child: Icon(
-          Icons.add_a_photo,
-          size: Converts.c24,
-          color: Palette.tabColor,
-        ),
+        child: !isMultipleImageSelected
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_a_photo,
+                    size: Converts.c24,
+                    color: Palette.tabColor,
+                  ),
+                  TextViewCustom(
+                      text: "($totalImageSelected/5)",
+                      fontSize: Converts.c8,
+                      tvColor: Palette.iconColor,
+                      isRubik: false,
+                      isBold: true),
+                ],
+              )
+            : Center(
+                child: SizedBox(
+                  height: Converts.c16,
+                  width: Converts.c16,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2, // Smaller stroke for a finer spinner
+                    valueColor: AlwaysStoppedAnimation<Color>(Palette.tabColor),
+                  ),
+                ),
+              ),
       ),
     );
   }
@@ -143,27 +177,58 @@ class _FileAttachmentState extends State<FileAttachment> {
           _imageFiles.add(image);
           // pass files
           widget.onFileAttached(_imageFileList);
+          totalImageSelected = _imageFileList.length.toString();
+          // hide loading
+          isMultipleImageSelected = false;
+        });
+      } else {
+        // hide loading
+        setState(() {
+          isMultipleImageSelected = false;
         });
       }
     }
   }
 
   Future<void> _pickImages() async {
-    //if (await _checkPermissions(Permission.storage)) {
-    if (await _checkPermissions(Permission.photos)) {
+    // check for photo permission only for android version 33
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+
+    bool isStoragePermission = true;
+    bool isPhotosPermission = true;
+
+    if (androidInfo.version.sdkInt >= 33) {
+      isPhotosPermission = await _checkPermissions(Permission.photos);
+    } else {
+      isStoragePermission = await _checkPermissions(Permission.storage);
+    }
+    // if all permission granted
+    if (isPhotosPermission && isStoragePermission) {
       final List<XFile>? selectedImages = await _picker.pickMultiImage();
       if (selectedImages != null && selectedImages.isNotEmpty) {
+        // if more than 5 images are selected
+        List<XFile> limitedImages = selectedImages.length > 5
+            ? selectedImages.sublist(0, 5) // to get the first 5 images
+            : selectedImages;
         // process selected image
-        for (var image in selectedImages) {
+        for (var image in limitedImages) {
           File file = File(image.path);
           Uint8List compressedBytes = await _processImage(file);
           _imageFileList.add(ImageFile(compressedBytes, _fileName("340553")));
         }
-
         setState(() {
-          _imageFiles.addAll(selectedImages);
+          _imageFiles.addAll(limitedImages);
           // pass files
           widget.onFileAttached(_imageFileList);
+          totalImageSelected = _imageFileList.length.toString();
+          // hide loading
+          isMultipleImageSelected = false;
+        });
+      } else {
+        // hide loading
+        setState(() {
+          isMultipleImageSelected = false;
         });
       }
     }
@@ -171,21 +236,27 @@ class _FileAttachmentState extends State<FileAttachment> {
 
   Future<Uint8List> _processImage(File imageFile,
       {minWidth = 800, minHeight = 800, quality = 50}) async {
-    // Step 1: read image as bytes and decode
-    img.Image? image = img.decodeImage(await imageFile.readAsBytes());
-    if (image != null) {
-      // Step 2: resize the image (keep aspect ratio)
-      img.Image resizedImage =
-          img.copyResize(image, width: minWidth, height: minHeight);
+    try {
+      // Step 1: read image as bytes and decode
+      img.Image? image = img.decodeImage(await imageFile.readAsBytes());
 
-      // Step 3: compress the image (JPEG format, quality set to 85 for reasonable compression)
-      Uint8List resizedBytes =
-          Uint8List.fromList(img.encodeJpg(resizedImage, quality: quality));
+      if (image != null) {
+        // Step 2: resize the image (keep aspect ratio)
+        img.Image resizedImage =
+            img.copyResize(image, width: minWidth, height: minHeight);
 
-      // Step 4: optionally, compress further using `flutter_image_compress`
-      return await _compressImage(resizedBytes);
+        // Step 3: compress the image (JPEG format, quality set for reasonable compression)
+        Uint8List resizedBytes =
+            Uint8List.fromList(img.encodeJpg(resizedImage, quality: quality));
+
+        // Step 4: optionally, compress further using `flutter_image_compress`
+        return await _compressImage(resizedBytes);
+      }
+    } catch (e) {
+      debugPrint("ERROR::${e.toString()}");
+      return await imageFile.readAsBytes();
     }
-    throw Exception("Failed to decode image.");
+    return await imageFile.readAsBytes();
   }
 
   Future<Uint8List> _compressImage(Uint8List imageBytes,

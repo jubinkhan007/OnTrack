@@ -34,25 +34,6 @@ class _CounterCardState extends State<CounterCard> {
           final counter = widget.counters[index];
           return GestureDetector(
             onTap: () async {
-              /*setState(() {
-                widget.counters[index].isSelected = true;
-                //!widget.counters[index].isSelected;
-                widget.counters[index].isLoading = true;
-              });
-              // after 3 seconds, set isLoading to false
-              Future.delayed(const Duration(seconds: 3), () {
-                setState(() {
-                  widget.counters[index].isLoading = false;
-                  if (widget.counters[index].isSelected) {
-                    // after 3 seconds, set isSelected to false
-                    Future.delayed(const Duration(seconds: 3), () {
-                      setState(() {
-                        widget.counters[index].isSelected = false;
-                      });
-                    });
-                  }
-                });
-              });*/
               setState(() {
                 counter.isLoading = true;
               });
