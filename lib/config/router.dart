@@ -41,6 +41,12 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
           attachmentId: args,
         ),
       );
+    case NoteScreen.routeName:
+      //final args = routeSettings.arguments as String;
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => const NoteScreen(),
+      );
     default:
       return MaterialPageRoute(
           settings: routeSettings,

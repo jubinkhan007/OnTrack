@@ -162,4 +162,14 @@ class InquiryRepo {
       throw Exception(error);
     }
   }
+
+  Future<NoteResponse> getNotes() async {
+    try {
+      final response = await dio.get("2a2ecc5de4a852629548");
+      debugPrint("RESPONSE#${response.data}");
+      return NoteResponse.fromJson(response.data);
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
 }

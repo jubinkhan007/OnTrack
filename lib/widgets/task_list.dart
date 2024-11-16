@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/screens/dialog/update_task_dialog.dart';
+import 'package:tmbi/screens/note_screen.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
@@ -124,12 +125,25 @@ class TaskList extends StatelessWidget {
               // icon
               Row(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.all(Converts.c8),
-                    child: Icon(
-                      Icons.note,
-                      color: Colors.black,
-                      size: Converts.c20,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        NoteScreen.routeName,
+                        //arguments: task.id, // Pass the list as arguments
+                      );
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: Converts.c16,
+                        right: Converts.c8,
+                        top: Converts.c8,
+                      ),
+                      child: Icon(
+                        Icons.note,
+                        color: Colors.black,
+                        size: Converts.c20,
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -144,7 +158,11 @@ class TaskList extends StatelessWidget {
                       );
                     },
                     child: Padding(
-                      padding: EdgeInsets.all(Converts.c8),
+                      padding: EdgeInsets.only(
+                        left: Converts.c8,
+                        right: Converts.c8,
+                        top: Converts.c8,
+                      ),
                       child: Icon(
                         Icons.attach_file,
                         color: Colors.black,

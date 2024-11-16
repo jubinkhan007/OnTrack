@@ -28,6 +28,7 @@ class Strings {
   static const String inquiry_view = 'Inquiry View';
   static const String pending = 'Pending';
   static const String attachment = 'Attachment';
+  static const String notes = 'Notes';
   static const String project = 'Project';
   static const String owner = 'Owner';
   static const String overview = 'Overview';
@@ -73,4 +74,5 @@ class Strings {
   static const String good_night = 'Good Night';
   static const String good_afternoon = 'Good Afternoon';
   static const String good_morning = 'Good Morning';
+  static const String available_soon = 'This feature will be available soon.';
 }

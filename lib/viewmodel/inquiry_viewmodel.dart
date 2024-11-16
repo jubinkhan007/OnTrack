@@ -26,6 +26,11 @@ class InquiryViewModel extends ChangeNotifier {
 
   AttachmentViewResponse? get attachmentViewResponse => _attachmentViewResponse;
 
+  /// note list
+  NoteResponse? _noteResponse;
+
+  NoteResponse? get noteResponse => _noteResponse;
+
   /// ui state
   UiState _uiState = UiState.init;
 
@@ -56,8 +61,24 @@ class InquiryViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       final response = await inquiryRepo.getAttachments();
-      //final response = _getDemoTasks(); // test purpose
       _attachmentViewResponse = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> getNotes() async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.getNotes();
+      _noteResponse = response;
       _uiState = UiState.success;
     } catch (error) {
       _uiState = UiState.error;

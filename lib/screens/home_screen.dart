@@ -70,7 +70,9 @@ class HomeScreen extends StatelessWidget {
                 Icons.folder_open,
                 color: Colors.black,
               ),
-              onPressed: () {},
+              onPressed: () {
+                context.showMessage(Strings.available_soon);
+              },
             ),
           ],
         ),
@@ -109,7 +111,9 @@ class HomeScreen extends StatelessWidget {
             floating: true,
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.showMessage(Strings.available_soon);
+                },
                 icon: Icon(
                   Icons.notifications,
                   color: Colors.white,
@@ -284,5 +288,4 @@ class HomeScreen extends StatelessWidget {
       return Strings.good_night;
     }
   }
-
 }
