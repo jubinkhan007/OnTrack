@@ -1,7 +1,7 @@
 class Strings {
   Strings._();
 
-  static const String app_name = "Kick Track";
+  static const String app_name = "Track All";
   static const String transforming_inquiries =
       "Transforming Inquiries\ninto Actionable Tasks";
   static const String buyer_inquiry_task_management =

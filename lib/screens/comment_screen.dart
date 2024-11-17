@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/models/comment_response.dart';
 
 import '../config/converts.dart';
 import '../config/strings.dart';
+import '../network/ui_state.dart';
+import '../viewmodel/viewmodel.dart';
 import '../widgets/widgets.dart';
 
 class CommentScreen extends StatefulWidget {
@@ -18,8 +21,7 @@ class CommentScreen extends StatefulWidget {
 
 class _CommentScreenState extends State<CommentScreen> {
   final TextEditingController _bodyController = TextEditingController();
-
-  final List<Comments> comments = [
+  /*final List<Comments> comments = [
     Comments(
         id: "1",
         body:
@@ -39,7 +41,8 @@ class _CommentScreenState extends State<CommentScreen> {
         time: "9:12 AM",
         date: "9 Oct, 24",
         owner: Owner(id: "103", name: "Md. Alamgir")),
-  ];
+  ];*/
+  final List<Comments> comments = [];
 
   void _addComment() {
     if (_bodyController.text.isNotEmpty) {
@@ -54,6 +57,22 @@ class _CommentScreenState extends State<CommentScreen> {
         _bodyController.clear();
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _bodyController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // delay the call to `getComments()` using addPostFrameCallback
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // fetch the comments after the widget has been built
+      Provider.of<InquiryViewModel>(context, listen: false).getComments();
+    });
   }
 
   @override
@@ -78,47 +97,76 @@ class _CommentScreenState extends State<CommentScreen> {
           },
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: comments.length,
-              itemBuilder: (context, index) {
-                return CommentList(comments: comments[index]);
-              },
+      body: Consumer<InquiryViewModel>(
+          builder: (context, inquiryViewModel, child) {
+        // handle loading view
+        if (inquiryViewModel.uiState == UiState.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } // handle error view
+        else if (inquiryViewModel.uiState == UiState.error) {
+          return Center(
+            child: ErrorContainer(
+                message: inquiryViewModel.message != null
+                    ? inquiryViewModel.message!
+                    : Strings.something_went_wrong),
+          );
+        }
+        // null check for noteResponse and notes
+        if (inquiryViewModel.commentResponse?.comments?.isEmpty ?? true) {
+          /*return Center(
+            child: ErrorContainer(
+                message: inquiryViewModel.message != null
+                    ? inquiryViewModel.message!
+                    : Strings.no_data_found),
+          );*/
+        } else {
+          if (comments.isEmpty) {
+            comments.addAll(inquiryViewModel.commentResponse!.comments!);
+          }
+        }
+
+        return Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: comments.length,
+                itemBuilder: (context, index) {
+                  return CommentList(comments: comments[index]);
+                },
+              ),
             ),
-          ),
-          const Divider(
-            thickness: 0.5, // Thickness of the line
-            color: Palette.semiNormalTv, // Color of the line
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: Converts.c8, right: Converts.c8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextFieldInquiry(
-                    fontSize: Converts.c16,
-                    fontColor: Palette.normalTv,
-                    hintColor: Palette.semiNormalTv,
-                    hint: Strings.type_a_comment,
-                    controller: _bodyController,
-                    maxLine: 1,
-                    hasBorder: false,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.send,
-                    color: Palette.mainColor,
-                  ),
-                  onPressed: _addComment,
-                ),
-              ],
+            const Divider(
+              thickness: 0.5, // Thickness of the line
+              color: Palette.semiNormalTv, // Color of the line
             ),
-          ),
-        ],
-      ),
+            Padding(
+              padding: EdgeInsets.only(left: Converts.c8, right: Converts.c8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextFieldInquiry(
+                      fontSize: Converts.c16,
+                      fontColor: Palette.normalTv,
+                      hintColor: Palette.semiNormalTv,
+                      hint: Strings.type_a_comment,
+                      controller: _bodyController,
+                      maxLine: 1,
+                      hasBorder: false,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.send,
+                      color: Palette.mainColor,
+                    ),
+                    onPressed: _addComment,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }

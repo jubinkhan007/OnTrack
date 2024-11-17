@@ -31,6 +31,11 @@ class InquiryViewModel extends ChangeNotifier {
 
   NoteResponse? get noteResponse => _noteResponse;
 
+  /// comment
+  CommentResponse? _commentResponse;
+
+  CommentResponse? get commentResponse => _commentResponse;
+
   /// ui state
   UiState _uiState = UiState.init;
 
@@ -79,6 +84,23 @@ class InquiryViewModel extends ChangeNotifier {
     try {
       final response = await inquiryRepo.getNotes();
       _noteResponse = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> getComments() async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.getComments();
+      _commentResponse = response;
       _uiState = UiState.success;
     } catch (error) {
       _uiState = UiState.error;

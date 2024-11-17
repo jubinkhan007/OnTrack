@@ -172,4 +172,15 @@ class InquiryRepo {
       throw Exception(error);
     }
   }
+
+  Future<CommentResponse> getComments() async {
+    try {
+      final response = await dio.get("c129b21084d6208d2753");
+      debugPrint("RESPONSE#${response.data}");
+      return CommentResponse.fromJson(response.data);
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
 }
