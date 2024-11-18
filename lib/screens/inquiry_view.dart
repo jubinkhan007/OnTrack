@@ -9,8 +9,9 @@ import '../widgets/widgets.dart';
 class InquiryView extends StatelessWidget {
   static const String routeName = '/inquiry_screen';
   final InquiryResponse inquiryResponse;
+  final String flag;
 
-  const InquiryView({super.key, required this.inquiryResponse});
+  const InquiryView({super.key, required this.inquiryResponse, required this.flag});
 
   int _countPendingTask() {
     int count = 0;
@@ -99,7 +100,7 @@ class InquiryView extends StatelessWidget {
                           radius: 8,
                           bgColor: Palette.iconColor,
                           hasOpacity: false,
-                          text: Strings.pending,
+                          text: flag,
                           fontSize: Converts.c16,
                           tvColor: Colors.white,
                           onTap: () {}),
@@ -174,6 +175,7 @@ class InquiryView extends StatelessWidget {
               final task = inquiryResponse.tasks[index];
               return TaskList(
                 task: task,
+                inquiryId: inquiryResponse.id.toString(),
               );
             },
             childCount: inquiryResponse

@@ -28,6 +28,7 @@ class UserResponse {
 
 class User {
   String? staffName;
+  String? staffId;
   String? designation;
   String? mailId;
 
@@ -35,6 +36,7 @@ class User {
 
   User.fromJson(Map<String, dynamic> json) {
     staffName = json['STAFF_NAME'];
+    staffId = json['STAFFID'];
     designation = json['DESIGNATION'];
     mailId = json['MAILID'];
   }
@@ -42,6 +44,7 @@ class User {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['STAFF_NAME'] = staffName;
+    data['STAFFID'] = staffId;
     data['DESIGNATION'] = designation;
     data['MAILID'] = mailId;
     return data;

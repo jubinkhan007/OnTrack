@@ -273,4 +273,5 @@ class InquiryViewModel extends ChangeNotifier {
     // map the list of JSON objects to InquiryResponse objects
     return jsonList.map((json) => InquiryResponse.fromJson(json)).toList();
   }
+
 }

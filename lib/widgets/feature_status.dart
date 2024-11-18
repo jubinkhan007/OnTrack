@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/home_flag.dart';
+import 'package:tmbi/screens/home_screen.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
@@ -7,7 +8,7 @@ import '../config/palette.dart';
 
 class FeatureStatus extends StatefulWidget {
   final List<HomeFlag> homeFlags;
-  final Function(String) onPressed;
+  final Function(String, Status) onPressed;
 
   const FeatureStatus({
     super.key,
@@ -31,7 +32,7 @@ class _FeatureStatusState extends State<FeatureStatus> {
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
             onTap: () {
-              widget.onPressed(widget.homeFlags[index].title);
+              widget.onPressed(widget.homeFlags[index].title, widget.homeFlags[index].status);
               setState(() {
                 for (int i = 0; i < widget.homeFlags.length; i++) {
                   if (i == index) {

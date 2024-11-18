@@ -44,6 +44,7 @@ class InquiryRepo {
       List<String> fileNames) async {
     try {
       final headers = {
+        "dtype": "INQUERY",
         "compid": companyId,
         "custid": customerId,
         "inqrid": inquiryId,
@@ -53,6 +54,41 @@ class InquiryRepo {
         "needdate": neededDate,
         "userid": userId,
         "custname": customerName,
+        "priorityid": priorityId,
+        "files": fileNames.length
+      };
+
+      // set file names
+      for (var i = 0; i < fileNames.length; i++) {
+        headers['picture${i + 1}'] = fileNames[i];
+      }
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
+
+  Future<bool> updateTask(
+      String inquiryId,
+      String taskId,
+      String priorityId,
+      String description,
+      String userId,
+      List<String> fileNames) async {
+    try {
+      final headers = {
+        "dtype": "TASK",
+        "inqrid": inquiryId,
+        "taskid": taskId,
+        "inqrdesc": description,
+        "userid": userId,
         "priorityid": priorityId,
         "files": fileNames.length
       };

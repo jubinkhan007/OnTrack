@@ -10,14 +10,15 @@ import '../screens/attachment_view_screen.dart';
 
 class TaskList extends StatelessWidget {
   final Task task;
+  final String inquiryId;
 
-  const TaskList({super.key, required this.task});
+  const TaskList({super.key, required this.task, required this.inquiryId});
 
   _showDialog(BuildContext context) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return UpdateTaskDialog();
+          return UpdateTaskDialog(task: task, inquiryId: inquiryId,);
         });
   }
 

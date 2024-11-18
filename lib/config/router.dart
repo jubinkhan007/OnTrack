@@ -12,14 +12,20 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const LoginScreen());
     case HomeScreen.routeName:
+      final args = routeSettings.arguments as String;
       return MaterialPageRoute(
-          settings: routeSettings, builder: (_) => const HomeScreen());
+          settings: routeSettings, builder: (_) => HomeScreen(staffId: args,));
     case InquiryView.routeName:
-      final args = routeSettings.arguments as InquiryResponse;
+      /*final args = routeSettings.arguments as InquiryResponse;
+      final args1 = routeSettings.arguments as String;*/
+      final arguments = routeSettings.arguments as Map<String, dynamic>;
+      final inquiryResponse = arguments['inquiryResponse'] as InquiryResponse;
+      final flag = arguments['flag'] as String;
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => InquiryView(
-          inquiryResponse: args,
+          inquiryResponse: inquiryResponse,
+          flag: flag,
         ),
       );
     case CreateInquiryScreen.routeName:

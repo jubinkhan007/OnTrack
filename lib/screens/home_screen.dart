@@ -18,17 +18,21 @@ import 'package:tmbi/widgets/widgets.dart';
 import '../models/models.dart';
 import '../network/ui_state.dart';
 
+enum Status { DELAYED, PENDING, UPCOMING, COMPLETED }
+
 class HomeScreen extends StatelessWidget {
   static const String routeName = '/home_screen';
+  final String staffId;
+  String selectedFlag = "";
 
-  const HomeScreen({super.key});
+  HomeScreen({super.key, required this.staffId});
 
   @override
   Widget build(BuildContext context) {
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      inquiryViewModel.getInquiries("1", "340553");
+      inquiryViewModel.getInquiries(getFlag(Status.PENDING), staffId);
     });
 
     return Scaffold(
@@ -168,19 +172,10 @@ class HomeScreen extends StatelessWidget {
                 ),
                 FeatureStatus(
                   homeFlags: HomeFlagItem().homeFlagItems,
-                  onPressed: (value) async {
-                    String flag = "2";
-                    if (value == "Delayed") {
-                      flag = "1";
-                    } else if (value == "Pending") {
-                      flag = "2";
-                    } else if (value == "Upcoming") {
-                      flag = "3";
-                    } else {
-                      flag = "4";
-                    }
-                    await _getInquiries(inquiryViewModel, flag);
-                    debugPrint(value);
+                  onPressed: (value, flag) async {
+                    selectedFlag = value;
+                    await _getInquiries(inquiryViewModel, getFlag(flag));
+                    //debugPrint(value);
                   },
                 )
               ],
@@ -214,6 +209,21 @@ class HomeScreen extends StatelessWidget {
                 ),
               );
             }
+            // null check
+            if (inquiryViewModel.inquiries?.isEmpty ?? true) {
+              return SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: Converts.c120,
+                  ),
+                  child: ErrorContainer(
+                      message: inquiryViewModel.message != null
+                          ? inquiryViewModel.message!
+                          : Strings.no_data_found),
+                ),
+              );
+            }
+
             return inquiryViewModel.inquiries != null &&
                     inquiryViewModel.inquiries!.isNotEmpty
                 ? SliverList(
@@ -224,11 +234,19 @@ class HomeScreen extends StatelessWidget {
                         return InquiryList(
                           inquiryResponse: inquiryResponse,
                           onTap: () {
-                            Navigator.pushNamed(
+                            /*Navigator.pushNamed(
                               context,
                               InquiryView.routeName,
                               arguments:
-                                  inquiryResponse, // Pass the list as arguments
+                                  inquiryResponse,
+                            );*/
+                            Navigator.pushNamed(
+                              context,
+                              InquiryView.routeName,
+                              arguments: {
+                                'inquiryResponse': inquiryResponse,
+                                'flag': selectedFlag,
+                              },
                             );
                           },
                           onCommentTap: (id) {
@@ -271,8 +289,9 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _getInquiries(InquiryViewModel inquiryViewModel, String flag) async {
-    await inquiryViewModel.getInquiries(flag, "340553");
+  Future<void> _getInquiries(
+      InquiryViewModel inquiryViewModel, String flag) async {
+    await inquiryViewModel.getInquiries(flag, staffId);
   }
 
   Future<String> _getUserName() async {
@@ -296,6 +315,20 @@ class HomeScreen extends StatelessWidget {
       return Strings.good_afternoon;
     } else {
       return Strings.good_night;
+    }
+  }
+
+  String getFlag(Status status) {
+    switch (status) {
+      case Status.DELAYED:
+        return "1";
+      case Status.PENDING:
+        return "2";
+      case Status.UPCOMING:
+        return "3";
+      case Status.COMPLETED:
+      default:
+        return "4"; // Default flag value for unknown or unhandled statuses
     }
   }
 }

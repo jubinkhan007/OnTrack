@@ -154,6 +154,7 @@ class _LoginOperationState extends State<LoginOperation> {
                             Navigator.pushNamed(
                               context,
                               HomeScreen.routeName,
+                              arguments: loginViewModel.userResponse!.users![0].staffId
                             );
                           } else {
                             _showMessage(

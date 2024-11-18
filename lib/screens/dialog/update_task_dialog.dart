@@ -11,12 +11,13 @@ import '../../widgets/widgets.dart';
 
 class UpdateTaskDialog extends StatelessWidget {
   final TextEditingController descriptionController = TextEditingController();
-
+  final Task task;
+  final String inquiryId;
   // files
   final List<ImageFile> imageFiles = [];
   String mStatusId = "";
 
-  UpdateTaskDialog({super.key});
+  UpdateTaskDialog({super.key, required this.task, required this.inquiryId});
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +73,10 @@ class UpdateTaskDialog extends StatelessWidget {
               ComboBoxPriority(
                 hintName: Strings.select,
                 items: [
-                  Priority(id: 1, name: "Update"),
-                  Priority(id: 2, name: "Completed"),
+                  Priority(id: 1, name: "Started"),
+                  Priority(id: 3, name: "In Progress"),
+                  Priority(id: 5, name: "Hold"),
+                  Priority(id: 7, name: "Completed"),
                 ],
                 onChanged: (id) {
                   mStatusId = id;
@@ -141,16 +144,11 @@ class UpdateTaskDialog extends StatelessWidget {
                         await inquiryViewModel.saveFiles(imageFiles);
                       }
                       // save inquiry
-                      await inquiryViewModel.saveInquiry(
-                          "X",
-                          mStatusId,
-                          "X",
+                      await inquiryViewModel.updateTask(
+                          inquiryId,
+                          task.id.toString(),
+                          "0",
                           descriptionController.text,
-                          "X",
-                          "2024-11-15",
-                          "X",
-                          "X",
-                          "X",
                           "340553",
                           inquiryViewModel.files);
                       if (inquiryViewModel.uiState == UiState.error) {
