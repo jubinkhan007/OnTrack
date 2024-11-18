@@ -164,14 +164,15 @@ class InquiryList extends StatelessWidget {
                   ButtonCircularIcon(
                     height: Converts.c32,
                     width: Converts.c72,
-                    text: inquiryResponse.comment.count.toString(),
+                    text: inquiryResponse.comment.count,
                     iconData: Icons.chat,
                     radius: Converts.c20,
                     bgColor: Palette.iconColor,
                     hasOpacity: false,
                     tvColor: Colors.white,
                     onTap: () {
-                      onCommentTap(inquiryResponse.id);
+                      //onCommentTap(inquiryResponse.id);
+                      onCommentTap(inquiryResponse.id.toString());
                     },
                   ),
                   SizedBox(
@@ -180,14 +181,15 @@ class InquiryList extends StatelessWidget {
                   ButtonCircularIcon(
                     height: Converts.c32,
                     width: Converts.c72,
-                    text: inquiryResponse.attachment.count.toString(),
+                    text: inquiryResponse.attachment.count,
                     iconData: Icons.attach_file,
                     radius: Converts.c20,
                     bgColor: Palette.iconColor,
                     hasOpacity: false,
                     tvColor: Colors.white,
                     onTap: () {
-                      onAttachmentTap(inquiryResponse.id);
+                      //onAttachmentTap(inquiryResponse.id);
+                      onAttachmentTap(inquiryResponse.id.toString());
                     },
                   ),
                 ],

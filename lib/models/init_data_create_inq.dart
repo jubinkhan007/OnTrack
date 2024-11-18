@@ -334,7 +334,8 @@ class Company {
 }
 
 class Customer {
-  int? id; // Changed to int
+  //int? id; // Changed to int
+  String? id;
   String? name;
   bool? isVerified;
 
@@ -343,7 +344,7 @@ class Customer {
   Customer.fromJson(Map<String, dynamic> json) {
     id = json['ID']; // Ensure this is an integer in JSON
     name = json['NAME'];
-    isVerified = json['IS_VERIFIED'];
+    isVerified = json['IS_VERIFIED'] == 'true';
   }
 
   Map<String, dynamic> toJson() {

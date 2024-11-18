@@ -74,10 +74,13 @@ class CreateInquiryScreen extends StatelessWidget {
         if (inquiryViewModel.uiState == UiState.loading) {
           return const Center(child: CircularProgressIndicator());
         } else if (inquiryViewModel.uiState == UiState.error) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
+          /*WidgetsBinding.instance.addPostFrameCallback((_) {
             showMessage("Error: ${inquiryViewModel.message}");
-          });
-          //return Center(child: Text("Error: ${inquiryViewModel.message}"));
+          });*/
+          return ErrorContainer(
+              message: inquiryViewModel.message != null
+                  ? inquiryViewModel.message!
+                  : Strings.something_went_wrong);
         }
 
         return CustomScrollView(

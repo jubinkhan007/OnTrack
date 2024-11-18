@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      inquiryViewModel.getInquiries();
+      inquiryViewModel.getInquiries("1", "340553");
     });
 
     return Scaffold(
@@ -169,7 +169,17 @@ class HomeScreen extends StatelessWidget {
                 FeatureStatus(
                   homeFlags: HomeFlagItem().homeFlagItems,
                   onPressed: (value) async {
-                    await _getInquiries(inquiryViewModel);
+                    String flag = "2";
+                    if (value == "Delayed") {
+                      flag = "1";
+                    } else if (value == "Pending") {
+                      flag = "2";
+                    } else if (value == "Upcoming") {
+                      flag = "3";
+                    } else {
+                      flag = "4";
+                    }
+                    await _getInquiries(inquiryViewModel, flag);
                     debugPrint(value);
                   },
                 )
@@ -261,8 +271,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _getInquiries(InquiryViewModel inquiryViewModel) async {
-    await inquiryViewModel.getInquiries();
+  Future<void> _getInquiries(InquiryViewModel inquiryViewModel, String flag) async {
+    await inquiryViewModel.getInquiries(flag, "340553");
   }
 
   Future<String> _getUserName() async {

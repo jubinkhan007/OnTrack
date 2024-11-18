@@ -5,11 +5,12 @@ import '../widgets/widgets.dart';
 import 'converts.dart';
 
 extension DateTimeFormatter on DateTime {
-  String toFormattedString() {
-    DateFormat dateFormat = DateFormat("dd MMM, yyyy");
+  String toFormattedString({isFullYear = false}) {
+    DateFormat dateFormat = isFullYear ? DateFormat("dd MMM, yyyy") : DateFormat("dd MMM, yy");
     return dateFormat.format(this);
   }
 }
+
 
 extension SnackbarExtension on BuildContext {
   void showMessage(String message) {

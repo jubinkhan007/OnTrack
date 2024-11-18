@@ -106,7 +106,7 @@ class InquiryView extends StatelessWidget {
                       SizedBox(
                         width: Converts.c8,
                       ),
-                      ButtonCircularIcon(
+                      /*ButtonCircularIcon(
                           height: Converts.c32,
                           width: Converts.c96,
                           radius: 8,
@@ -119,7 +119,7 @@ class InquiryView extends StatelessWidget {
                           onTap: () {}),
                       SizedBox(
                         width: Converts.c8,
-                      ),
+                      ),*/
                       ButtonCircularIcon(
                           height: Converts.c32,
                           width: Converts.c152,

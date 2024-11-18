@@ -69,6 +69,26 @@ class TaskList extends StatelessWidget {
               ),
             ],
           ),
+          /// date
+          Row(
+            children: [
+              Icon(
+                Icons.date_range,
+                color: Palette.semiTv,
+                size: Converts.c20,
+              ),
+              SizedBox(
+                width: Converts.c8,
+              ),
+              TextViewCustom(
+                text: task.date,
+                fontSize: Converts.c16,
+                tvColor: Palette.semiTv,
+                isTextAlignCenter: false,
+                isBold: false,
+              ),
+            ],
+          ),
           SizedBox(
             height: Converts.c16,
           ),
@@ -109,17 +129,18 @@ class TaskList extends StatelessWidget {
                   SizedBox(
                     width: Converts.c8,
                   ),
-                  ButtonCircularIcon(
+                  /*ButtonCircularIcon(
                       height: Converts.c24,
                       width: Converts.c96,
                       radius: 4,
                       bgColor: Colors.black,
                       hasOpacity: false,
                       tvColor: Colors.white,
-                      fontSize: 14,
+                      fontSize: 8,
                       iconData: Icons.flag_outlined,
-                      text: task.date.split("-")[1].split(",")[0],
-                      onTap: () {})
+                      //text: task.date.split("-")[1].split(",")[0],
+                      text: task.date,
+                      onTap: () {})*/
                 ],
               ),
               // icon

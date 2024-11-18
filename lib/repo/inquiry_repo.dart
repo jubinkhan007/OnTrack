@@ -113,9 +113,39 @@ class InquiryRepo {
     }
   }
 
+  Future<List<InquiryResponse>> getInquiries(String flag, String userId) async {
+    try {
+      final headers = {
+        'vm': 'INQALL',
+        'va': flag,
+        'vb': userId,
+        'vc': 'XX',
+        'vd': 'queries',
+      };
+      final response = await dio.get(
+        "getall",
+        options: Options(headers: headers),
+      );
+      // check if the response data is a Map and contains 'queries'
+      if (response.data is Map<String, dynamic> &&
+          response.data.containsKey('queries')) {
+        final List<dynamic> inquiriesJson = response.data['queries'] ?? [];
+        // map the list of JSON objects to InquiryResponse objects
+        return inquiriesJson
+            .map((json) => InquiryResponse.fromJson(json))
+            .toList();
+      } else {
+        return [];
+      }
+    } on DioException catch (error) {
+      debugPrint("Error fetching inquiries: $error");
+      throw Exception(error);
+    }
+  }
+
   /// DEMO API
 
-  Future<List<InquiryResponse>> getInquiries() async {
+  /*Future<List<InquiryResponse>> getInquiries() async {
     try {
       final response = await dio.get("6a2a424e53a984ad4ea3");
       // check if the response data is a Map and contains 'queries'
@@ -133,7 +163,7 @@ class InquiryRepo {
       debugPrint("Error fetching inquiries: $error");
       throw Exception(error);
     }
-  }
+  }*/
 
   Future<String> getCount() async {
     try {
@@ -182,5 +212,4 @@ class InquiryRepo {
       throw Exception(error);
     }
   }
-
 }
