@@ -5,6 +5,7 @@ import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
+import '../data/data.dart';
 import '../models/models.dart';
 import '../screens/attachment_view_screen.dart';
 
@@ -242,4 +243,27 @@ class _TaskListState extends State<TaskList> {
       ),
     );
   }
+
+  /*Color _getColor(String status) {
+    String started = PriorityList().priorities[0].name.toString();
+    String inProgress = PriorityList().priorities[1].name.toString();
+    String hold = PriorityList().priorities[2].name.toString();
+    String completed = PriorityList().priorities[3].name.toString();
+    switch (status) {
+      case "Delayed":
+        return Colors.deepOrange;
+      case "Pending":
+        return Colors.blueGrey;
+      case "Upcoming":
+        return Colors.green;
+      case started:
+        return Colors.blue;
+      case "Cancelled":
+        return Colors.red;
+      case "In Progress":
+        return Colors.amber;
+      default:
+        return Colors.grey; // Default color if status is unknown
+    }
+  }*/
 }

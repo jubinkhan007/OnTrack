@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/models/comment_response.dart';
 
@@ -45,20 +46,6 @@ class _CommentScreenState extends State<CommentScreen> {
         date: "9 Oct, 24",
         owner: Owner(id: "103", name: "Md. Alamgir")),
   ];*/
-  final List<Discussion> comments = [];
-
-  void _addComment(String name) async {
-    if (_bodyController.text.isNotEmpty) {
-      setState(() {
-        comments.add(Discussion(
-            body: _bodyController.text,
-            dateTime: "29 Oct, 24T4:55 AM",
-            name: name));
-
-        _bodyController.clear();
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -93,7 +80,6 @@ class _CommentScreenState extends State<CommentScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          // Customize icon color
           onPressed: () {
             Navigator.pop(context); // Navigate back
           },
@@ -102,15 +88,12 @@ class _CommentScreenState extends State<CommentScreen> {
       body: Consumer<InquiryViewModel>(
           builder: (context, inquiryViewModel, child) {
         // handle loading view
-            if (inquiryViewModel.uiState == UiState.loading) {
-              if(inquiryViewModel.commentResponse != null) {
-                inquiryViewModel.commentResponse!.clear();
-              }
-            }
         /*if (inquiryViewModel.uiState == UiState.loading) {
           return const Center(child: CircularProgressIndicator());
-        } // handle error view
-        else*/ if (inquiryViewModel.uiState == UiState.error) {
+        }
+        else*/
+        // handle error view
+        if (inquiryViewModel.uiState == UiState.error) {
           return Center(
             child: ErrorContainer(
                 message: inquiryViewModel.message != null
@@ -118,28 +101,19 @@ class _CommentScreenState extends State<CommentScreen> {
                     : Strings.something_went_wrong),
           );
         }
-        // null check for noteResponse and notes
-        if (inquiryViewModel.commentResponse?.isEmpty ?? true) {
-          /*return Center(
-            child: ErrorContainer(
-                message: inquiryViewModel.message != null
-                    ? inquiryViewModel.message!
-                    : Strings.no_data_found),
-          );*/
-        } else {
-          /*if (comments.isNotEmpty) {
-            comments.clear();
-          }*/
-          comments.addAll(inquiryViewModel.commentResponse!);
-        }
 
         return Column(
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: comments.length,
+                //itemCount: comments.length,
+                itemCount: inquiryViewModel.commentResponse != null
+                    ? inquiryViewModel.commentResponse!.length
+                    : 0,
                 itemBuilder: (context, index) {
-                  return CommentList(comment: comments[index]);
+                  //return CommentList(comment: comments[index]);
+                  return CommentList(
+                      comment: inquiryViewModel.commentResponse![index]);
                 },
               ),
             ),
@@ -168,8 +142,8 @@ class _CommentScreenState extends State<CommentScreen> {
                             width: Converts.c16,
                             height: Converts.c16,
                             child: const CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Palette.mainColor),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Palette.mainColor),
                               strokeWidth: 2.0,
                             ),
                           )
@@ -180,8 +154,7 @@ class _CommentScreenState extends State<CommentScreen> {
                     onPressed: () async {
                       String userId = await _getUserInfo();
                       String name = await _getUserInfo(isName: true);
-                      if (_bodyController.text != "" &&
-                          _bodyController.text != null) {
+                      if (_bodyController.text != "") {
                         // save inquiry
                         await inquiryViewModel.saveComment(
                           widget.inquiryId,
@@ -189,6 +162,7 @@ class _CommentScreenState extends State<CommentScreen> {
                           "0",
                           userId,
                         );
+                        // handle error view
                         if (inquiryViewModel.uiState == UiState.error) {
                           _showMessage("Error: ${inquiryViewModel.message}");
                         }
@@ -196,7 +170,16 @@ class _CommentScreenState extends State<CommentScreen> {
                         else {
                           if (inquiryViewModel.isSavedInquiry != null) {
                             if (inquiryViewModel.isSavedInquiry!) {
-                              _addComment(name);
+                              //_addComment(name);
+                              setState(() {
+                                inquiryViewModel.commentResponse!.add(Discussion(
+                                    body: _bodyController.text,
+                                    dateTime:
+                                    DateTime.now().toFormattedString(format: "dd MMM, yy'T'h:mm a"),
+                                    name: name));
+                                _bodyController.text = "";
+                              });
+
                             } else {
                               _showMessage(Strings.failed_to_save_the_data);
                             }
@@ -222,7 +205,8 @@ class _CommentScreenState extends State<CommentScreen> {
     try {
       UserResponse? userResponse = await SPHelper().getUser();
       String id = userResponse != null ? userResponse.users![0].staffId! : "";
-      String name = userResponse != null ? userResponse.users![0].staffName! : "";
+      String name =
+          userResponse != null ? userResponse.users![0].staffName! : "";
       return isName ? name : id;
     } catch (e) {
       return "";

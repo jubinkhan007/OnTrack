@@ -5,8 +5,9 @@ import '../widgets/widgets.dart';
 import 'converts.dart';
 
 extension DateTimeFormatter on DateTime {
-  String toFormattedString({isFullYear = false}) {
-    DateFormat dateFormat = isFullYear ? DateFormat("dd MMM, yyyy") : DateFormat("dd MMM, yy");
+  String toFormattedString({isFullYear = false, format = "dd MMM, yy"}) {
+    String fullYearFormat = "dd MMM, yyyy";
+    DateFormat dateFormat = isFullYear ? DateFormat(fullYearFormat) : DateFormat(format);
     return dateFormat.format(this);
   }
 }

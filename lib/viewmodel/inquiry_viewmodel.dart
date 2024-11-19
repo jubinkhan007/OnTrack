@@ -74,23 +74,6 @@ class InquiryViewModel extends ChangeNotifier {
     }
   }
 
-  /*Future<void> getAttachments() async {
-    if (_uiState == UiState.loading) return;
-
-    _uiState = UiState.loading;
-    notifyListeners();
-    try {
-      final response = await inquiryRepo.getAttachments();
-      _attachmentViewResponse = response;
-      _uiState = UiState.success;
-    } catch (error) {
-      _uiState = UiState.error;
-      _message = error.toString();
-    } finally {
-      notifyListeners();
-    }
-  }*/
-
   Future<void> getNotes(String inquiryId, String taskId) async {
     if (_uiState == UiState.loading) return;
 
@@ -161,7 +144,7 @@ class InquiryViewModel extends ChangeNotifier {
     }
   }
 
-  List<InquiryResponse> _getDemoTasks() {
+/*List<InquiryResponse> _getDemoTasks() {
     /*const jsonString = '''{
         "queries": []
       }''';*/
@@ -323,7 +306,7 @@ class InquiryViewModel extends ChangeNotifier {
     final List<dynamic> jsonList = jsonMap['queries'];
     // map the list of JSON objects to InquiryResponse objects
     return jsonList.map((json) => InquiryResponse.fromJson(json)).toList();
-  }
+  }*/
 
 /*  Future<void> getNotes(String inquiryId, String taskId) async {
     if (_uiState == UiState.loading) return;
@@ -341,4 +324,22 @@ class InquiryViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }*/
+
+/*Future<void> getAttachments() async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.getAttachments();
+      _attachmentViewResponse = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }*/
+
 }
