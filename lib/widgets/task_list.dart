@@ -8,17 +8,31 @@ import '../config/palette.dart';
 import '../models/models.dart';
 import '../screens/attachment_view_screen.dart';
 
-class TaskList extends StatelessWidget {
+class TaskList extends StatefulWidget {
   final Task task;
   final String inquiryId;
 
   const TaskList({super.key, required this.task, required this.inquiryId});
 
+  @override
+  State<TaskList> createState() => _TaskListState();
+}
+
+class _TaskListState extends State<TaskList> {
   _showDialog(BuildContext context) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return UpdateTaskDialog(task: task, inquiryId: inquiryId,);
+          return UpdateTaskDialog(
+            task: widget.task,
+            inquiryId: widget.inquiryId,
+            onCall: (hasUpdate, flag) {
+              setState(() {
+                widget.task.status = flag;
+                widget.task.isUpdated = hasUpdate;
+              });
+            },
+          );
         });
   }
 
@@ -26,11 +40,11 @@ class TaskList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: task.hasAccess
-            ? task.isUpdated
+        color: widget.task.hasAccess
+            ? widget.task.isUpdated
                 ? Colors.green.withOpacity(0.1)
                 : Colors.purple.withOpacity(0.1)
-            : task.isUpdated
+            : widget.task.isUpdated
                 ? Colors.green.withOpacity(0.1)
                 : Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(4),
@@ -41,14 +55,35 @@ class TaskList extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// title
-          TextViewCustom(
-              text: task.name,
-              fontSize: Converts.c16,
-              tvColor: Palette.normalTv,
-              isTextAlignCenter: false,
-              isRubik: false,
-              isBold: true),
+          /// title & status
+          Row(
+            children: [
+              Expanded(
+                child: TextViewCustom(
+                    text: widget.task.name,
+                    fontSize: Converts.c16,
+                    tvColor: Palette.normalTv,
+                    isTextAlignCenter: false,
+                    isRubik: false,
+                    isBold: true),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.blue, // Set your desired background color here
+                  borderRadius: BorderRadius.circular(
+                      Converts.c12), // Adjust the radius for roundness
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: TextViewCustom(
+                    text: widget.task.status,
+                    fontSize: Converts.c12,
+                    tvColor: Colors.white,
+                    isTextAlignCenter: false,
+                    isRubik: false,
+                    isBold: true),
+              ),
+            ],
+          ),
 
           /// completer name
           Row(
@@ -62,7 +97,7 @@ class TaskList extends StatelessWidget {
                 width: Converts.c8,
               ),
               TextViewCustom(
-                text: task.assignedPerson,
+                text: widget.task.assignedPerson,
                 fontSize: Converts.c16,
                 tvColor: Palette.semiTv,
                 isTextAlignCenter: false,
@@ -70,6 +105,7 @@ class TaskList extends StatelessWidget {
               ),
             ],
           ),
+
           /// date
           Row(
             children: [
@@ -82,7 +118,7 @@ class TaskList extends StatelessWidget {
                 width: Converts.c8,
               ),
               TextViewCustom(
-                text: task.date,
+                text: widget.task.date,
                 fontSize: Converts.c16,
                 tvColor: Palette.semiTv,
                 isTextAlignCenter: false,
@@ -105,25 +141,25 @@ class TaskList extends StatelessWidget {
                       height: Converts.c24,
                       width: Converts.c96,
                       radius: 4,
-                      bgColor: task.hasAccess
-                          ? task.isUpdated
+                      bgColor: widget.task.hasAccess
+                          ? widget.task.isUpdated
                               ? Colors.green
                               : Colors.purple
-                          : task.isUpdated
+                          : widget.task.isUpdated
                               ? Colors.green
                               : Palette.iconColor,
                       hasOpacity: false,
                       tvColor: Colors.white,
                       fontSize: 14,
-                      text: task.hasAccess
-                          ? task.isUpdated
+                      text: widget.task.hasAccess
+                          ? widget.task.isUpdated
                               ? "Complete"
                               : "Update"
-                          : task.isUpdated
+                          : widget.task.isUpdated
                               ? "Complete"
                               : "Pending",
                       onTap: () {
-                        if (task.hasAccess && !task.isUpdated) {
+                        if (widget.task.hasAccess && !widget.task.isUpdated) {
                           _showDialog(context);
                         }
                       }),
@@ -152,7 +188,10 @@ class TaskList extends StatelessWidget {
                       Navigator.pushNamed(
                         context,
                         NoteScreen.routeName,
-                        //arguments: task.id, // Pass the list as arguments
+                        arguments: {
+                          'inquiryId': widget.inquiryId.toString(),
+                          'taskId': widget.task.id.toString(),
+                        },
                       );
                     },
                     child: Padding(
@@ -176,7 +215,10 @@ class TaskList extends StatelessWidget {
                       Navigator.pushNamed(
                         context,
                         AttachmentViewScreen.routeName,
-                        arguments: task.id, // Pass the list as arguments
+                        arguments: {
+                          'inquiryId': widget.inquiryId.toString(),
+                          'taskId': widget.task.id.toString(),
+                        },
                       );
                     },
                     child: Padding(

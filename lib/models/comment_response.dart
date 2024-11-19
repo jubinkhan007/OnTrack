@@ -1,3 +1,4 @@
+/*
 class CommentResponse {
   List<Comments>? comments;
 
@@ -66,6 +67,51 @@ class Owner {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['name'] = name;
+    return data;
+  }
+}*/
+
+class CommentResponse {
+  List<Discussion>? comments;
+
+  CommentResponse({this.comments});
+
+  CommentResponse.fromJson(Map<String, dynamic> json) {
+    if (json['comments'] != null) {
+      comments = <Discussion>[];
+      json['comments'].forEach((v) {
+        comments!.add(Discussion.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (comments != null) {
+      data['comments'] = comments!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Discussion {
+  String? name;
+  String? dateTime;
+  String? body;
+
+  Discussion({this.name, this.dateTime, this.body});
+
+  Discussion.fromJson(Map<String, dynamic> json) {
+    name = json['NAME'];
+    dateTime = json['DATETIME'];
+    body = json['COMMENTS'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['NAME'] = name;
+    data['DATETIME'] = dateTime;
+    data['COMMENTS'] = body;
     return data;
   }
 }

@@ -253,14 +253,17 @@ class HomeScreen extends StatelessWidget {
                             Navigator.pushNamed(
                               context,
                               CommentScreen.routeName,
-                              arguments: id, // Pass the list as arguments
+                              arguments: id,
                             );
                           },
                           onAttachmentTap: (id) {
                             Navigator.pushNamed(
                               context,
                               AttachmentViewScreen.routeName,
-                              arguments: id, // Pass the list as arguments
+                              arguments: {
+                                'inquiryId': id,
+                                'taskId': "0",
+                              },
                             );
                           },
                         );

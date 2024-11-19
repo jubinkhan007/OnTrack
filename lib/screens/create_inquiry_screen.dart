@@ -6,7 +6,9 @@ import 'package:tmbi/widgets/date_selection_view.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
+import '../config/sp_helper.dart';
 import '../config/strings.dart';
+import '../models/user_response.dart';
 import '../network/ui_state.dart';
 import '../widgets/widgets.dart';
 
@@ -400,6 +402,8 @@ class CreateInquiryScreen extends StatelessWidget {
                             titleController.value != null &&
                             descriptionController.value != null &&
                             mCustomer != null) {
+                          // get user id
+                          String userId = await _getUserInfo();
                           // upload files, if any are selected
                           if (imageFiles.isNotEmpty) {
                             await inquiryViewModel.saveFiles(imageFiles);
@@ -414,10 +418,10 @@ class CreateInquiryScreen extends StatelessWidget {
                               selectedDate,
                               mPriorityId,
                               mCustomer!.id.toString(),
-                              mCustomer!.id != 0
+                              mCustomer!.id != "0"
                                   ? mCustomer!.name.toString()
                                   : customerNameController.text.toString(),
-                              "340553",
+                              userId,
                               inquiryViewModel.files);
 
                           // check the status of the request
@@ -461,4 +465,16 @@ class CreateInquiryScreen extends StatelessWidget {
     }
     return customers;
   }
+
+  Future<String> _getUserInfo({bool isName = false}) async {
+    try {
+      UserResponse? userResponse = await SPHelper().getUser();
+      String id = userResponse != null ? userResponse.users![0].staffId! : "";
+      String name = userResponse != null ? userResponse.users![0].staffName! : "";
+      return isName ? name : id;
+    } catch (e) {
+      return "";
+    }
+  }
+
 }

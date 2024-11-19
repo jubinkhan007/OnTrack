@@ -4,7 +4,9 @@ import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/models/models.dart';
 
+import '../../config/sp_helper.dart';
 import '../../config/strings.dart';
+import '../../models/user_response.dart';
 import '../../network/ui_state.dart';
 import '../../viewmodel/viewmodel.dart';
 import '../../widgets/widgets.dart';
@@ -13,11 +15,24 @@ class UpdateTaskDialog extends StatelessWidget {
   final TextEditingController descriptionController = TextEditingController();
   final Task task;
   final String inquiryId;
+
   // files
   final List<ImageFile> imageFiles = [];
+  final List<Priority> priorities = [
+    Priority(id: 1, name: "Started"),
+    Priority(id: 3, name: "In Progress"),
+    Priority(id: 5, name: "Hold"),
+    Priority(id: 7, name: "Completed"),
+  ];
   String mStatusId = "";
+  String mStatusName = "";
+  final Function(bool, String) onCall;
 
-  UpdateTaskDialog({super.key, required this.task, required this.inquiryId});
+  UpdateTaskDialog(
+      {super.key,
+      required this.task,
+      required this.inquiryId,
+      required this.onCall});
 
   @override
   Widget build(BuildContext context) {
@@ -72,14 +87,16 @@ class UpdateTaskDialog extends StatelessWidget {
               /// status
               ComboBoxPriority(
                 hintName: Strings.select,
-                items: [
-                  Priority(id: 1, name: "Started"),
-                  Priority(id: 3, name: "In Progress"),
-                  Priority(id: 5, name: "Hold"),
-                  Priority(id: 7, name: "Completed"),
-                ],
+                items: priorities,
                 onChanged: (id) {
                   mStatusId = id;
+                  mStatusName = priorities
+                          .firstWhere(
+                            (priority) => priority.id.toString() == mStatusId,
+                            orElse: () => Priority(id: 0, name: "Not Found"),
+                          )
+                          .name ??
+                      "Not Found";
                 },
               ),
 
@@ -138,6 +155,8 @@ class UpdateTaskDialog extends StatelessWidget {
                   isLoading: inquiryViewModel.uiState == UiState.loading,
                   stockColor: Palette.mainColor,
                   onTap: () async {
+                    String userId = await _getUserId();
+
                     if (mStatusId != "") {
                       // upload files, if any are selected
                       if (imageFiles.isNotEmpty) {
@@ -147,9 +166,9 @@ class UpdateTaskDialog extends StatelessWidget {
                       await inquiryViewModel.updateTask(
                           inquiryId,
                           task.id.toString(),
-                          "0",
+                          mStatusId,
                           descriptionController.text,
-                          "340553",
+                          userId,
                           inquiryViewModel.files);
                       if (inquiryViewModel.uiState == UiState.error) {
                         showMessage("Error: ${inquiryViewModel.message}");
@@ -159,6 +178,8 @@ class UpdateTaskDialog extends StatelessWidget {
                         if (inquiryViewModel.isSavedInquiry != null) {
                           if (inquiryViewModel.isSavedInquiry!) {
                             showMessage(Strings.data_saved_successfully);
+                            // update task
+                            onCall(mStatusId == "7" ? true : false, mStatusName);
                             Navigator.pop(context);
                           } else {
                             showMessage(Strings.failed_to_save_the_data);
@@ -176,5 +197,15 @@ class UpdateTaskDialog extends StatelessWidget {
         );
       }),
     );
+  }
+
+  Future<String> _getUserId() async {
+    try {
+      UserResponse? userResponse = await SPHelper().getUser();
+      String name = userResponse != null ? userResponse.users![0].staffId! : "";
+      return name;
+    } catch (e) {
+      return "";
+    }
   }
 }

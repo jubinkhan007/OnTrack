@@ -1,6 +1,8 @@
 import 'package:tmbi/models/home_flag.dart';
 import 'package:tmbi/screens/home_screen.dart';
 
+import '../models/models.dart';
+
 class HomeFlagItem {
   List<HomeFlag> homeFlagItems = [
     HomeFlag(status: Status.DELAYED, title: "Delayed", isSelected: false),

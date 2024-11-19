@@ -179,6 +179,120 @@ class InquiryRepo {
     }
   }
 
+  Future<List<Note>> getNotes(String inquiryId, String taskId) async {
+    try {
+      final headers = {
+        'vm': 'COMMENTS_TASK',
+        'va': inquiryId,
+        'vb': taskId,
+        'vc': 'XX',
+        'vd': 'notes',
+      };
+
+      final response = await dio.get(
+        "getall",
+        options: Options(headers: headers),
+      );
+
+      // Check if the response contains valid 'notes' data
+      if (response.data is Map<String, dynamic> &&
+          response.data.containsKey('notes')) {
+        final List<dynamic> notesJson = response.data['notes'] ?? [];
+        return notesJson.map((json) => Note.fromJson(json)).toList();
+      } else {
+        return []; // Return an empty list if no notes found
+      }
+    } on DioException catch (error) {
+      debugPrint("Error fetching notes: ${error.message}");
+      throw Exception("Failed to fetch notes: ${error.response?.statusMessage}");
+    }
+  }
+
+  Future<List<StringUrl>> getAttachments(String inquiryId, String taskId) async {
+    try {
+      final headers = {
+        'vm': 'ATTACHMENT_TASK',
+        'va': inquiryId,
+        'vb': taskId,
+        'vc': 'XX',
+        'vd': 'attachments',
+      };
+
+      final response = await dio.get(
+        "getall",
+        options: Options(headers: headers),
+      );
+
+      // Check if the response contains valid 'notes' data
+      if (response.data is Map<String, dynamic> &&
+          response.data.containsKey('attachments')) {
+        final List<dynamic> notesJson = response.data['attachments'] ?? [];
+        return notesJson.map((json) => StringUrl.fromJson(json)).toList();
+      } else {
+        return []; // Return an empty list if no notes found
+      }
+    } on DioException catch (error) {
+      debugPrint("Error fetching notes: ${error.message}");
+      throw Exception("Failed to fetch notes: ${error.response?.statusMessage}");
+    }
+  }
+
+  Future<List<Discussion>> getComments(String inquiryId, String taskId) async {
+    try {
+      final headers = {
+        'vm': 'COMMENTS',
+        'va': inquiryId,
+        'vb': taskId,
+        'vc': 'XX',
+        'vd': 'comments',
+      };
+
+      final response = await dio.get(
+        "getall",
+        options: Options(headers: headers),
+      );
+
+      // Check if the response contains valid 'notes' data
+      if (response.data is Map<String, dynamic> &&
+          response.data.containsKey('comments')) {
+        final List<dynamic> notesJson = response.data['comments'] ?? [];
+        return notesJson.map((json) => Discussion.fromJson(json)).toList();
+      } else {
+        return []; // Return an empty list if no notes found
+      }
+    } on DioException catch (error) {
+      debugPrint("Error fetching notes: ${error.message}");
+      throw Exception("Failed to fetch notes: ${error.response?.statusMessage}");
+    }
+  }
+
+  Future<bool> saveComment(
+      String inquiryId,
+      String body,
+      String priorityId,
+      String userId) async {
+    try {
+      final headers = {
+        "dtype": "TASK",
+        "inqrid": inquiryId,
+        "inqrdesc": body,
+        "taskid":"0",
+        "userid": userId,
+        "priorityid": "0",
+        "files": "0"
+      };
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
   /// DEMO API
 
   /*Future<List<InquiryResponse>> getInquiries() async {
@@ -219,7 +333,7 @@ class InquiryRepo {
     }
   }
 
-  Future<AttachmentViewResponse> getAttachments() async {
+  /*Future<AttachmentViewResponse> getAttachments() async {
     try {
       final response = await dio.get("5dedf78a78969c55cfb3");
       debugPrint("RESPONSE#${response.data}");
@@ -227,9 +341,9 @@ class InquiryRepo {
     } on DioException catch (error) {
       throw Exception(error);
     }
-  }
+  }*/
 
-  Future<NoteResponse> getNotes() async {
+  /*Future<NoteResponse> getNotes() async {
     try {
       final response = await dio.get("2a2ecc5de4a852629548");
       debugPrint("RESPONSE#${response.data}");
@@ -237,9 +351,9 @@ class InquiryRepo {
     } on DioException catch (error) {
       throw Exception(error);
     }
-  }
+  }*/
 
-  Future<CommentResponse> getComments() async {
+  /*Future<CommentResponse> getComments() async {
     try {
       final response = await dio.get("c129b21084d6208d2753");
       debugPrint("RESPONSE#${response.data}");
@@ -247,5 +361,5 @@ class InquiryRepo {
     } on DioException catch (error) {
       throw Exception(error);
     }
-  }
+  }*/
 }

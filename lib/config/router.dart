@@ -14,7 +14,10 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
     case HomeScreen.routeName:
       final args = routeSettings.arguments as String;
       return MaterialPageRoute(
-          settings: routeSettings, builder: (_) => HomeScreen(staffId: args,));
+          settings: routeSettings,
+          builder: (_) => HomeScreen(
+                staffId: args,
+              ));
     case InquiryView.routeName:
       /*final args = routeSettings.arguments as InquiryResponse;
       final args1 = routeSettings.arguments as String;*/
@@ -36,22 +39,30 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => CommentScreen(
-          commentId: args,
+          inquiryId: args,
         ),
       );
     case AttachmentViewScreen.routeName:
-      final args = routeSettings.arguments as String;
+      final arguments = routeSettings.arguments as Map<String, dynamic>;
+      final inquiryId = arguments['inquiryId'] as String;
+      final taskId = arguments['taskId'] as String;
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => AttachmentViewScreen(
-          attachmentId: args,
+          inquiryId: inquiryId,
+          taskId: taskId,
         ),
       );
     case NoteScreen.routeName:
-      //final args = routeSettings.arguments as String;
+      final arguments = routeSettings.arguments as Map<String, dynamic>;
+      final inquiryId = arguments['inquiryId'] as String;
+      final taskId = arguments['taskId'] as String;
       return MaterialPageRoute(
         settings: routeSettings,
-        builder: (_) => const NoteScreen(),
+        builder: (_) => NoteScreen(
+          inquiryId: inquiryId,
+          taskId: taskId,
+        ),
       );
     default:
       return MaterialPageRoute(

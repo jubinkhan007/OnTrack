@@ -11,18 +11,20 @@ import '../viewmodel/viewmodel.dart';
 
 class AttachmentViewScreen extends StatelessWidget {
   static const String routeName = '/attachment_view_screen';
-  final String attachmentId;
+  final String inquiryId;
+  final String taskId;
   final PageController _controller = PageController();
   final List<String> _imageUrls = [];
 
-  AttachmentViewScreen({super.key, required this.attachmentId});
+  AttachmentViewScreen(
+      {super.key, required this.inquiryId, required this.taskId});
 
   @override
   Widget build(BuildContext context) {
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      inquiryViewModel.getAttachments();
+      inquiryViewModel.getAttachments(inquiryId, taskId);
     });
     return Scaffold(
         appBar: AppBar(
@@ -53,26 +55,33 @@ class AttachmentViewScreen extends StatelessWidget {
                     ? inquiryViewModel.message!
                     : Strings.something_went_wrong);
           }
+          // null check for noteResponse and notes
+          if (inquiryViewModel.attachmentViewResponse?.isEmpty ?? true) {
+            return Center(
+              child: ErrorContainer(
+                  message: inquiryViewModel.message != null
+                      ? inquiryViewModel.message!
+                      : Strings.no_data_found),
+            );
+          } else {
+            if (_imageUrls.isNotEmpty) {
+              _imageUrls.clear();
+            }
+            for (var data in inquiryViewModel.attachmentViewResponse!) {
+              _imageUrls.add(data.imageUrl ?? "");
+            }
+          }
           return Column(
             children: [
               Expanded(
                 child: PageView.builder(
                   controller: _controller,
                   itemCount: inquiryViewModel.attachmentViewResponse != null
-                      ? inquiryViewModel.attachmentViewResponse!.images != null
-                          ? inquiryViewModel
-                              .attachmentViewResponse!.images!.length
-                          : _imageUrls.length
+                      ? inquiryViewModel.attachmentViewResponse!.length
                       : _imageUrls.length,
                   itemBuilder: (context, index) {
                     return Image.network(
-                      inquiryViewModel.attachmentViewResponse != null
-                          ? inquiryViewModel.attachmentViewResponse!.images !=
-                                  null
-                              ? inquiryViewModel
-                                  .attachmentViewResponse!.images![index]
-                              : _imageUrls[index]
-                          : _imageUrls[index],
+                      _imageUrls[index],
                       fit: BoxFit.cover,
                       width: double.infinity,
                     );
@@ -83,12 +92,7 @@ class AttachmentViewScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: SmoothPageIndicator(
                   controller: _controller,
-                  count: inquiryViewModel.attachmentViewResponse != null
-                      ? inquiryViewModel.attachmentViewResponse!.images != null
-                          ? inquiryViewModel
-                              .attachmentViewResponse!.images!.length
-                          : _imageUrls.length
-                      : _imageUrls.length,
+                  count: _imageUrls.length,
                   effect: WormEffect(
                     dotWidth: Converts.c8,
                     dotHeight: Converts.c8,

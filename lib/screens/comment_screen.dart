@@ -4,16 +4,18 @@ import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/models/comment_response.dart';
 
 import '../config/converts.dart';
+import '../config/sp_helper.dart';
 import '../config/strings.dart';
+import '../models/user_response.dart';
 import '../network/ui_state.dart';
 import '../viewmodel/viewmodel.dart';
 import '../widgets/widgets.dart';
 
 class CommentScreen extends StatefulWidget {
   static const String routeName = '/comment_screen';
-  final String commentId;
+  final String inquiryId;
 
-  const CommentScreen({super.key, required this.commentId});
+  const CommentScreen({super.key, required this.inquiryId});
 
   @override
   State<CommentScreen> createState() => _CommentScreenState();
@@ -21,6 +23,7 @@ class CommentScreen extends StatefulWidget {
 
 class _CommentScreenState extends State<CommentScreen> {
   final TextEditingController _bodyController = TextEditingController();
+
   /*final List<Comments> comments = [
     Comments(
         id: "1",
@@ -42,17 +45,15 @@ class _CommentScreenState extends State<CommentScreen> {
         date: "9 Oct, 24",
         owner: Owner(id: "103", name: "Md. Alamgir")),
   ];*/
-  final List<Comments> comments = [];
+  final List<Discussion> comments = [];
 
-  void _addComment() {
+  void _addComment(String name) async {
     if (_bodyController.text.isNotEmpty) {
       setState(() {
-        comments.add(Comments(
-            id: "1",
+        comments.add(Discussion(
             body: _bodyController.text,
-            date: "29 Oct, 24",
-            time: "4:12 PM",
-            owner: Owner(id: "101", name: "Md. Salauddin")));
+            dateTime: "29 Oct, 24T4:55 AM",
+            name: name));
 
         _bodyController.clear();
       });
@@ -71,7 +72,8 @@ class _CommentScreenState extends State<CommentScreen> {
     // delay the call to `getComments()` using addPostFrameCallback
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // fetch the comments after the widget has been built
-      Provider.of<InquiryViewModel>(context, listen: false).getComments();
+      Provider.of<InquiryViewModel>(context, listen: false)
+          .getComments(widget.inquiryId, "0");
     });
   }
 
@@ -100,10 +102,15 @@ class _CommentScreenState extends State<CommentScreen> {
       body: Consumer<InquiryViewModel>(
           builder: (context, inquiryViewModel, child) {
         // handle loading view
-        if (inquiryViewModel.uiState == UiState.loading) {
+            if (inquiryViewModel.uiState == UiState.loading) {
+              if(inquiryViewModel.commentResponse != null) {
+                inquiryViewModel.commentResponse!.clear();
+              }
+            }
+        /*if (inquiryViewModel.uiState == UiState.loading) {
           return const Center(child: CircularProgressIndicator());
         } // handle error view
-        else if (inquiryViewModel.uiState == UiState.error) {
+        else*/ if (inquiryViewModel.uiState == UiState.error) {
           return Center(
             child: ErrorContainer(
                 message: inquiryViewModel.message != null
@@ -112,7 +119,7 @@ class _CommentScreenState extends State<CommentScreen> {
           );
         }
         // null check for noteResponse and notes
-        if (inquiryViewModel.commentResponse?.comments?.isEmpty ?? true) {
+        if (inquiryViewModel.commentResponse?.isEmpty ?? true) {
           /*return Center(
             child: ErrorContainer(
                 message: inquiryViewModel.message != null
@@ -120,9 +127,10 @@ class _CommentScreenState extends State<CommentScreen> {
                     : Strings.no_data_found),
           );*/
         } else {
-          if (comments.isEmpty) {
-            comments.addAll(inquiryViewModel.commentResponse!.comments!);
-          }
+          /*if (comments.isNotEmpty) {
+            comments.clear();
+          }*/
+          comments.addAll(inquiryViewModel.commentResponse!);
         }
 
         return Column(
@@ -131,7 +139,7 @@ class _CommentScreenState extends State<CommentScreen> {
               child: ListView.builder(
                 itemCount: comments.length,
                 itemBuilder: (context, index) {
-                  return CommentList(comments: comments[index]);
+                  return CommentList(comment: comments[index]);
                 },
               ),
             ),
@@ -155,11 +163,51 @@ class _CommentScreenState extends State<CommentScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(
-                      Icons.send,
-                      color: Palette.mainColor,
-                    ),
-                    onPressed: _addComment,
+                    icon: inquiryViewModel.uiState == UiState.loading
+                        ? SizedBox(
+                            width: Converts.c16,
+                            height: Converts.c16,
+                            child: const CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Palette.mainColor),
+                              strokeWidth: 2.0,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.send,
+                            color: Palette.mainColor,
+                          ),
+                    onPressed: () async {
+                      String userId = await _getUserInfo();
+                      String name = await _getUserInfo(isName: true);
+                      if (_bodyController.text != "" &&
+                          _bodyController.text != null) {
+                        // save inquiry
+                        await inquiryViewModel.saveComment(
+                          widget.inquiryId,
+                          _bodyController.text,
+                          "0",
+                          userId,
+                        );
+                        if (inquiryViewModel.uiState == UiState.error) {
+                          _showMessage("Error: ${inquiryViewModel.message}");
+                        }
+                        // check the status of the request
+                        else {
+                          if (inquiryViewModel.isSavedInquiry != null) {
+                            if (inquiryViewModel.isSavedInquiry!) {
+                              _addComment(name);
+                            } else {
+                              _showMessage(Strings.failed_to_save_the_data);
+                            }
+                          } else {
+                            _showMessage(Strings.data_is_missing);
+                          }
+                        }
+                      } else {
+                        _showMessage(Strings.some_values_are_missing);
+                      }
+                    },
                   ),
                 ],
               ),
@@ -168,5 +216,34 @@ class _CommentScreenState extends State<CommentScreen> {
         );
       }),
     );
+  }
+
+  Future<String> _getUserInfo({bool isName = false}) async {
+    try {
+      UserResponse? userResponse = await SPHelper().getUser();
+      String id = userResponse != null ? userResponse.users![0].staffId! : "";
+      String name = userResponse != null ? userResponse.users![0].staffName! : "";
+      return isName ? name : id;
+    } catch (e) {
+      return "";
+    }
+  }
+
+  _showMessage(String message) {
+    final snackBar = SnackBar(
+      content: TextViewCustom(
+        text: message,
+        tvColor: Colors.white,
+        fontSize: Converts.c16,
+        isBold: false,
+        isRubik: true,
+        isTextAlignCenter: false,
+      ),
+      action: SnackBarAction(
+        label: 'Ok',
+        onPressed: () {},
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

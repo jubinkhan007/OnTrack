@@ -134,6 +134,7 @@ class InquiryResponse {
   final int id;
   final List<Task> tasks;
   final String title;
+
   //final String status;
   final Comment comment;
   final String company;
@@ -172,10 +173,14 @@ class InquiryResponse {
       /*customer: Customer.fromJson(json['CUSTOMER']),
       postedBy: User.fromJson(json['POSTED_BY']),
       attachment: Attachment.fromJson(json['ATTACHMENT']),*/
-      postedBy: User.fromJson(jsonDecode(json['POSTED_BY'])), // Decode JSON string to Map
-      attachment: Attachment.fromJson(jsonDecode(json['ATTACHMENT'])), // Decode JSON string to Map
-      customer: Customer.fromJson(jsonDecode(json['CUSTOMER'])), // Decode JSON string to Map
-      comment: Comment.fromJson(jsonDecode(json['COMMENTS'])), // Decode JSON string to Map
+      postedBy: User.fromJson(jsonDecode(json['POSTED_BY'])),
+      // Decode JSON string to Map
+      attachment: Attachment.fromJson(jsonDecode(json['ATTACHMENT'])),
+      // Decode JSON string to Map
+      customer: Customer.fromJson(jsonDecode(json['CUSTOMER'])),
+      // Decode JSON string to Map
+      comment: Comment.fromJson(jsonDecode(json['COMMENTS'])),
+      // Decode JSON string to Map
       description: json['DESCRIPTION'],
     );
   }
@@ -187,9 +192,15 @@ class Task {
   final String date;
   final String name;
   final bool hasAccess;
-  final bool isUpdated;
+
   //final String totalTime;
   final int totalTime;
+
+  //final bool isUpdated;
+  bool isUpdated;
+
+  //final String status;
+  String status;
   final String assignedPerson;
 
   Task({
@@ -199,6 +210,7 @@ class Task {
     required this.hasAccess,
     required this.isUpdated,
     required this.totalTime,
+    required this.status,
     required this.assignedPerson,
   });
 
@@ -210,6 +222,7 @@ class Task {
       hasAccess: json['HAS_ACCESS'],
       isUpdated: json['IS_UPDATED'],
       totalTime: json['TOTAL_TIME'],
+      status: json['STATUS'],
       assignedPerson: json['ASSIGNED_PERSON'],
     );
   }
@@ -232,7 +245,6 @@ class Comment {
 class Attachment {
   final String id;
   final String? count;
-
 
   Attachment({required this.id, required this.count});
 

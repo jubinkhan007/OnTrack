@@ -6,9 +6,9 @@ import 'package:tmbi/widgets/widgets.dart';
 import '../config/converts.dart';
 
 class CommentList extends StatelessWidget {
-  final Comments comments;
+  final Discussion comment;
 
-  const CommentList({super.key, required this.comments});
+  const CommentList({super.key, required this.comment});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class CommentList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextViewCustom(
-                    text: comments.owner!.name!,
+                    text: comment.name!,
                     fontSize: Converts.c16,
                     tvColor: Palette.mainColor,
                     isTextAlignCenter: false,
@@ -46,7 +46,7 @@ class CommentList extends StatelessWidget {
                   Row(
                     children: [
                       TextViewCustom(
-                        text: comments.date!,
+                        text: comment.dateTime != null ? comment.dateTime!.split("T")[0] : "",
                         fontSize: Converts.c12,
                         tvColor: Palette.semiTv,
                         isTextAlignCenter: false,
@@ -64,7 +64,7 @@ class CommentList extends StatelessWidget {
                         ),
                       ),
                       TextViewCustom(
-                        text: comments.time!,
+                        text: comment.dateTime != null ? comment.dateTime!.split("T")[1] : "",
                         fontSize: Converts.c12,
                         tvColor: Palette.semiTv,
                         isTextAlignCenter: false,
@@ -74,7 +74,7 @@ class CommentList extends StatelessWidget {
                   ),
                   SizedBox(height: Converts.c8), // Space for better alignment
                   TextViewCustom(
-                    text: comments.body!,
+                    text: comment.body!,
                     fontSize: Converts.c16,
                     tvColor: Palette.semiTv,
                     isTextAlignCenter: false,

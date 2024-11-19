@@ -22,19 +22,34 @@ class InquiryViewModel extends ChangeNotifier {
   List<InquiryResponse>? get inquiries => _inquiries;
 
   /// attachment list
-  AttachmentViewResponse? _attachmentViewResponse;
+  /*AttachmentViewResponse? _attachmentViewResponse;
 
-  AttachmentViewResponse? get attachmentViewResponse => _attachmentViewResponse;
+  AttachmentViewResponse? get attachmentViewResponse => _attachmentViewResponse;*/
+  List<StringUrl>? _attachmentViewResponse;
+
+  List<StringUrl>? get attachmentViewResponse => _attachmentViewResponse;
 
   /// note list
-  NoteResponse? _noteResponse;
+  /*NoteResponse? _noteResponse;
 
-  NoteResponse? get noteResponse => _noteResponse;
+  NoteResponse? get noteResponse => _noteResponse;*/
+  List<Note>? _noteResponse;
+
+  List<Note>? get noteResponse => _noteResponse;
 
   /// comment
-  CommentResponse? _commentResponse;
+  /*CommentResponse? _commentResponse;
 
-  CommentResponse? get commentResponse => _commentResponse;
+  CommentResponse? get commentResponse => _commentResponse;*/
+
+  List<Discussion>? _commentResponse;
+
+  List<Discussion>? get commentResponse => _commentResponse;
+
+  /// save inquiry
+  bool? _isSavedInquiry;
+
+  bool? get isSavedInquiry => _isSavedInquiry;
 
   /// ui state
   UiState _uiState = UiState.init;
@@ -59,7 +74,7 @@ class InquiryViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> getAttachments() async {
+  /*Future<void> getAttachments() async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
@@ -74,15 +89,15 @@ class InquiryViewModel extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
-  }
+  }*/
 
-  Future<void> getNotes() async {
+  Future<void> getNotes(String inquiryId, String taskId) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response = await inquiryRepo.getNotes();
+      final response = await inquiryRepo.getNotes(inquiryId, taskId);
       _noteResponse = response;
       _uiState = UiState.success;
     } catch (error) {
@@ -93,14 +108,50 @@ class InquiryViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> getComments() async {
+  Future<void> getAttachments(String inquiryId, String taskId) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response = await inquiryRepo.getComments();
+      final response = await inquiryRepo.getAttachments(inquiryId, taskId);
+      _attachmentViewResponse = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> getComments(String inquiryId, String taskId) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.getComments(inquiryId, taskId);
       _commentResponse = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> saveComment(
+      String inquiryId, String body, String priorityId, String userId) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response =
+          await inquiryRepo.saveComment(inquiryId, body, priorityId, userId);
+      _isSavedInquiry = response;
       _uiState = UiState.success;
     } catch (error) {
       _uiState = UiState.error;
@@ -274,4 +325,20 @@ class InquiryViewModel extends ChangeNotifier {
     return jsonList.map((json) => InquiryResponse.fromJson(json)).toList();
   }
 
+/*  Future<void> getNotes(String inquiryId, String taskId) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.getNotes(inquiryId, taskId);
+      _noteResponse = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }*/
 }

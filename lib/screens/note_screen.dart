@@ -10,15 +10,17 @@ import '../widgets/widgets.dart';
 
 class NoteScreen extends StatelessWidget {
   static const String routeName = '/note_screen';
+  final String inquiryId;
+  final String taskId;
 
-  const NoteScreen({super.key});
+  const NoteScreen({super.key, required this.inquiryId, required this.taskId});
 
   @override
   Widget build(BuildContext context) {
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      inquiryViewModel.getNotes();
+      inquiryViewModel.getNotes(inquiryId, taskId);
     });
 
     return Scaffold(
@@ -53,7 +55,7 @@ class NoteScreen extends StatelessWidget {
           );
         }
         // null check for noteResponse and notes
-        if (inquiryViewModel.noteResponse?.notes?.isEmpty ?? true) {
+        if (inquiryViewModel.noteResponse?.isEmpty ?? true) {
           return Center(
             child: ErrorContainer(
                 message: inquiryViewModel.message != null
@@ -64,9 +66,7 @@ class NoteScreen extends StatelessWidget {
 
         return ListView.separated(
           itemCount: inquiryViewModel.noteResponse != null
-              ? inquiryViewModel.noteResponse!.notes != null
-                  ? inquiryViewModel.noteResponse!.notes!.length
-                  : 0
+              ? inquiryViewModel.noteResponse!.length
               : 0,
           itemBuilder: (context, index) {
             return Padding(
@@ -93,7 +93,7 @@ class NoteScreen extends StatelessWidget {
                       ),
                       TextViewCustom(
                           text: inquiryViewModel
-                              .noteResponse!.notes![index]!.date!,
+                              .noteResponse![index]!.dateTime!,
                           fontSize: Converts.c16,
                           tvColor: Palette.normalTv,
                           isBold: true),
@@ -107,7 +107,7 @@ class NoteScreen extends StatelessWidget {
                         left: Converts.c16, right: Converts.c16),
                     child: TextViewCustom(
                         text:
-                            inquiryViewModel.noteResponse!.notes![index]!.desc!,
+                            inquiryViewModel.noteResponse![index]!.description!,
                         fontSize: Converts.c16,
                         tvColor: Palette.normalTv,
                         isTextAlignCenter: false,

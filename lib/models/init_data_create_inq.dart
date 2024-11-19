@@ -342,7 +342,7 @@ class Customer {
   Customer({this.id, this.name, this.isVerified});
 
   Customer.fromJson(Map<String, dynamic> json) {
-    id = json['ID']; // Ensure this is an integer in JSON
+    id = json['ID'].toString(); // Ensure this is an integer in JSON
     name = json['NAME'];
     isVerified = json['IS_VERIFIED'] == 'true';
   }
