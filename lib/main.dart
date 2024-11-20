@@ -67,8 +67,7 @@ class MyApp extends StatelessWidget {
                       ColorScheme.fromSeed(seedColor: Palette.mainColor),
                   useMaterial3: true,
                   scaffoldBackgroundColor: Palette.scaffold),
-              home:
-                  const LoginScreen() /*const IntroScreen()*/ /*const HomeScreen()*/),
+              home: const LoginScreen()),
         );
       },
     );

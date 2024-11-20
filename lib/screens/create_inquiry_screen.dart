@@ -428,7 +428,7 @@ class CreateInquiryScreen extends StatelessWidget {
                           if (inquiryViewModel.isSavedInquiry != null) {
                             if (inquiryViewModel.isSavedInquiry!) {
                               showMessage(Strings.data_saved_successfully);
-                              //Navigator.pop(context);
+                              Navigator.pop(context);
                             } else {
                               showMessage(Strings.failed_to_save_the_data);
                             }

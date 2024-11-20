@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/screens/dialog/update_task_dialog.dart';
 import 'package:tmbi/screens/note_screen.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
-import '../data/data.dart';
 import '../models/models.dart';
 import '../screens/attachment_view_screen.dart';
 
@@ -70,7 +70,9 @@ class _TaskListState extends State<TaskList> {
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.blue, // Set your desired background color here
+                  color: widget.task.status.statusColor,
+                  // Set your desired background color here
+                  // Set your desired background color here
                   borderRadius: BorderRadius.circular(
                       Converts.c12), // Adjust the radius for roundness
                 ),
@@ -78,7 +80,7 @@ class _TaskListState extends State<TaskList> {
                 child: TextViewCustom(
                     text: widget.task.status,
                     fontSize: Converts.c12,
-                    tvColor: Colors.white,
+                    tvColor: Colors.black,
                     isTextAlignCenter: false,
                     isRubik: false,
                     isBold: true),
@@ -167,18 +169,17 @@ class _TaskListState extends State<TaskList> {
                   SizedBox(
                     width: Converts.c8,
                   ),
-                  /*ButtonCircularIcon(
+                  ButtonCircularIcon(
                       height: Converts.c24,
                       width: Converts.c96,
                       radius: 4,
                       bgColor: Colors.black,
                       hasOpacity: false,
                       tvColor: Colors.white,
-                      fontSize: 8,
+                      fontSize: 14,
                       iconData: Icons.flag_outlined,
-                      //text: task.date.split("-")[1].split(",")[0],
-                      text: task.date,
-                      onTap: () {})*/
+                      text: widget.task.date.split("To")[1].trim(),
+                      onTap: () {})
                 ],
               ),
               // icon
@@ -201,15 +202,26 @@ class _TaskListState extends State<TaskList> {
                         right: Converts.c8,
                         top: Converts.c8,
                       ),
-                      child: Icon(
-                        Icons.note,
-                        color: Colors.black,
-                        size: Converts.c20,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          // Background color of the circle (customize as needed)
+                          shape: BoxShape
+                              .circle, // This makes the container circular
+                        ),
+                        padding: EdgeInsets.all(Converts.c8),
+                        // Padding around the icon inside the circle
+                        child: Icon(
+                          Icons.note,
+                          color: Colors.white,
+                          // Color of the icon (customize as needed)
+                          size: Converts.c20, // Icon size (customize as needed)
+                        ),
                       ),
                     ),
                   ),
                   SizedBox(
-                    width: Converts.c16,
+                    width: Converts.c8,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -228,10 +240,19 @@ class _TaskListState extends State<TaskList> {
                         right: Converts.c8,
                         top: Converts.c8,
                       ),
-                      child: Icon(
-                        Icons.attach_file,
-                        color: Colors.black,
-                        size: Converts.c20,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          // Background color of the circle (customize as needed)
+                          shape: BoxShape
+                              .circle, // This makes the container circular
+                        ),
+                        padding: EdgeInsets.all(Converts.c8),
+                        child: Icon(
+                          Icons.attach_file,
+                          color: Colors.white,
+                          size: Converts.c20,
+                        ),
                       ),
                     ),
                   ),
@@ -243,27 +264,4 @@ class _TaskListState extends State<TaskList> {
       ),
     );
   }
-
-  /*Color _getColor(String status) {
-    String started = PriorityList().priorities[0].name.toString();
-    String inProgress = PriorityList().priorities[1].name.toString();
-    String hold = PriorityList().priorities[2].name.toString();
-    String completed = PriorityList().priorities[3].name.toString();
-    switch (status) {
-      case "Delayed":
-        return Colors.deepOrange;
-      case "Pending":
-        return Colors.blueGrey;
-      case "Upcoming":
-        return Colors.green;
-      case started:
-        return Colors.blue;
-      case "Cancelled":
-        return Colors.red;
-      case "In Progress":
-        return Colors.amber;
-      default:
-        return Colors.grey; // Default color if status is unknown
-    }
-  }*/
 }

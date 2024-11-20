@@ -24,6 +24,7 @@ class CommentScreen extends StatefulWidget {
 
 class _CommentScreenState extends State<CommentScreen> {
   final TextEditingController _bodyController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   /*final List<Comments> comments = [
     Comments(
@@ -61,6 +62,7 @@ class _CommentScreenState extends State<CommentScreen> {
       // fetch the comments after the widget has been built
       Provider.of<InquiryViewModel>(context, listen: false)
           .getComments(widget.inquiryId, "0");
+      _scrollToBottom();
     });
   }
 
@@ -106,12 +108,11 @@ class _CommentScreenState extends State<CommentScreen> {
           children: [
             Expanded(
               child: ListView.builder(
-                //itemCount: comments.length,
+                controller: _scrollController,
                 itemCount: inquiryViewModel.commentResponse != null
                     ? inquiryViewModel.commentResponse!.length
                     : 0,
                 itemBuilder: (context, index) {
-                  //return CommentList(comment: comments[index]);
                   return CommentList(
                       comment: inquiryViewModel.commentResponse![index]);
                 },
@@ -155,11 +156,11 @@ class _CommentScreenState extends State<CommentScreen> {
                       String userId = await _getUserInfo();
                       String name = await _getUserInfo(isName: true);
                       if (_bodyController.text != "") {
-                        // save inquiry
+                        // save comment
                         await inquiryViewModel.saveComment(
                           widget.inquiryId,
                           _bodyController.text,
-                          "0",
+                          "0", // task id must be '0'
                           userId,
                         );
                         // handle error view
@@ -176,8 +177,10 @@ class _CommentScreenState extends State<CommentScreen> {
                                     body: _bodyController.text,
                                     dateTime:
                                     DateTime.now().toFormattedString(format: "dd MMM, yy'T'h:mm a"),
+                                    staffId: userId,
                                     name: name));
                                 _bodyController.text = "";
+                                _scrollToBottom();
                               });
 
                             } else {
@@ -230,4 +233,16 @@ class _CommentScreenState extends State<CommentScreen> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
+  // scroll to the bottom of the ListView
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300), // Animation duration
+        curve: Curves.easeOut, // Animation curve
+      );
+    }
+  }
+
 }

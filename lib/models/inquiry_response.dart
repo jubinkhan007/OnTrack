@@ -159,7 +159,10 @@ class InquiryResponse {
   });
 
   factory InquiryResponse.fromJson(Map<String, dynamic> json) {
-    var tasksList = json['TASKS'] as List;
+    //var tasksList = json['TASKS'] as List;
+    var tasksList = json['TASKS'] != null
+        ? json['TASKS'] as List
+        : <dynamic>[];
     List<Task> taskList = tasksList.map((task) => Task.fromJson(task)).toList();
 
     return InquiryResponse(
@@ -230,14 +233,14 @@ class Task {
 
 class Comment {
   final String id;
-  final String count;
+  final String? count;
 
   Comment({required this.id, required this.count});
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(
       id: json['id'],
-      count: json['count'], // count is returned as a String in the JSON
+      count: json['count'] ?? "0", // count is returned as a String in the JSON
     );
   }
 }

@@ -96,13 +96,15 @@ class CommentResponse {
 
 class Discussion {
   String? name;
+  String? staffId;
   String? dateTime;
   String? body;
 
-  Discussion({this.name, this.dateTime, this.body});
+  Discussion({this.name, this.staffId, this.dateTime, this.body});
 
   Discussion.fromJson(Map<String, dynamic> json) {
     name = json['NAME'];
+    staffId = json['STAFFID'];
     dateTime = json['DATETIME'];
     body = json['COMMENTS'];
   }
@@ -110,6 +112,7 @@ class Discussion {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['NAME'] = name;
+    data['STAFFID'] = staffId;
     data['DATETIME'] = dateTime;
     data['COMMENTS'] = body;
     return data;

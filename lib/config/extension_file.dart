@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../data/data.dart';
 import '../widgets/widgets.dart';
 import 'converts.dart';
 
@@ -30,5 +31,28 @@ extension SnackbarExtension on BuildContext {
       ),
     );
     ScaffoldMessenger.of(this).showSnackBar(snackBar);
+  }
+}
+
+extension StatusColor on String {
+  Color get statusColor {
+    // Priority list initialization
+    String started = PriorityList().priorities[0].name ?? "";
+    String progress = PriorityList().priorities[1].name ?? "";
+    String hold = PriorityList().priorities[2].name ?? "";
+    String completed = PriorityList().priorities[3].name ?? "";
+
+    // Check the status and return the appropriate color
+    if (this == started) {
+      return Colors.blue;
+    } else if (this == progress) {
+      return Colors.yellow;
+    } else if (this == hold) {
+      return Colors.redAccent;
+    } else if (this == completed) {
+      return Colors.green;
+    } else {
+      return Colors.grey; // Default color if status is unknown
+    }
   }
 }

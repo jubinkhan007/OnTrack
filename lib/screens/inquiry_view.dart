@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/strings.dart';
+import 'package:tmbi/screens/screens.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
@@ -11,7 +12,8 @@ class InquiryView extends StatelessWidget {
   final InquiryResponse inquiryResponse;
   final String flag;
 
-  const InquiryView({super.key, required this.inquiryResponse, required this.flag});
+  const InquiryView(
+      {super.key, required this.inquiryResponse, required this.flag});
 
   int _countPendingTask() {
     int count = 0;
@@ -98,7 +100,9 @@ class InquiryView extends StatelessWidget {
                           height: Converts.c32,
                           width: Converts.c96,
                           radius: 8,
-                          bgColor: Palette.iconColor,
+                          bgColor: flag == HomeFlagItem().homeFlagItems[3].title
+                              ? Colors.green
+                              : Palette.iconColor,
                           hasOpacity: false,
                           text: flag,
                           fontSize: Converts.c16,
@@ -127,11 +131,20 @@ class InquiryView extends StatelessWidget {
                           radius: 8,
                           bgColor: Colors.purple,
                           hasOpacity: false,
-                          text: "Attachment",
+                          text: Strings.attachment,
                           fontSize: Converts.c16,
                           iconData: Icons.attach_file,
                           tvColor: Colors.white,
-                          onTap: () {}),
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AttachmentViewScreen.routeName,
+                              arguments: {
+                                'inquiryId': inquiryResponse.id.toString(),
+                                'taskId': "0",
+                              },
+                            );
+                          }),
                     ],
                   ),
                   SizedBox(

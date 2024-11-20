@@ -156,7 +156,7 @@ class _CustomerAddViewState extends State<CustomerAddView> {
                     setState(() {
                       this.customer = customer;
                       _isCustomerViewVisible = true;
-                      if (customer.id == 0) {
+                      if (customer.id == "0") {
                         _isOtherCustomerViewVisible = true;
                       } else {
                         _isOtherCustomerViewVisible = false;

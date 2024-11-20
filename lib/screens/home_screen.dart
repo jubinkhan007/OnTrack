@@ -11,6 +11,7 @@ import 'package:tmbi/screens/attachment_view_screen.dart';
 import 'package:tmbi/screens/comment_screen.dart';
 import 'package:tmbi/screens/create_inquiry_screen.dart';
 import 'package:tmbi/screens/inquiry_view.dart';
+import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
 import 'package:tmbi/widgets/feature_status.dart';
 import 'package:tmbi/widgets/widgets.dart';
@@ -23,7 +24,7 @@ enum Status { DELAYED, PENDING, UPCOMING, COMPLETED }
 class HomeScreen extends StatelessWidget {
   static const String routeName = '/home_screen';
   final String staffId;
-  String selectedFlag = "";
+  String selectedFlag = HomeFlagItem().homeFlagItems[1].title;
 
   HomeScreen({super.key, required this.staffId});
 
@@ -71,11 +72,16 @@ class HomeScreen extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(
-                Icons.folder_open,
+                Icons.logout,
                 color: Colors.black,
               ),
               onPressed: () {
-                context.showMessage(Strings.available_soon);
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      (Route<dynamic> route) => false, // Removes all previous routes
+                );
+                //context.showMessage(Strings.available_soon);
               },
             ),
           ],
@@ -294,7 +300,7 @@ class HomeScreen extends StatelessWidget {
 
   Future<void> _getInquiries(
       InquiryViewModel inquiryViewModel, String flag) async {
-    await inquiryViewModel.getInquiries(flag, staffId);
+      await inquiryViewModel.getInquiries(flag, staffId);
   }
 
   Future<String> _getUserName() async {

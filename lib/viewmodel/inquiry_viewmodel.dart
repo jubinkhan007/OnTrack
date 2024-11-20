@@ -58,7 +58,7 @@ class InquiryViewModel extends ChangeNotifier {
 
   Future<void> getInquiries(String flag, String userId) async {
     if (_uiState == UiState.loading) return;
-
+    _message = null;
     _uiState = UiState.loading;
     notifyListeners();
     try {

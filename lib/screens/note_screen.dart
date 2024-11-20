@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tmbi/config/extension_file.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
@@ -80,23 +81,73 @@ class NoteScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: Converts.c8),
-                        child: Icon(
-                          Icons.date_range,
-                          color: Palette.normalTv,
-                          size: Converts.c16,
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: Converts.c8),
+                              child: Icon(
+                                Icons.date_range,
+                                color: Palette.normalTv,
+                                size: Converts.c16,
+                              ),
+                            ),
+                            SizedBox(
+                              width: Converts.c8,
+                            ),
+                            TextViewCustom(
+                                text: inquiryViewModel
+                                        .noteResponse![index]!.dateTime!
+                                        .split("T")[0] ??
+                                    "",
+                                fontSize: Converts.c16,
+                                tvColor: Palette.normalTv,
+                                isBold: true),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              child: Container(
+                                height: 4,
+                                width: 4,
+                                decoration: const BoxDecoration(
+                                  color: Palette.semiNormalTv,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                            TextViewCustom(
+                                text: inquiryViewModel
+                                        .noteResponse![index]!.dateTime!
+                                        .split("T")[1] ??
+                                    "",
+                                fontSize: Converts.c16,
+                                tvColor: Palette.normalTv,
+                                isBold: true),
+                          ],
                         ),
                       ),
-                      SizedBox(
-                        width: Converts.c8,
+                      Padding(
+                        padding: EdgeInsets.only(right: Converts.c12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: inquiryViewModel!
+                                .noteResponse![index]!.status!.statusColor,
+                            borderRadius: BorderRadius.circular(
+                                Converts.c12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          child: TextViewCustom(
+                              text: inquiryViewModel!
+                                      .noteResponse![index]!.status ??
+                                  "",
+                              fontSize: Converts.c12,
+                              tvColor: Colors.black,
+                              isTextAlignCenter: false,
+                              isRubik: false,
+                              isBold: true),
+                        ),
                       ),
-                      TextViewCustom(
-                          text: inquiryViewModel
-                              .noteResponse![index]!.dateTime!,
-                          fontSize: Converts.c16,
-                          tvColor: Palette.normalTv,
-                          isBold: true),
                     ],
                   ),
                   SizedBox(
