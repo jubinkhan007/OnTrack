@@ -29,9 +29,9 @@ class Strings {
   static const String pending = 'Pending';
   static const String attachment = 'Attachment';
   static const String notes = 'Notes';
-  static const String project = 'Project';
+  static const String project = 'Title';
   static const String owner = 'Owner';
-  static const String overview = 'Overview';
+  static const String overview = 'Description';
   static const String date = 'Date';
   static const String company = 'Company';
   static const String inquiry_type = 'Inquiry type';
@@ -74,5 +74,6 @@ class Strings {
   static const String good_night = 'Good Night';
   static const String good_afternoon = 'Good Afternoon';
   static const String good_morning = 'Good Morning';
+  static const String remember_me = 'Remember me';
   static const String available_soon = 'This feature will be available soon.';
 }

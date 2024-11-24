@@ -136,7 +136,7 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
+                /*Padding(
                   padding: EdgeInsets.only(
                     left: Converts.c16,
                     top: Converts.c24,
@@ -147,6 +147,9 @@ class HomeScreen extends StatelessWidget {
                     tvColor: Colors.black,
                     isBold: true,
                   ),
+                ),*/
+                SizedBox(
+                  height: Converts.c8,
                 ),
                 CounterCard(
                   counters: CounterItem().counters,
@@ -158,13 +161,11 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: Converts.c16,
-                ),
+
                 Padding(
                   padding: EdgeInsets.only(
                     left: Converts.c16,
-                    top: Converts.c24,
+                    top: Converts.c8,
                   ),
                   child: TextViewCustom(
                     text: Strings.inquiry,
@@ -174,7 +175,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  height: Converts.c16,
+                  height: Converts.c8,
                 ),
                 FeatureStatus(
                   homeFlags: HomeFlagItem().homeFlagItems,

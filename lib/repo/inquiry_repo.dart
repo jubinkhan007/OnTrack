@@ -90,7 +90,7 @@ class InquiryRepo {
         "inqrdesc": description,
         "userid": userId,
         "priorityid": priorityId,
-        "files": fileNames.length
+        "files": fileNames.length,
       };
 
       // set file names
@@ -279,7 +279,7 @@ class InquiryRepo {
         "taskid":"0",
         "userid": userId,
         "priorityid": "0",
-        "files": "0"
+        "files": "0",
       };
 
       final response = await dio.post(

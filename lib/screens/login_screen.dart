@@ -4,6 +4,7 @@ import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
+import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/network/ui_state.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
@@ -73,6 +74,14 @@ class _LoginOperationState extends State<LoginOperation> {
   final TextEditingController _idTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
 
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredential();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<LoginViewmodel>(builder: (context, loginViewModel, child) {
@@ -84,7 +93,10 @@ class _LoginOperationState extends State<LoginOperation> {
             right: Converts.c24,
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              /// staff id
               TextFieldCustom(
                 controller: _idTEController,
                 hintText: Strings.staff_id,
@@ -108,6 +120,8 @@ class _LoginOperationState extends State<LoginOperation> {
               SizedBox(
                 height: Converts.c16,
               ),
+
+              /// password
               TextFieldCustom(
                 controller: _passwordTEController,
                 hintText: Strings.password,
@@ -128,9 +142,17 @@ class _LoginOperationState extends State<LoginOperation> {
                   return null;
                 },
               ),
-              SizedBox(
-                height: Converts.c32,
-              ),
+
+              /// remember me
+              CheckBox(
+                  title: Strings.remember_me,
+                  isTitleBold: false,
+                  isChecked: _rememberMe,
+                  onChecked: (value) {
+                    _rememberMe = value == "Y" ? true : false;
+                  }),
+
+              /// button
               ButtonCustom1(
                 btnText: Strings.login,
                 btnHeight: Converts.c48,
@@ -145,17 +167,26 @@ class _LoginOperationState extends State<LoginOperation> {
                         _idTEController.text, _passwordTEController.text);
                     if (loginViewModel.uiState == UiState.error) {
                       _showMessage(loginViewModel.message.toString());
-                    }
-                    else if (loginViewModel.uiState == UiState.success) {
+                    } else if (loginViewModel.uiState == UiState.success) {
                       if (loginViewModel.userResponse != null) {
                         if (loginViewModel.userResponse!.users != null) {
                           if (loginViewModel.userResponse!.users!.isNotEmpty) {
-                            await SPHelper().saveUser(loginViewModel.userResponse!);
-                            Navigator.pushNamed(
-                              context,
-                              HomeScreen.routeName,
-                              arguments: loginViewModel.userResponse!.users![0].staffId
-                            );
+                            // saved password based of 'Remember me' flag
+                            /*_saveCredential(_passwordTEController.text,
+                                loginViewModel.userResponse!);*/
+                            if (_rememberMe) {
+                              loginViewModel.userResponse!.users![0].password =
+                                  _passwordTEController.text;
+                            } else {
+                              loginViewModel.userResponse!.users![0].password =
+                                  "";
+                            }
+                            await SPHelper().saveCredentialFlag(_rememberMe);
+                            await SPHelper()
+                                .saveUser(loginViewModel.userResponse!);
+                            Navigator.pushNamed(context, HomeScreen.routeName,
+                                arguments: loginViewModel
+                                    .userResponse!.users![0].staffId);
                           } else {
                             _showMessage(
                                 loginViewModel.userResponse!.status!.message!);
@@ -164,8 +195,7 @@ class _LoginOperationState extends State<LoginOperation> {
                           _showMessage(Strings.login_validation_error);
                         }
                       }
-                    }
-                    else {
+                    } else {
                       _showMessage(Strings.something_went_wrong);
                     }
                   }
@@ -199,4 +229,22 @@ class _LoginOperationState extends State<LoginOperation> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  _loadSavedCredential() async {
+    bool isSaved = await SPHelper().isCredentialSaved();
+    UserResponse? userResponse = await SPHelper().getUser();
+    setState(() {
+      _rememberMe = isSaved;
+      if (_rememberMe) {
+        if (UserResponse != null) {
+          String? staffId = userResponse!.users![0]!.staffId;
+          String? password = userResponse!.users![0]!.password;
+          _idTEController.text = staffId ?? "";
+          _passwordTEController.text = password ?? "";
+        }
+      } else {
+        _idTEController.text = "";
+        _passwordTEController.text = "";
+      }
+    });
+  }
 }

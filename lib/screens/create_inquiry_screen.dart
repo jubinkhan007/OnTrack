@@ -117,6 +117,7 @@ class CreateInquiryScreen extends StatelessWidget {
                     SizedBox(
                       height: Converts.c8,
                     ),
+
                     /// title & is sample
                     Row(
                       children: [
@@ -129,9 +130,13 @@ class CreateInquiryScreen extends StatelessWidget {
                               hint: "Type Title Here",
                               controller: titleController),
                         ),
-                        CheckBox(onChecked: (value) {
-                          isSample = value ?? "N";
-                        }),
+                        CheckBox(
+                            title: Strings.is_sample,
+                            isTitleBold: true,
+                            isChecked: false,
+                            onChecked: (value) {
+                              isSample = value ?? "N";
+                            }),
                       ],
                     ),
 
@@ -470,11 +475,11 @@ class CreateInquiryScreen extends StatelessWidget {
     try {
       UserResponse? userResponse = await SPHelper().getUser();
       String id = userResponse != null ? userResponse.users![0].staffId! : "";
-      String name = userResponse != null ? userResponse.users![0].staffName! : "";
+      String name =
+          userResponse != null ? userResponse.users![0].staffName! : "";
       return isName ? name : id;
     } catch (e) {
       return "";
     }
   }
-
 }
