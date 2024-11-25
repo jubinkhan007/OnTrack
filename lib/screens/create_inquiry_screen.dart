@@ -14,15 +14,16 @@ import '../widgets/widgets.dart';
 
 class CreateInquiryScreen extends StatelessWidget {
   static const String routeName = '/create_inquiry_screen';
+  final String staffId;
 
-  const CreateInquiryScreen({super.key});
+  const CreateInquiryScreen({super.key, required this.staffId});
 
   @override
   Widget build(BuildContext context) {
     final inquiryViewModel =
         Provider.of<InquiryCreateViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      inquiryViewModel.getInitDataForCreateInquiry();
+      inquiryViewModel.getInitDataForCreateInquiry(staffId);
     });
 
     // customer list

@@ -14,7 +14,7 @@ class SizeConfig {
   void init(BoxConstraints constraints) {
     _screenWidth = constraints.maxWidth;
     _screenHeight = constraints.maxHeight;
-    //log('$_screenWidth $_screenHeight');
+    //debugPrint('$_screenWidth $_screenHeight');
     _blockWidth = _screenWidth / 50.5854791898;
     _blockHeight = _screenHeight / 112.4121759774;
     //log('$_blockWidth $_blockHeight');
@@ -23,4 +23,18 @@ class SizeConfig {
     heightMultiplier = _blockHeight;
     widthMultiplier = _blockWidth;
   }
+  void init2(Size screenSize) {
+    _screenWidth = screenSize.width;
+    _screenHeight = screenSize.height;
+
+    _blockWidth = _screenWidth / 50.5854791898;
+    _blockHeight = _screenHeight / 112.4121759774;
+
+    textMultiplier = _blockHeight;
+    imageSizeMultiplier = _blockWidth;
+    heightMultiplier = _blockHeight;
+    widthMultiplier = _blockWidth;
+  }
+
+
 }

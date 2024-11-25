@@ -66,7 +66,7 @@ class InquiryView extends StatelessWidget {
                     height: 4,
                   ),
                   _iconView(Icons.account_circle_outlined, "${Strings.owner}:",
-                      "${inquiryResponse.postedBy.name} & ${inquiryResponse.customer.name}"),
+                      "${inquiryResponse.postedBy.name} [${inquiryResponse.customer.name}]"),
                   const SizedBox(
                     height: 4,
                   ),

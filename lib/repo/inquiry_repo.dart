@@ -10,12 +10,12 @@ class InquiryRepo {
 
   InquiryRepo({required this.fileDio, required this.dio});
 
-  Future<InitDataCreateInq> getInitDataForCreateInquiry() async {
+  Future<InitDataCreateInq> getInitDataForCreateInquiry(String staffId) async {
     try {
       final headers = {
         'vm': 'COMP',
         'va': '5',
-        'vb': '340553',
+        'vb': staffId,
         'vc': '123456',
         'vd': 'company',
       };
@@ -149,13 +149,13 @@ class InquiryRepo {
     }
   }
 
-  Future<List<InquiryResponse>> getInquiries(String flag, String userId) async {
+  Future<List<InquiryResponse>> getInquiries(String flag, String userId, String isAssigned) async {
     try {
       final headers = {
         'vm': 'INQALL',
         'va': flag,
         'vb': userId,
-        'vc': 'XX',
+        'vc': isAssigned,
         'vd': 'queries',
       };
       final response = await dio.get(

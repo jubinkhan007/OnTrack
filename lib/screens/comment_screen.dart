@@ -90,10 +90,10 @@ class _CommentScreenState extends State<CommentScreen> {
       body: Consumer<InquiryViewModel>(
           builder: (context, inquiryViewModel, child) {
         // handle loading view
-        /*if (inquiryViewModel.uiState == UiState.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        else*/
+        if (inquiryViewModel.uiState == UiState.loading) {
+          //return const Center(child: CircularProgressIndicator());
+          return context.shimmerLoading();
+        } else
         // handle error view
         if (inquiryViewModel.uiState == UiState.error) {
           return Center(
@@ -138,7 +138,8 @@ class _CommentScreenState extends State<CommentScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: inquiryViewModel.uiState == UiState.loading
+                    //icon: inquiryViewModel.uiState == UiState.loading
+                    icon: inquiryViewModel.uiState == UiState.commentLoading
                         ? SizedBox(
                             width: Converts.c16,
                             height: Converts.c16,
@@ -173,16 +174,17 @@ class _CommentScreenState extends State<CommentScreen> {
                             if (inquiryViewModel.isSavedInquiry!) {
                               //_addComment(name);
                               setState(() {
-                                inquiryViewModel.commentResponse!.add(Discussion(
-                                    body: _bodyController.text,
-                                    dateTime:
-                                    DateTime.now().toFormattedString(format: "dd MMM, yy'T'h:mm a"),
-                                    staffId: userId,
-                                    name: name));
+                                inquiryViewModel.commentResponse!.add(
+                                    Discussion(
+                                        body: _bodyController.text,
+                                        dateTime: DateTime.now()
+                                            .toFormattedString(
+                                                format: "dd MMM, yy'T'h:mm a"),
+                                        staffId: userId,
+                                        name: name));
                                 _bodyController.text = "";
                                 _scrollToBottom();
                               });
-
                             } else {
                               _showMessage(Strings.failed_to_save_the_data);
                             }
@@ -244,5 +246,4 @@ class _CommentScreenState extends State<CommentScreen> {
       );
     }
   }
-
 }

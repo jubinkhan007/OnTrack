@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../data/data.dart';
 import '../widgets/widgets.dart';
@@ -8,11 +9,11 @@ import 'converts.dart';
 extension DateTimeFormatter on DateTime {
   String toFormattedString({isFullYear = false, format = "dd MMM, yy"}) {
     String fullYearFormat = "dd MMM, yyyy";
-    DateFormat dateFormat = isFullYear ? DateFormat(fullYearFormat) : DateFormat(format);
+    DateFormat dateFormat =
+        isFullYear ? DateFormat(fullYearFormat) : DateFormat(format);
     return dateFormat.format(this);
   }
 }
-
 
 extension SnackbarExtension on BuildContext {
   void showMessage(String message) {
@@ -54,5 +55,46 @@ extension StatusColor on String {
     } else {
       return Colors.grey; // Default color if status is unknown
     }
+  }
+}
+
+extension ShimmerLoadingExtension on BuildContext {
+  // Shimmer loading extension method
+  Shimmer shimmerLoading() {
+    return Shimmer.fromColors(
+      baseColor: Colors.red[100]!,
+      highlightColor: Colors.red[50]!,
+      child: Padding(
+        padding: EdgeInsets.all(Converts.c8),
+        child: ListView.builder(
+          itemCount: 5, // Number of shimmering items
+          itemBuilder: (context, index) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: Converts.c208,
+                  height: Converts.c16,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  width: double.infinity,
+                  height: Converts.c16,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  width: Converts.c296,
+                  height: Converts.c16,
+                  color: Colors.white,
+                ),
+                SizedBox(height: Converts.c16),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 }

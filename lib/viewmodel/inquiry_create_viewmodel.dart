@@ -35,13 +35,13 @@ class InquiryCreateViewModel extends ChangeNotifier {
 
   UiState get uiState => _uiState;
 
-  Future<void> getInitDataForCreateInquiry() async {
+  Future<void> getInitDataForCreateInquiry(String staffId) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response = await inquiryRepo.getInitDataForCreateInquiry();
+      final response = await inquiryRepo.getInitDataForCreateInquiry(staffId);
       _initDataCreateInq = response;
       _uiState = UiState.success;
     } catch (error) {

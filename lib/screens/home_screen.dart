@@ -7,10 +7,6 @@ import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/data/counter_item.dart';
 import 'package:tmbi/models/user_response.dart';
-import 'package:tmbi/screens/attachment_view_screen.dart';
-import 'package:tmbi/screens/comment_screen.dart';
-import 'package:tmbi/screens/create_inquiry_screen.dart';
-import 'package:tmbi/screens/inquiry_view.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
 import 'package:tmbi/widgets/feature_status.dart';
@@ -25,25 +21,25 @@ class HomeScreen extends StatelessWidget {
   static const String routeName = '/home_screen';
   final String staffId;
   String selectedFlag = HomeFlagItem().homeFlagItems[1].title;
+  String isAssigned = "1";
 
   HomeScreen({super.key, required this.staffId});
 
   @override
   Widget build(BuildContext context) {
+    String selectedFlagValue = getFlag(Status.PENDING);
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      inquiryViewModel.getInquiries(getFlag(Status.PENDING), staffId);
+      inquiryViewModel.getInquiries(selectedFlagValue, staffId, isAssigned);
     });
 
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(
-            context,
-            CreateInquiryScreen.routeName,
-          );
+          Navigator.pushNamed(context, CreateInquiryScreen.routeName,
+              arguments: staffId);
         },
         mini: true,
         backgroundColor: Palette.mainColor,
@@ -76,12 +72,7 @@ class HomeScreen extends StatelessWidget {
                 color: Colors.black,
               ),
               onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                      (Route<dynamic> route) => false, // Removes all previous routes
-                );
-                //context.showMessage(Strings.available_soon);
+                _showLogoutDialog(context);
               },
             ),
           ],
@@ -161,17 +152,34 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Padding(
                   padding: EdgeInsets.only(
                     left: Converts.c16,
                     top: Converts.c8,
                   ),
-                  child: TextViewCustom(
-                    text: Strings.inquiry,
-                    fontSize: Converts.c20,
-                    tvColor: Colors.black,
-                    isBold: true,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextViewCustom(
+                          text: Strings.inquiry,
+                          fontSize: Converts.c20,
+                          tvColor: Colors.black,
+                          isTextAlignCenter: false,
+                          isBold: true,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(right: Converts.c16),
+                        child: SwitchContainer(
+                          onSwitchTap: (value) async {
+                            isAssigned = value ? "1" : "0";
+                            await _getInquiries(inquiryViewModel,
+                                selectedFlagValue, isAssigned);
+                            debugPrint("IS_ASSIGNED:: $isAssigned");
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(
@@ -181,7 +189,9 @@ class HomeScreen extends StatelessWidget {
                   homeFlags: HomeFlagItem().homeFlagItems,
                   onPressed: (value, flag) async {
                     selectedFlag = value;
-                    await _getInquiries(inquiryViewModel, getFlag(flag));
+                    selectedFlagValue = getFlag(flag);
+                    await _getInquiries(
+                        inquiryViewModel, getFlag(flag), isAssigned);
                     //debugPrint(value);
                   },
                 )
@@ -300,8 +310,8 @@ class HomeScreen extends StatelessWidget {
   }
 
   Future<void> _getInquiries(
-      InquiryViewModel inquiryViewModel, String flag) async {
-      await inquiryViewModel.getInquiries(flag, staffId);
+      InquiryViewModel inquiryViewModel, String flag, String isAssigned) async {
+    await inquiryViewModel.getInquiries(flag, staffId, isAssigned);
   }
 
   Future<String> _getUserName() async {
@@ -340,5 +350,37 @@ class HomeScreen extends StatelessWidget {
       default:
         return "4"; // Default flag value for unknown or unhandled statuses
     }
+  }
+
+  Future<void> _showLogoutDialog(BuildContext context) async {
+    bool? logoutConfirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(Strings.logout),
+          content: const Text(Strings.are_you_sure_you_want_to_logout),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // return false to indicate cancellation
+              },
+              child: const Text(Strings.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (Route<dynamic> route) =>
+                      false, // Removes all previous routes
+                );
+              },
+              child: const Text(Strings.yes),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

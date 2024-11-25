@@ -21,7 +21,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        SizeConfig().init(constraints);
+        //SizeConfig().init(constraints);
+        SizeConfig().init2(MediaQuery.of(context).size);
         return MultiProvider(
           providers: [
             ChangeNotifierProvider(

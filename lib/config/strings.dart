@@ -76,4 +76,11 @@ class Strings {
   static const String good_morning = 'Good Morning';
   static const String remember_me = 'Remember me';
   static const String available_soon = 'This feature will be available soon.';
+  static const String assigned = 'Assigned';
+  static const String created = 'Created';
+  static const String logout = 'Logout';
+  static const String are_you_sure_you_want_to_logout = 'Are you sure you want to log out?';
+  static const String yes = 'Yes';
+  static const String no = 'No';
+  static const String cancel = 'Cancel';
 }

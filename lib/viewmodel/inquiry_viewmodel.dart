@@ -56,13 +56,13 @@ class InquiryViewModel extends ChangeNotifier {
 
   UiState get uiState => _uiState;
 
-  Future<void> getInquiries(String flag, String userId) async {
+  Future<void> getInquiries(String flag, String userId, String isAssigned) async {
     if (_uiState == UiState.loading) return;
     _message = null;
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response = await inquiryRepo.getInquiries(flag, userId);
+      final response = await inquiryRepo.getInquiries(flag, userId, isAssigned);
       //final response = _getDemoTasks(); // test purpose
       _inquiries = response;
       _uiState = UiState.success;
@@ -125,7 +125,7 @@ class InquiryViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> saveComment(
+  /*Future<void> saveComment(
       String inquiryId, String body, String priorityId, String userId) async {
     if (_uiState == UiState.loading) return;
 
@@ -134,6 +134,25 @@ class InquiryViewModel extends ChangeNotifier {
     try {
       final response =
           await inquiryRepo.saveComment(inquiryId, body, priorityId, userId);
+      _isSavedInquiry = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }*/
+
+  Future<void> saveComment(
+      String inquiryId, String body, String priorityId, String userId) async {
+    if (_uiState == UiState.commentLoading) return;
+
+    _uiState = UiState.commentLoading;
+    notifyListeners();
+    try {
+      final response =
+      await inquiryRepo.saveComment(inquiryId, body, priorityId, userId);
       _isSavedInquiry = response;
       _uiState = UiState.success;
     } catch (error) {

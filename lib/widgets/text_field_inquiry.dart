@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 
 class TextFieldInquiry extends StatelessWidget {
   final double fontSize;
@@ -26,6 +26,9 @@ class TextFieldInquiry extends StatelessWidget {
     return TextField(
       controller: controller,
       maxLines: maxLine,
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9,!.? ]')),
+      ],
       style: TextStyle(
         fontSize: fontSize, // Hint text size
         color: fontColor, // Text color
@@ -36,8 +39,9 @@ class TextFieldInquiry extends StatelessWidget {
             fontSize: fontSize, // Hint text size
             color: hintColor, // Hint text color
           ),
-          border:
-              hasBorder ? const OutlineInputBorder() : const UnderlineInputBorder(),
+          border: hasBorder
+              ? const OutlineInputBorder()
+              : const UnderlineInputBorder(),
           enabledBorder: hasBorder
               ? const OutlineInputBorder(
                   borderSide: BorderSide(

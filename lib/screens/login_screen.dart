@@ -10,10 +10,28 @@ import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
-class LoginScreen extends StatelessWidget {
+import '../config/size_config.dart';
+
+class LoginScreen extends StatefulWidget {
   static const String routeName = '/login_screen';
 
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    // this is for login screen shrink while build apk
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SizeConfig().init2(MediaQuery.of(context).size);
+    });
+    //SizeConfig().init2(MediaQuery.of(context).size);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +48,8 @@ class LoginScreen extends StatelessWidget {
                   height: Converts.c48,
                 ),
                 TextViewCustom(
-                    text: Strings.app_name,
+                    //text: Strings.app_name,
+                    text: "Track all",
                     fontSize: Converts.c24,
                     tvColor: Palette.mainColor,
                     isTextAlignCenter: true,
@@ -75,12 +94,6 @@ class _LoginOperationState extends State<LoginOperation> {
   final TextEditingController _passwordTEController = TextEditingController();
 
   bool _rememberMe = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSavedCredential();
-  }
 
   @override
   Widget build(BuildContext context) {

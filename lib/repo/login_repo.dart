@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tmbi/models/user_response.dart';
 
 class LoginRepo {
@@ -10,10 +11,11 @@ class LoginRepo {
   });
 
   Future<UserResponse> userAuth(String userid, String password) async {
+    final packageInfo = await PackageInfo.fromPlatform();
     try {
       final headers = {
         'vm': 'LOGIN',
-        'va': '5',
+        'va': packageInfo.buildNumber,
         'vb': userid,
         'vc': password,
         'vd': 'user',
