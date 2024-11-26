@@ -19,34 +19,45 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        //SizeConfig().init(constraints);
-        SizeConfig().init2(MediaQuery.of(context).size);
-        return MultiProvider(
+    //return LayoutBuilder(
+    //builder: (context, constraints) {
+    //SizeConfig().init(constraints);
+    //SizeConfig().init2(context);
+    return MultiProvider(
           providers: [
             ChangeNotifierProvider(
               create: (_) => LoginViewmodel(
                 //loginRepo: LoginRepo(dio: ApiService().provideDio()),
-                loginRepo: LoginRepo(dio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").provideDio()),
+                loginRepo: LoginRepo(
+                    dio: ApiService(
+                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        .provideDio()),
               ),
             ),
             ChangeNotifierProvider(
               create: (_) => InquiryCreateViewModel(
                 inquiryRepo: InquiryRepo(
                     //fileDio: ApiService().fileUploadDio(),
-                    fileDio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").fileUploadDio(),
+                    fileDio: ApiService(
+                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        .fileUploadDio(),
                     //dio: ApiService().provideDio()),
-                    dio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").provideDio()),
+                    dio: ApiService(
+                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        .provideDio()),
               ),
             ),
             ChangeNotifierProvider(
               create: (_) => InquiryViewModel(
                 inquiryRepo: InquiryRepo(
                     //fileDio: ApiService().fileUploadDio(),
-                    fileDio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").fileUploadDio(),
+                    fileDio: ApiService(
+                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        .fileUploadDio(),
                     //dio: ApiService().provideDio()),
-                    dio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").provideDio()),
+                    dio: ApiService(
+                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        .provideDio()),
               ),
             ),
             ChangeNotifierProvider(
@@ -64,13 +75,11 @@ class MyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               onGenerateRoute: (settings) => generateRoute(settings),
               theme: ThemeData(
-                  colorScheme:
-                      ColorScheme.fromSeed(seedColor: Palette.mainColor),
+                  colorScheme: ColorScheme.fromSeed(seedColor: Palette.mainColor),
                   useMaterial3: true,
                   scaffoldBackgroundColor: Palette.scaffold),
               home: const LoginScreen()),
         );
-      },
-    );
   }
+//);
 }

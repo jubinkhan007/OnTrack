@@ -1,7 +1,7 @@
 import 'package:tmbi/config/size_config.dart';
 
 class Converts {
-  static double c8 = 1 * SizeConfig.textMultiplier;
+  /*static double c8 = 1 * SizeConfig.textMultiplier;
   static double c12 = 1.5 * SizeConfig.textMultiplier;
   static double c16 = 2 * SizeConfig.textMultiplier;
   static double c20 = 2.5 * SizeConfig.textMultiplier;
@@ -43,5 +43,50 @@ class Converts {
   static double c304 = 38 * SizeConfig.textMultiplier;
   static double c312 = 39 * SizeConfig.textMultiplier;
   static double c320 = 40 * SizeConfig.textMultiplier;
-  static double c350 = 50 * SizeConfig.textMultiplier;
+  static double c350 = 50 * SizeConfig.textMultiplier;*/
+
+  static double c8 = 1 * 6.6;
+  static double c12 = 1.5 * 6.6;
+  static double c16 = 2 * 6.6;
+  static double c20 = 2.5 * 6.6;
+  static double c24 = 3 * 6.6;
+  static double c32 = 4 * 6.6;
+  static double c40 = 5 * 6.6;
+  static double c48 = 6 * 6.6;
+  static double c56 = 7 * 6.6;
+  static double c64 = 8 * 6.6;
+  static double c72 = 9 * 6.6;
+  static double c80 = 10 * 6.6;
+  static double c88 = 11 * 6.6;
+  static double c96 = 12 * 6.6;
+  static double c104 = 13 * 6.6;
+  static double c112 = 14 * 6.6;
+  static double c120 = 15 * 6.6;
+  static double c128 = 16 * 6.6;
+  static double c136 = 17 * 6.6;
+  static double c144 = 18 * 6.6;
+  static double c152 = 19 * 6.6;
+  static double c160 = 20 * 6.6;
+  static double c168 = 21 * 6.6;
+  static double c176 = 22 * 6.6;
+  static double c184 = 23 * 6.6;
+  static double c192 = 24 * 6.6;
+  static double c200 = 25 * 6.6;
+  static double c208 = 26 * 6.6;
+  static double c216 = 27 * 6.6;
+  static double c224 = 28 * 6.6;
+  static double c232 = 29 * 6.6;
+  static double c240 = 30 * 6.6;
+  static double c248 = 31 * 6.6;
+  static double c256 = 32 * 6.6;
+  static double c264 = 33 * 6.6;
+  static double c272 = 34 * 6.6;
+  static double c280 = 35 * 6.6;
+  static double c288 = 36 * 6.6;
+  static double c296 = 37 * 6.6;
+  static double c304 = 38 * 6.6;
+  static double c312 = 39 * 6.6;
+  static double c320 = 40 * 6.6;
+  static double c350 = 50 * 6.6;
 }
+
