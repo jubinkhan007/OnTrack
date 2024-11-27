@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:tmbi/config/sp_helper.dart';
+import 'package:tmbi/models/user_response.dart';
 
 import '../data/data.dart';
 import '../widgets/widgets.dart';
@@ -96,5 +98,18 @@ extension ShimmerLoadingExtension on BuildContext {
         ),
       ),
     );
+  }
+}
+
+extension UserInfoExtension on SPHelper {
+  Future<String> getUserInfo({bool isName = false}) async {
+    try {
+      UserResponse? userResponse = await getUser();
+      String id = userResponse != null ? userResponse.users![0].staffId! : "";
+      String name = userResponse != null ? userResponse.users![0].staffName! : "";
+      return isName ? name : id;
+    } catch (e) {
+      return "";
+    }
   }
 }

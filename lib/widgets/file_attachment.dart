@@ -6,9 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:tmbi/config/aws_test.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
+import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
 class FileAttachment extends StatefulWidget {
@@ -165,13 +169,15 @@ class _FileAttachmentState extends State<FileAttachment> {
   }
 
   Future<void> _captureImage() async {
+    String staffId = await SPHelper().getUserInfo();
     if (await _checkPermissions(Permission.camera)) {
       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
       if (image != null) {
         // process selected image
         File file = File(image.path);
         Uint8List compressedBytes = await _processImage(file);
-        _imageFileList.add(ImageFile(compressedBytes, _fileName("340553")));
+        //_imageFileList.add(ImageFile(compressedBytes, _fileName("340553")));
+        _imageFileList.add(ImageFile(compressedBytes, _fileName(staffId)));
 
         setState(() {
           _imageFiles.add(image);
@@ -191,6 +197,7 @@ class _FileAttachmentState extends State<FileAttachment> {
   }
 
   Future<void> _pickImages() async {
+    String staffId = await SPHelper().getUserInfo();
     bool isStoragePermission = true;
     bool isPhotosPermission = true;
 
@@ -219,7 +226,8 @@ class _FileAttachmentState extends State<FileAttachment> {
         for (var image in limitedImages) {
           File file = File(image.path);
           Uint8List compressedBytes = await _processImage(file);
-          _imageFileList.add(ImageFile(compressedBytes, _fileName("340553")));
+          //_imageFileList.add(ImageFile(compressedBytes, _fileName("340553")));
+          _imageFileList.add(ImageFile(compressedBytes, _fileName(staffId)));
         }
         setState(() {
           _imageFiles.addAll(limitedImages);
@@ -238,7 +246,7 @@ class _FileAttachmentState extends State<FileAttachment> {
     }
   }
 
-  Future<Uint8List> _processImage(File imageFile,
+  /*Future<Uint8List> _processImage(File imageFile,
       {minWidth = 800, minHeight = 800, quality = 50}) async {
     try {
       // Step 1: read image as bytes and decode
@@ -271,6 +279,74 @@ class _FileAttachmentState extends State<FileAttachment> {
         quality: quality,
         format: CompressFormat.jpeg);
     return result;
+  }*/
+
+  Future<Uint8List> _processImage(File imageFile, {quality = 80}) async {
+    try {
+      // read image as bytes
+      List<int> imageBytes = await imageFile.readAsBytes();
+      // convert List<int> to Uint8List
+      Uint8List uint8ListImageBytes = Uint8List.fromList(imageBytes);
+      // decode image to check the image properties
+      img.Image? image = img.decodeImage(Uint8List.fromList(imageBytes));
+
+      if (image != null) {
+        // compress the image without resizing
+        // for better file size reduction
+        Uint8List compressedBytes = await FlutterImageCompress.compressWithList(
+          uint8ListImageBytes,
+          quality: quality,
+          format: CompressFormat.jpeg,
+        );
+        // save image into local
+        //_saveIntoLocalDir(compressedBytes);
+        /// test
+        final uploader = AwsTest();
+        await uploader.uploadFile(imageFile);
+        /// test
+        return compressedBytes;
+      }
+    } catch (e) {
+      debugPrint("ERROR::${e.toString()}");
+    }
+    // return original image if something goes wrong
+    return await imageFile.readAsBytes();
+  }
+
+  Future<void> _saveIntoLocalDir(Uint8List compressedBytes, {String folderName = "track_all"}) async {
+    try {
+      String staffId = await SPHelper().getUserInfo();
+      // get the directory for app-specific documents
+      Directory directory = await getApplicationDocumentsDirectory();
+      String folderPath = "${directory.path}/$folderName";
+      debugPrint("IMAGE_PATH: $folderPath");
+      // create a Directory instance for the folder
+      Directory folder = Directory(folderPath);
+      // folder doesn't exist, create it recursively
+      if (!await folder.exists()) {
+        await folder.create(recursive: true);  // Ensure all parent directories are created
+      }
+      // define file path to save the image using the actual folder path
+      String fileName = _fileName(staffId);
+      String imagePath = '${folder.path}/$fileName';  // Use folder.path here
+      debugPrint("Final IMAGE_PATH: $imagePath");
+      /// Test start
+      // Get external storage directory (compatible with both API 29 and below)
+      Directory? externalDirectory = await getExternalStorageDirectory();
+      String externalFilePath = '${externalDirectory!.path}/$fileName';
+      File copyFile = File(externalFilePath);
+      /// Test End
+      // save the compressed image to the local path
+      File file = File(imagePath);
+      await file.writeAsBytes(compressedBytes);
+      /// TEST START
+      await file.copy(copyFile.path);
+      /// TEST END
+      debugPrint("File saved at: $imagePath");
+      debugPrint("File copy at: ${copyFile.path}");
+    } catch (e) {
+      debugPrint("FILE_ERROR: ${e.toString()}");
+    }
   }
 
   String _fileName(String userId, {String type1 = "5", String type2 = "img"}) {

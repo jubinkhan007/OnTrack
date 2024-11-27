@@ -81,56 +81,6 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    /*final inquiryViewModel =
-        Provider.of<InquiryCreateViewModel>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      inquiryViewModel.getInitDataForCreateInquiry(widget.staffId);
-    });*/
-
-    /*// customer list
-    List<Customer> customers = [];
-    // title & description & customer name
-    final TextEditingController titleController = TextEditingController();
-    final TextEditingController descriptionController = TextEditingController();
-    final TextEditingController customerNameController =
-        TextEditingController();
-    // selected date
-    String isSample = "N";
-    String selectedDate = "";
-    String mCompanyId = "";
-    String mInquiryId = "";
-    String mPriorityId = "";
-    Customer? mCustomer;
-    // files
-    final List<ImageFile> imageFiles = [];
-    // methods
-    showMessage(String message) {
-      final snackBar = SnackBar(
-        content: TextViewCustom(
-          text: message,
-          tvColor: Colors.white,
-          fontSize: Converts.c16,
-          isBold: false,
-          isRubik: true,
-          isTextAlignCenter: false,
-        ),
-        action: SnackBarAction(
-          label: 'Ok',
-          onPressed: () {},
-        ),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-
-    resetFields() {
-      isSample = "N";
-      selectedDate = "";
-      mCompanyId = "";
-      mInquiryId = "";
-      mPriorityId = "";
-      mCustomer = null;
-    }
-*/
     return Scaffold(
       backgroundColor: Colors.white,
       body: Consumer<InquiryCreateViewModel>(
