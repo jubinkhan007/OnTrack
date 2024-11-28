@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
@@ -28,8 +29,21 @@ class _FileAttachmentState extends State<FileAttachment> {
   final ImagePicker _picker = ImagePicker();
   final List<XFile> _imageFiles = [];
   final List<ImageFile> _imageFileList = [];
+  final List<String> _imageFileNameList = [];
   bool isMultipleImageSelected = false;
   String totalImageSelected = "0";
+
+  /// ACCESS NATIVE CODE \\\
+  var channel = const MethodChannel("aws_service_channel");
+
+  Future<void> awsService(List<String> files) async {
+    try {
+      var status = await channel.invokeMethod("upload_file", {'args': files});
+      debugPrint("RESULT $status");
+    } catch (e) {
+      debugPrint("FLUTTER_AWS_ERROR:: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -299,11 +313,9 @@ class _FileAttachmentState extends State<FileAttachment> {
           format: CompressFormat.jpeg,
         );
         // save image into local
+        //awsService(["image/abc.jpg", "image/123.jpg"]);
         //_saveIntoLocalDir(compressedBytes);
-        /// test
-        final uploader = AwsTest();
-        await uploader.uploadFile(imageFile);
-        /// test
+        _saveIntoExternalDirectory(compressedBytes);
         return compressedBytes;
       }
     } catch (e) {
@@ -313,7 +325,8 @@ class _FileAttachmentState extends State<FileAttachment> {
     return await imageFile.readAsBytes();
   }
 
-  Future<void> _saveIntoLocalDir(Uint8List compressedBytes, {String folderName = "track_all"}) async {
+  Future<void> _saveIntoLocalDir(Uint8List compressedBytes,
+      {String folderName = "track_all"}) async {
     try {
       String staffId = await SPHelper().getUserInfo();
       // get the directory for app-specific documents
@@ -324,23 +337,28 @@ class _FileAttachmentState extends State<FileAttachment> {
       Directory folder = Directory(folderPath);
       // folder doesn't exist, create it recursively
       if (!await folder.exists()) {
-        await folder.create(recursive: true);  // Ensure all parent directories are created
+        await folder.create(
+            recursive: true); // Ensure all parent directories are created
       }
       // define file path to save the image using the actual folder path
       String fileName = _fileName(staffId);
-      String imagePath = '${folder.path}/$fileName';  // Use folder.path here
+      String imagePath = '${folder.path}/$fileName'; // Use folder.path here
       debugPrint("Final IMAGE_PATH: $imagePath");
+
       /// Test start
       // Get external storage directory (compatible with both API 29 and below)
       Directory? externalDirectory = await getExternalStorageDirectory();
       String externalFilePath = '${externalDirectory!.path}/$fileName';
       File copyFile = File(externalFilePath);
+
       /// Test End
       // save the compressed image to the local path
       File file = File(imagePath);
       await file.writeAsBytes(compressedBytes);
+
       /// TEST START
       await file.copy(copyFile.path);
+
       /// TEST END
       debugPrint("File saved at: $imagePath");
       debugPrint("File copy at: ${copyFile.path}");
@@ -349,10 +367,28 @@ class _FileAttachmentState extends State<FileAttachment> {
     }
   }
 
+  Future<void> _saveIntoExternalDirectory(Uint8List compressedBytes) async {
+    try {
+      String staffId = await SPHelper().getUserInfo();
+      String fileName = _fileName(staffId);
+      Directory? externalDirectory = await getExternalStorageDirectory();
+      String externalFilePath = '${externalDirectory!.path}/$fileName';
+      File file = File(externalFilePath);
+      await file.writeAsBytes(compressedBytes);
+      _imageFileNameList.add(file.path);
+      // test
+      awsService(_imageFileNameList);
+      debugPrint("File saved at: ${file.path}");
+    } catch(e) {
+      debugPrint("FILE_ERROR: ${e.toString()}");
+    }
+  }
+
   String _fileName(String userId, {String type1 = "5", String type2 = "img"}) {
     final DateTime dateTime = DateTime.now();
     return "$type1${dateTime.year.toString().substring(2, 4)}${dateTime.month.toString().padLeft(2, '0')}_${userId}_${dateTime.millisecondsSinceEpoch}_$type2.jpg";
   }
+
 }
 
 class ImageFile {
