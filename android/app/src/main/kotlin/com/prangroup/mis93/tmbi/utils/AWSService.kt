@@ -16,10 +16,14 @@ class AWSService(
     private val onSuccess: (Boolean, String) -> Unit,
     private val onError: (Boolean, String) -> Unit,
 ) {
-    private val accessKey = "NKHLZGVLLLAIV62USI5G"
-    private val secretKey = "+hznHV41sb/5vlStEUczr0FZlS57hYWnNZh4HY6SSgk"
-    private val endPoint = "https://sgp1.digitaloceanspaces.com/"
-    private val bucketName = "spro"
+    private val accessKey = ""
+    //private val accessKey = "NKHLZGVLLLAIV62USI5G"
+    //private val secretKey = "+hznHV41sb/5vlStEUczr0FZlS57hYWnNZh4HY6SSgk"
+    private val secretKey = ""
+    //private val endPoint = "https://sgp1.digitaloceanspaces.com/"
+    private val endPoint = ""
+    //private val bucketName = "spro"
+    private val bucketName = ""
     //private val appFolderName = "qpod"
     private val appFolderName = "track_all"
 

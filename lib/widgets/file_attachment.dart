@@ -45,6 +45,7 @@ class _FileAttachmentState extends State<FileAttachment> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -240,7 +241,6 @@ class _FileAttachmentState extends State<FileAttachment> {
         for (var image in limitedImages) {
           File file = File(image.path);
           Uint8List compressedBytes = await _processImage(file);
-          //_imageFileList.add(ImageFile(compressedBytes, _fileName("340553")));
           _imageFileList.add(ImageFile(compressedBytes, _fileName(staffId)));
         }
         setState(() {
@@ -315,7 +315,7 @@ class _FileAttachmentState extends State<FileAttachment> {
         // save image into local
         //awsService(["image/abc.jpg", "image/123.jpg"]);
         //_saveIntoLocalDir(compressedBytes);
-        _saveIntoExternalDirectory(compressedBytes);
+        //_saveIntoExternalDirectory(compressedBytes);
         return compressedBytes;
       }
     } catch (e) {
@@ -377,7 +377,7 @@ class _FileAttachmentState extends State<FileAttachment> {
       await file.writeAsBytes(compressedBytes);
       _imageFileNameList.add(file.path);
       // test
-      awsService(_imageFileNameList);
+      //awsService(_imageFileNameList);
       debugPrint("File saved at: ${file.path}");
     } catch(e) {
       debugPrint("FILE_ERROR: ${e.toString()}");
