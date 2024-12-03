@@ -40,15 +40,18 @@ class Strings {
   static const String select = 'Select';
   static const String tasks = 'Tasks';
   static const String create_new = 'Create New';
+  static const String add_task = 'Add Task';
   static const String update_task = 'Update Task';
   static const String update = 'Update';
   static const String description = 'Description';
   static const String enter_brief_description = 'Enter Brief Description';
+  static const String what_is_the_task = 'What is the Task?';
   static const String buyer_customer = 'Customer';
   static const String customer_name = 'Customer name';
   static const String end_date = 'End date';
   static const String select_company = 'Select Company';
   static const String select_a_date = 'Select a Date';
+  static const String select_end_date = 'Select End Date';
   static const String no_data_found = '(no data found)';
   static const String connection_timeout =
       'Connection timeout, Please try again later.';

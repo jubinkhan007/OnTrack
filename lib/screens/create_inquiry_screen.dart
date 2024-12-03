@@ -494,4 +494,5 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
       return "";
     }
   }
+
 }

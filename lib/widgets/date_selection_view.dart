@@ -7,8 +7,12 @@ import '../config/strings.dart';
 
 class DateSelectionView extends StatefulWidget {
   final Function(String?) onDateSelected;
+  String hint;
 
-  const DateSelectionView({super.key, required this.onDateSelected});
+  DateSelectionView(
+      {super.key,
+      required this.onDateSelected,
+      this.hint = Strings.select_a_date});
 
   @override
   State<DateSelectionView> createState() => _DateSelectionViewState();
@@ -34,7 +38,7 @@ class _DateSelectionViewState extends State<DateSelectionView> {
           children: [
             Expanded(
               child: TextViewCustom(
-                  text: _selectedDate ?? Strings.select_a_date,
+                  text: _selectedDate ?? widget.hint,
                   fontSize: Converts.c16,
                   tvColor: Palette.semiTv,
                   isTextAlignCenter: false,

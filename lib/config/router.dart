@@ -38,6 +38,20 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
           builder: (_) => CreateInquiryScreen(
                 staffId: args,
               ));
+    case AddTaskToStaffScreen.routeName:
+      //final args = routeSettings.arguments as String;
+      final args = routeSettings.arguments as Map<String, dynamic>;
+      final staffId = args['staffId'] as String;
+      final List<Discussion> tasks = (args['individual_task'] as List)
+          .map((taskJson) =>
+              Discussion.fromJson(taskJson as Map<String, dynamic>))
+          .toList();
+      return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => AddTaskToStaffScreen(
+                staffId: staffId,
+                tasks: tasks,
+              ));
     case CommentScreen.routeName:
       final args = routeSettings.arguments as String;
       return MaterialPageRoute(
