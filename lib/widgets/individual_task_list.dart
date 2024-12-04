@@ -99,6 +99,7 @@ class IndividualTaskList extends StatelessWidget {
           SizedBox(height: Converts.c8),
           const Divider(
             height: 0.5,
+            color: Colors.black12,
           ),
           SizedBox(height: Converts.c8, ),
         ],

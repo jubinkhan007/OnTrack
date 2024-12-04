@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
     });
 
     List<Discussion> discussionList = [
-      Discussion(
+      /*Discussion(
         name: "Task 1",
         staffId: "340553",
         dateTime: "2024-12-01 10:00",
@@ -58,7 +58,7 @@ class HomeScreen extends StatelessWidget {
         staffId: "340553",
         dateTime: "2024-12-04 16:00",
         body: "Prepare budget analysis for the next quarter.",
-      ),
+      ),*/
     ];
 
 
@@ -163,18 +163,6 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /*Padding(
-                  padding: EdgeInsets.only(
-                    left: Converts.c16,
-                    top: Converts.c24,
-                  ),
-                  child: TextViewCustom(
-                    text: Strings.summary,
-                    fontSize: Converts.c20,
-                    tvColor: Colors.black,
-                    isBold: true,
-                  ),
-                ),*/
                 SizedBox(
                   height: Converts.c8,
                 ),
