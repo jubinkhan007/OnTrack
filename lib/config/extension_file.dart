@@ -113,3 +113,13 @@ extension UserInfoExtension on SPHelper {
     }
   }
 }
+
+
+extension HideKeyboard on BuildContext {
+  void hideKeyboard() {
+    FocusScope.of(this).requestFocus(FocusNode());
+  }
+}
+
+
+

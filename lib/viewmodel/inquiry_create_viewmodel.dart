@@ -35,6 +35,26 @@ class InquiryCreateViewModel extends ChangeNotifier {
 
   UiState get uiState => _uiState;
 
+  /// TEST START
+  List<Discussion> _discussions = [];
+
+  List<Discussion> get discussions => _discussions;
+
+  // Add a new discussion
+  void addTask(Discussion discussions) {
+    _discussions.add(discussions);
+    notifyListeners(); // Notify listeners to update UI
+  }
+
+  // Remove a discussion by index
+  void removeTask(int index) {
+    if (index >= 0 && index < _discussions.length) {
+      _discussions.removeAt(index);
+      notifyListeners(); // Notify listeners to update UI
+    }
+  }
+  /// TEST END
+
   Future<void> getInitDataForCreateInquiry(String staffId) async {
     if (_uiState == UiState.loading) return;
 

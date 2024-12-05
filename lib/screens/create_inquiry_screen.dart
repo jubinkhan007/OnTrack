@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/models/init_data_create_inq.dart';
+import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/inquiry_create_viewmodel.dart';
 import 'package:tmbi/widgets/date_selection_view.dart';
 
@@ -8,6 +9,7 @@ import '../config/converts.dart';
 import '../config/palette.dart';
 import '../config/sp_helper.dart';
 import '../config/strings.dart';
+import '../models/models.dart';
 import '../models/user_response.dart';
 import '../network/ui_state.dart';
 import '../widgets/widgets.dart';
@@ -23,7 +25,42 @@ class CreateInquiryScreen extends StatefulWidget {
 }
 
 class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
-
+  //
+  List<Discussion> discussionList = [
+    /*Discussion(
+      name: "Task 1",
+      staffId: "340553",
+      dateTime: "2024-12-01 10:00",
+      body: "Complete the report by the end of the day.",
+    ),
+    Discussion(
+      name: "Task 2",
+      staffId: "340553",
+      dateTime: "2024-12-02 14:00",
+      body: "Review the presentation slides for the meeting.",
+    ),
+    Discussion(
+      name: "Task 3",
+      staffId: "340553",
+      dateTime: "2024-12-03 09:00",
+      body: "Attend the team meeting and provide updates.",
+    ),
+    Discussion(
+      name: "Task 4",
+      staffId: "340553",
+      dateTime: "2024-12-04 16:00",
+      body: "Prepare budget analysis for the next quarter.",
+    ),*/
+  ];
+  List<Customer> getStaffs() {
+    return [
+      Customer(id: '340553', name: 'Md. Salauddin', isVerified: true),
+      Customer(id: '397820', name: 'Md. Imrul Kayesh', isVerified: false),
+      Customer(id: '397690', name: 'Subrato Ghosh', isVerified: true),
+      Customer(id: '30940', name: 'Md. Elias Hossain', isVerified: false),
+      Customer(id: '486133', name: 'Adeepta Shushil Shuvo', isVerified: true),
+    ];
+  }
   // customer list
   List<Customer> customers = [];
   // title & description & customer name
@@ -96,7 +133,13 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                   ? inquiryViewModel.message!
                   : Strings.something_went_wrong);
         }
-
+        ///test
+        if (discussionList.isNotEmpty) {
+          discussionList.clear();
+        }
+        discussionList.addAll(inquiryViewModel.discussions);
+        debugPrint(discussionList.length.toString());
+        ///end
         return CustomScrollView(
           slivers: [
             SliverAppBar(
@@ -412,7 +455,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                       cornerRadius: 4,
                       stockColor: Palette.mainColor,
                       onTap: () async {
-                        if (mCompanyId != "" &&
+                        /*if (mCompanyId != "" &&
                             mInquiryId != "" &&
                             mPriorityId != "" &&
                             selectedDate != "" &&
@@ -456,7 +499,22 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                           resetFields();
                         } else {
                           showMessage(Strings.some_values_are_missing);
-                        }
+                        }*/
+                        /// test start
+                        String userId = await _getUserInfo();
+                        Navigator.pushNamed(context, AddTaskToStaffScreen.routeName,
+                            arguments: {
+                              'staffId': userId,
+                              //'individual_task': discussionList
+                              'individual_task': inquiryViewModel.discussions
+                                  .map((discussion) => discussion.toJson())
+                                  .toList(),
+                              'staff_list': getStaffs()
+                                  .map((discussion) => discussion.toJson())
+                                  .toList(),
+                            });
+                        debugPrint("INDEX:: ${inquiryViewModel.discussions.length}");
+                        /// test end
                       },
                     ),
                     SizedBox(

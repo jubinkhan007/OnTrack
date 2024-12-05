@@ -68,6 +68,7 @@ class Strings {
   static const String required = '*required';
   static const String search_customer = 'Search Customer';
   static const String select_customer = 'Select Customer';
+  static const String search_by_name = 'Search by name';
   static const String post_comment = 'Post Comment';
   static const String type_a_comment = 'Type a comment ...';
   static const String data_saved_successfully = 'Data saved successfully';

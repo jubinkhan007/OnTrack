@@ -1,9 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/models/models.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
 import '../config/strings.dart';
+import '../viewmodel/viewmodel.dart';
 import '../widgets/date_selection_view.dart';
 import '../widgets/widgets.dart';
 
@@ -11,8 +15,14 @@ class AddTaskToStaffScreen extends StatefulWidget {
   static const String routeName = '/add_task_to_staff_screen';
   final String staffId;
   final List<Discussion> tasks;
+  final List<Customer> staffs;
 
-  const AddTaskToStaffScreen({super.key, required this.staffId, required this.tasks});
+  const AddTaskToStaffScreen({
+    super.key,
+    required this.staffId,
+    required this.tasks,
+    required this.staffs,
+  });
 
   @override
   State<AddTaskToStaffScreen> createState() => _AddTaskToStaffScreenState();
@@ -21,12 +31,16 @@ class AddTaskToStaffScreen extends StatefulWidget {
 class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
   final TextEditingController descriptionController = TextEditingController();
   final List<Discussion> newTasks = [];
+  late InquiryCreateViewModel inquiryCreateViewModel;
   String selectedDate = "";
+  Customer? customer;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    inquiryCreateViewModel =
+        Provider.of<InquiryCreateViewModel>(context, listen: false);
     if (widget.tasks.isNotEmpty) {
       newTasks.addAll(widget.tasks);
     }
@@ -97,44 +111,72 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                     children: [
                       Row(
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.account_circle_outlined,
-                                color: Palette.semiTv,
-                                size: Converts.c32,
-                              ),
-                              SizedBox(
-                                width: Converts.c8,
-                              ),
-                              TextViewCustom(
-                                  text: "MD. AKASH ALAM",
-                                  fontSize: Converts.c16,
-                                  tvColor: Palette.normalTv,
-                                  isRubik: false,
-                                  isBold: true),
-                            ],
-                          ),
+                          customer != null
+                              ? Row(
+                                  children: [
+                                    ClipOval(
+                                      child: SizedBox(
+                                        width: Converts.c48,
+                                        height: Converts.c48,
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/${customer!.id}/${customer!.id}-0.jpg",
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) =>
+                                              SizedBox(
+                                            width: Converts.c16,
+                                            height: Converts.c16,
+                                            child:
+                                                const CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Palette.mainColor),
+                                              strokeWidth: 2.0,
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) {
+                                            return Icon(
+                                              Icons.account_circle,
+                                              color: Palette.normalTv,
+                                              size: Converts.c48,
+                                            ); // Fallback icon when the image fails to load
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: Converts.c8,
+                                    ),
+                                    TextViewCustom(
+                                        text: (customer!.name
+                                                    .toString()
+                                                    .length >
+                                                10)
+                                            ? '${customer!.name.toString().substring(0, 10)}...'
+                                            : customer!.name.toString(),
+                                        fontSize: Converts.c16,
+                                        tvColor: Palette.normalTv,
+                                        isRubik: false,
+                                        isBold: true),
+                                  ],
+                                )
+                              : const SizedBox.shrink(),
                           SizedBox(
                             width: Converts.c16,
                           ),
-                          Container(
-                            width: Converts.c48,
-                            height: Converts.c48,
-                            decoration: BoxDecoration(
-                              //color: Palette.mainColor,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(Converts.c24),
+                          GestureDetector(
+                            onTap: () {
+                              _showCustomerDialog(context, widget.staffs);
+                            },
+                            child: SizedBox(
+                              width: Converts.c48,
+                              height: Converts.c48,
+                              child: Image.asset(
+                                'assets/ic_add_user.png',
+                                width: Converts.c16,
+                                // You can adjust the size as needed
+                                height: Converts.c16,
                               ),
-                              border: Border.all(
-                                color: Palette.mainColor, // Border color
-                                width: 1.0, // Border width
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.add,
-                              size: Converts.c16,
-                              color: Colors.black,
                             ),
                           ),
                         ],
@@ -150,9 +192,26 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                           stockColor: Palette.mainColor,
                           onTap: () async {
                             setState(() {
-                              newTasks.add(Discussion(
-                                  name: "Md. Salauddin", staffId: "340553", dateTime: "2024-04-12, 10:42 AM", body: descriptionController.text
-                              ));
+                              context.hideKeyboard();
+                              if (customer != null &&
+                                  selectedDate != "" &&
+                                  descriptionController.text != "") {
+                                Discussion discussion = Discussion(
+                                    name: customer!.name.toString(),
+                                    staffId: customer!.id,
+                                    dateTime: selectedDate,
+                                    body: descriptionController.text);
+                                newTasks.add(discussion);
+                                ///test
+                                inquiryCreateViewModel.addTask(discussion);
+                                /// end
+                                // reset fields
+                                customer = null;
+                                descriptionController.text = "";
+                              } else {
+                                context.showMessage(
+                                    Strings.some_values_are_missing);
+                              }
                             });
                           }),
                     ],
@@ -195,12 +254,48 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
               delegate:
                   SliverChildBuilderDelegate((BuildContext context, int index) {
                 var task = newTasks[index];
-                return IndividualTaskList(task: task);
+                return Dismissible(
+                    key: UniqueKey(),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (direction) {
+                      if (index >= 0 && index < newTasks.length) {
+                        setState(() {
+                          newTasks.removeAt(index);
+                        });
+                      }
+                    },
+                    child: IndividualTaskList(task: task));
               }, childCount: newTasks.length),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _showCustomerDialog(BuildContext context, List<Customer> customers) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: TextViewCustom(
+                text: Strings.search_by_name,
+                fontSize: Converts.c16,
+                tvColor: Palette.normalTv,
+                isTextAlignCenter: false,
+                isRubik: false,
+                isBold: true),
+            content: CustomerSearchDialog(
+                customers: customers,
+                onCustomerSelected: (customer) {
+                  if (customer != null) {
+                    setState(() {
+                      this.customer = customer;
+                    });
+                  }
+                  Navigator.of(context).pop();
+                }),
+          );
+        });
   }
 }

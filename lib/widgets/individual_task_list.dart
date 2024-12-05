@@ -76,11 +76,11 @@ class IndividualTaskList extends StatelessWidget {
                     isBold: true,
                   ),
                   TextViewCustom(
-                    text: task.dateTime!,
+                    text: "within ${task.dateTime!}",
                     fontSize: Converts.c16,
-                    tvColor: Palette.semiNormalTv,
+                    tvColor: Palette.semiTv,
                     isTextAlignCenter: false,
-                    isRubik: false,
+                    isRubik: true,
                     isBold: false,
                   )
                 ],

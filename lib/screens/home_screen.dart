@@ -34,48 +34,12 @@ class HomeScreen extends StatelessWidget {
       inquiryViewModel.getInquiries(selectedFlagValue, staffId, isAssigned);
     });
 
-    List<Discussion> discussionList = [
-      /*Discussion(
-        name: "Task 1",
-        staffId: "340553",
-        dateTime: "2024-12-01 10:00",
-        body: "Complete the report by the end of the day.",
-      ),
-      Discussion(
-        name: "Task 2",
-        staffId: "340553",
-        dateTime: "2024-12-02 14:00",
-        body: "Review the presentation slides for the meeting.",
-      ),
-      Discussion(
-        name: "Task 3",
-        staffId: "340553",
-        dateTime: "2024-12-03 09:00",
-        body: "Attend the team meeting and provide updates.",
-      ),
-      Discussion(
-        name: "Task 4",
-        staffId: "340553",
-        dateTime: "2024-12-04 16:00",
-        body: "Prepare budget analysis for the next quarter.",
-      ),*/
-    ];
-
-
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //Navigator.pushNamed(context, CreateInquiryScreen.routeName, arguments: staffId);
-          // test start
-          Navigator.pushNamed(context, AddTaskToStaffScreen.routeName,
-              arguments: {
-                'staffId': staffId,
-                'individual_task': discussionList
-                    .map((discussion) => discussion.toJson())
-                    .toList(),
-              });
-          // test end
+          Navigator.pushNamed(context, CreateInquiryScreen.routeName,
+              arguments: staffId);
         },
         mini: true,
         backgroundColor: Palette.mainColor,
