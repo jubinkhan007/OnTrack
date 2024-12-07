@@ -36,7 +36,7 @@ class InquiryCreateViewModel extends ChangeNotifier {
   UiState get uiState => _uiState;
 
   /// TEST START
-  List<Discussion> _discussions = [];
+  final List<Discussion> _discussions = [];
 
   List<Discussion> get discussions => _discussions;
 
@@ -50,6 +50,14 @@ class InquiryCreateViewModel extends ChangeNotifier {
   void removeTask(int index) {
     if (index >= 0 && index < _discussions.length) {
       _discussions.removeAt(index);
+      notifyListeners(); // Notify listeners to update UI
+    }
+  }
+
+  // remove all task
+  void removeAllTask() {
+    if (_discussions.isNotEmpty) {
+      _discussions.clear();
       notifyListeners(); // Notify listeners to update UI
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -135,11 +137,11 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                                             ),
                                           ),
                                           errorWidget: (context, url, error) {
-                                            return Icon(
-                                              Icons.account_circle,
-                                              color: Palette.normalTv,
-                                              size: Converts.c48,
-                                            ); // Fallback icon when the image fails to load
+                                              return Icon(
+                                                Icons.account_circle,
+                                                color: Palette.normalTv,
+                                                size: Converts.c48,
+                                              );
                                           },
                                         ),
                                       ),
@@ -202,8 +204,10 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                                     dateTime: selectedDate,
                                     body: descriptionController.text);
                                 newTasks.add(discussion);
+
                                 ///test
                                 inquiryCreateViewModel.addTask(discussion);
+
                                 /// end
                                 // reset fields
                                 customer = null;
@@ -260,6 +264,7 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                     onDismissed: (direction) {
                       if (index >= 0 && index < newTasks.length) {
                         setState(() {
+                          inquiryCreateViewModel.removeTask(index);
                           newTasks.removeAt(index);
                         });
                       }

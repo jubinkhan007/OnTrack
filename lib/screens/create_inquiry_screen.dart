@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tmbi/models/init_data_create_inq.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/inquiry_create_viewmodel.dart';
 import 'package:tmbi/widgets/date_selection_view.dart';
@@ -52,6 +51,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
       body: "Prepare budget analysis for the next quarter.",
     ),*/
   ];
+
   List<Customer> getStaffs() {
     return [
       Customer(id: '340553', name: 'Md. Salauddin', isVerified: true),
@@ -61,13 +61,15 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
       Customer(id: '486133', name: 'Adeepta Shushil Shuvo', isVerified: true),
     ];
   }
+
   // customer list
   List<Customer> customers = [];
+
   // title & description & customer name
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController customerNameController =
-  TextEditingController();
+  final TextEditingController customerNameController = TextEditingController();
+
   // selected date
   String isSample = "N";
   String selectedDate = "";
@@ -75,8 +77,10 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
   String mInquiryId = "";
   String mPriorityId = "";
   Customer? mCustomer;
+
   // files
   final List<ImageFile> imageFiles = [];
+
   // methods
   showMessage(String message) {
     final snackBar = SnackBar(
@@ -105,14 +109,17 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
     mCustomer = null;
   }
 
-
   @override
   void initState() {
     super.initState();
     final inquiryViewModel =
-    Provider.of<InquiryCreateViewModel>(context, listen: false);
+        Provider.of<InquiryCreateViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       inquiryViewModel.getInitDataForCreateInquiry(widget.staffId);
+      /// test start
+      // reset tasks
+      inquiryViewModel.removeAllTask();
+      /// test end
     });
   }
 
@@ -133,12 +140,14 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                   ? inquiryViewModel.message!
                   : Strings.something_went_wrong);
         }
+
         ///test
         if (discussionList.isNotEmpty) {
           discussionList.clear();
         }
         discussionList.addAll(inquiryViewModel.discussions);
         debugPrint(discussionList.length.toString());
+
         ///end
         return CustomScrollView(
           slivers: [
@@ -500,9 +509,11 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                         } else {
                           showMessage(Strings.some_values_are_missing);
                         }*/
+
                         /// test start
                         String userId = await _getUserInfo();
-                        Navigator.pushNamed(context, AddTaskToStaffScreen.routeName,
+                        Navigator.pushNamed(
+                            context, AddTaskToStaffScreen.routeName,
                             arguments: {
                               'staffId': userId,
                               //'individual_task': discussionList
@@ -513,7 +524,9 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                   .map((discussion) => discussion.toJson())
                                   .toList(),
                             });
-                        debugPrint("INDEX:: ${inquiryViewModel.discussions.length}");
+                        debugPrint(
+                            "INDEX:: ${inquiryViewModel.discussions.length}");
+
                         /// test end
                       },
                     ),
@@ -552,5 +565,4 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
       return "";
     }
   }
-
 }
