@@ -19,11 +19,10 @@ class IndividualTaskList extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        // This will prevent the Row from taking full width
         children: [
           Row(
             children: [
-              Container(
+              /*Container(
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Palette.navyBlueColor,
@@ -62,7 +61,7 @@ class IndividualTaskList extends StatelessWidget {
               ),
               SizedBox(
                 width: Converts.c16,
-              ),
+              ),*/
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +88,7 @@ class IndividualTaskList extends StatelessWidget {
           ),
           SizedBox(width: Converts.c8),
           TextViewCustom(
-            text: task.body!,
+            text: "Task# ${task.body!}",
             fontSize: Converts.c16,
             tvColor: Palette.normalTv,
             isTextAlignCenter: false,
@@ -101,7 +100,9 @@ class IndividualTaskList extends StatelessWidget {
             height: 0.5,
             color: Colors.black12,
           ),
-          SizedBox(height: Converts.c8, ),
+          SizedBox(
+            height: Converts.c8,
+          ),
         ],
       ),
     );

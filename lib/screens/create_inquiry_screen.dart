@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/screens/screens.dart';
@@ -24,7 +26,6 @@ class CreateInquiryScreen extends StatefulWidget {
 }
 
 class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
-  //
   List<Discussion> discussionList = [
     /*Discussion(
       name: "Task 1",
@@ -64,6 +65,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
 
   // customer list
   List<Customer> customers = [];
+  bool isTaskEntryModeEnable = false;
 
   // title & description & customer name
   final TextEditingController titleController = TextEditingController();
@@ -116,10 +118,8 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
         Provider.of<InquiryCreateViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       inquiryViewModel.getInitDataForCreateInquiry(widget.staffId);
-      /// test start
-      // reset tasks
+      // reset individual tasks if any
       inquiryViewModel.removeAllTask();
-      /// test end
     });
   }
 
@@ -140,15 +140,12 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                   ? inquiryViewModel.message!
                   : Strings.something_went_wrong);
         }
-
-        ///test
+        //remove the previous task
+        // and save any new tasks
         if (discussionList.isNotEmpty) {
           discussionList.clear();
         }
         discussionList.addAll(inquiryViewModel.discussions);
-        debugPrint(discussionList.length.toString());
-
-        ///end
         return CustomScrollView(
           slivers: [
             SliverAppBar(
@@ -168,6 +165,51 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                   Navigator.pop(context); // Navigate back
                 },
               ),
+              actions: [
+                isTaskEntryModeEnable
+                    ? IconButton(
+                        icon: Padding(
+                          padding: EdgeInsets.only(right: Converts.c8),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: Converts.c16,
+                              ),
+                              const SizedBox(
+                                width: 4,
+                              ),
+                              TextViewCustom(
+                                text: Strings.tasks,
+                                fontSize: Converts.c16,
+                                tvColor: Colors.white,
+                                isBold: true,
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Customize icon color
+                        onPressed: () async {
+                          String userId = await _getUserInfo();
+                          Navigator.pushNamed(
+                              context, AddTaskToStaffScreen.routeName,
+                              arguments: {
+                                'staffId': userId,
+                                //'individual_task': discussionList
+                                'individual_task': inquiryViewModel.discussions
+                                    .map((discussion) => discussion.toJson())
+                                    .toList(),
+                                'staff_list': getStaffs()
+                                    .map((discussion) => discussion.toJson())
+                                    .toList(),
+                              });
+                          debugPrint(
+                              "INDEX:: ${inquiryViewModel.discussions.length}");
+                        },
+                      )
+                    : const SizedBox.shrink(),
+              ],
             ),
             SliverPadding(
               padding: EdgeInsets.only(
@@ -313,6 +355,16 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                   onChanged: (inquiryId) {
                                     debugPrint("COMPANY_ID# $inquiryId");
                                     mInquiryId = inquiryId;
+                                    //
+                                    if (mInquiryId == "3") {
+                                      setState(() {
+                                        isTaskEntryModeEnable = true;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        isTaskEntryModeEnable = false;
+                                      });
+                                    }
                                   },
                                 ),
                                 SizedBox(
@@ -464,7 +516,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                       cornerRadius: 4,
                       stockColor: Palette.mainColor,
                       onTap: () async {
-                        /*if (mCompanyId != "" &&
+                        if (mCompanyId != "" &&
                             mInquiryId != "" &&
                             mPriorityId != "" &&
                             selectedDate != "" &&
@@ -491,6 +543,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                   ? mCustomer!.name.toString()
                                   : customerNameController.text.toString(),
                               userId,
+                              _tasksToString(),
                               inquiryViewModel.files);
 
                           // check the status of the request
@@ -508,26 +561,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                           resetFields();
                         } else {
                           showMessage(Strings.some_values_are_missing);
-                        }*/
-
-                        /// test start
-                        String userId = await _getUserInfo();
-                        Navigator.pushNamed(
-                            context, AddTaskToStaffScreen.routeName,
-                            arguments: {
-                              'staffId': userId,
-                              //'individual_task': discussionList
-                              'individual_task': inquiryViewModel.discussions
-                                  .map((discussion) => discussion.toJson())
-                                  .toList(),
-                              'staff_list': getStaffs()
-                                  .map((discussion) => discussion.toJson())
-                                  .toList(),
-                            });
-                        debugPrint(
-                            "INDEX:: ${inquiryViewModel.discussions.length}");
-
-                        /// test end
+                        }
                       },
                     ),
                     SizedBox(
@@ -565,4 +599,14 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
       return "";
     }
   }
+
+  String _tasksToString() {
+    if (discussionList.isNotEmpty) {
+      List<Map<String, dynamic>> tasksJson =
+          discussionList.map((task) => task.toJson()).toList();
+      return jsonEncode(tasksJson);
+    }
+    return "";
+  }
+
 }

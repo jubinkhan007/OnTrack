@@ -35,18 +35,18 @@ class InquiryCreateViewModel extends ChangeNotifier {
 
   UiState get uiState => _uiState;
 
-  /// TEST START
+  /// DISCUSSION SECTION
   final List<Discussion> _discussions = [];
 
   List<Discussion> get discussions => _discussions;
 
-  // Add a new discussion
+  // add a new discussion
   void addTask(Discussion discussions) {
     _discussions.add(discussions);
     notifyListeners(); // Notify listeners to update UI
   }
 
-  // Remove a discussion by index
+  // remove a discussion by index
   void removeTask(int index) {
     if (index >= 0 && index < _discussions.length) {
       _discussions.removeAt(index);
@@ -61,7 +61,8 @@ class InquiryCreateViewModel extends ChangeNotifier {
       notifyListeners(); // Notify listeners to update UI
     }
   }
-  /// TEST END
+
+  /// NETWORK CALL
 
   Future<void> getInitDataForCreateInquiry(String staffId) async {
     if (_uiState == UiState.loading) return;
@@ -116,6 +117,7 @@ class InquiryCreateViewModel extends ChangeNotifier {
       String customerId,
       String customerName,
       String userId,
+      String tasks,
       List<String> fileNames) async {
     if (_uiState == UiState.loading) return;
 
@@ -133,6 +135,7 @@ class InquiryCreateViewModel extends ChangeNotifier {
           customerId,
           customerName,
           userId,
+          tasks,
           fileNames);
       _isSavedInquiry = response;
       _uiState = UiState.success;

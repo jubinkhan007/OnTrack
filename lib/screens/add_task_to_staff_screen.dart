@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,6 +41,7 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
     super.initState();
     inquiryCreateViewModel =
         Provider.of<InquiryCreateViewModel>(context, listen: false);
+    // load previous tasks if any
     if (widget.tasks.isNotEmpty) {
       newTasks.addAll(widget.tasks);
     }
@@ -137,11 +136,11 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                                             ),
                                           ),
                                           errorWidget: (context, url, error) {
-                                              return Icon(
-                                                Icons.account_circle,
-                                                color: Palette.normalTv,
-                                                size: Converts.c48,
-                                              );
+                                            return Icon(
+                                              Icons.account_circle,
+                                              color: Palette.normalTv,
+                                              size: Converts.c48,
+                                            );
                                           },
                                         ),
                                       ),
@@ -204,11 +203,8 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                                     dateTime: selectedDate,
                                     body: descriptionController.text);
                                 newTasks.add(discussion);
-
-                                ///test
+                                // add tasks into viewmodel
                                 inquiryCreateViewModel.addTask(discussion);
-
-                                /// end
                                 // reset fields
                                 customer = null;
                                 descriptionController.text = "";

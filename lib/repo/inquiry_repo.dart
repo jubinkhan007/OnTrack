@@ -41,6 +41,7 @@ class InquiryRepo {
       String customerId,
       String customerName,
       String userId,
+      String tasks,
       List<String> fileNames) async {
     try {
       final headers = {
@@ -55,6 +56,7 @@ class InquiryRepo {
         "userid": userId,
         "custname": customerName,
         "priorityid": priorityId,
+        "taskdetail": tasks,
         "files": fileNames.length
       };
 
