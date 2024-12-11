@@ -6,8 +6,8 @@ import 'package:tmbi/repo/inquiry_repo.dart';
 import 'package:tmbi/repo/login_repo.dart';
 import 'package:tmbi/screens/screens.dart';
 
+import 'config/converts.dart';
 import 'config/router.dart';
-import 'config/size_config.dart';
 import 'viewmodel/viewmodel.dart';
 
 void main() {
@@ -24,62 +24,62 @@ class MyApp extends StatelessWidget {
     //SizeConfig().init(constraints);
     //SizeConfig().init2(context);
     return MultiProvider(
-          providers: [
-            ChangeNotifierProvider(
-              create: (_) => LoginViewmodel(
-                //loginRepo: LoginRepo(dio: ApiService().provideDio()),
-                loginRepo: LoginRepo(
-                    dio: ApiService(
-                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                        .provideDio()),
-              ),
-            ),
-            ChangeNotifierProvider(
-              create: (_) => InquiryCreateViewModel(
-                inquiryRepo: InquiryRepo(
-                    //fileDio: ApiService().fileUploadDio(),
-                    fileDio: ApiService(
-                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                        .fileUploadDio(),
-                    //dio: ApiService().provideDio()),
-                    dio: ApiService(
-                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                        .provideDio()),
-              ),
-            ),
-            ChangeNotifierProvider(
-              create: (_) => InquiryViewModel(
-                inquiryRepo: InquiryRepo(
-                    //fileDio: ApiService().fileUploadDio(),
-                    fileDio: ApiService(
-                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                        .fileUploadDio(),
-                    //dio: ApiService().provideDio()),
-                    dio: ApiService(
-                            "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                        .provideDio()),
-              ),
-            ),
-            ChangeNotifierProvider(
-              create: (_) => CounterViewModel(
-                inquiryRepo: InquiryRepo(
-                    //fileDio: ApiService().fileUploadDio(),
-                    fileDio: ApiService("https://api.npoint.io/").fileUploadDio(),
-                    //dio: ApiService().provideDio()),
-                    dio: ApiService("https://api.npoint.io/").provideDio()),
-              ),
-            ),
-          ],
-          child: MaterialApp(
-              title: 'Kick Track',
-              debugShowCheckedModeBanner: false,
-              onGenerateRoute: (settings) => generateRoute(settings),
-              theme: ThemeData(
-                  colorScheme: ColorScheme.fromSeed(seedColor: Palette.mainColor),
-                  useMaterial3: true,
-                  scaffoldBackgroundColor: Palette.scaffold),
-              home: const LoginScreen()),
-        );
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => LoginViewmodel(
+            //loginRepo: LoginRepo(dio: ApiService().provideDio()),
+            loginRepo: LoginRepo(
+                dio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio()),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => InquiryCreateViewModel(
+            inquiryRepo: InquiryRepo(
+                //fileDio: ApiService().fileUploadDio(),
+                fileDio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .fileUploadDio(),
+                //dio: ApiService().provideDio()),
+                dio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio()),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => InquiryViewModel(
+            inquiryRepo: InquiryRepo(
+                //fileDio: ApiService().fileUploadDio(),
+                fileDio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .fileUploadDio(),
+                //dio: ApiService().provideDio()),
+                dio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio()),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CounterViewModel(
+            inquiryRepo: InquiryRepo(
+                //fileDio: ApiService().fileUploadDio(),
+                fileDio: ApiService("https://api.npoint.io/").fileUploadDio(),
+                //dio: ApiService().provideDio()),
+                dio: ApiService("https://api.npoint.io/").provideDio()),
+          ),
+        ),
+      ],
+      child: MaterialApp(
+          title: 'Kick Track',
+          debugShowCheckedModeBanner: false,
+          onGenerateRoute: (settings) => generateRoute(settings),
+          theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Palette.mainColor),
+              useMaterial3: true,
+              scaffoldBackgroundColor: Palette.scaffold),
+          home: const LoginScreen()),
+    );
   }
 //);
 }

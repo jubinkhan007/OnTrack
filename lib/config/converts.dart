@@ -1,7 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:tmbi/config/size_config.dart';
 
 class Converts {
-  /*static double c8 = 1 * SizeConfig.textMultiplier;
+/*  static bool _isInitialized = false;
+
+  static double c8 = 1 * SizeConfig.textMultiplier;
   static double c12 = 1.5 * SizeConfig.textMultiplier;
   static double c16 = 2 * SizeConfig.textMultiplier;
   static double c20 = 2.5 * SizeConfig.textMultiplier;
@@ -43,8 +46,18 @@ class Converts {
   static double c304 = 38 * SizeConfig.textMultiplier;
   static double c312 = 39 * SizeConfig.textMultiplier;
   static double c320 = 40 * SizeConfig.textMultiplier;
-  static double c350 = 50 * SizeConfig.textMultiplier;*/
+  static double c350 = 50 * SizeConfig.textMultiplier;
 
+  // Call this method once to initialize SizeConfig
+  static void initializeSizeConfig(BuildContext context) {
+    if (!_isInitialized) {
+      //WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Initialize SizeConfig after the first frame is drawn
+        SizeConfig().init2(context);
+        _isInitialized = true; // Set the flag to true so it doesn't initialize again
+      //});
+    }
+  }*/
   static double c8 = 1 * 6.6;
   static double c12 = 1.5 * 6.6;
   static double c16 = 2 * 6.6;

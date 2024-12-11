@@ -21,7 +21,7 @@ class InquiryCreateViewModel extends ChangeNotifier {
   InitDataCreateInq? get initDataCreateInq => _initDataCreateInq;
 
   /// file names
-  List<String> _files = [];
+  final List<String> _files = [];
 
   List<String> get files => _files;
 
