@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/models.dart';
+import 'package:tmbi/models/staff_response.dart';
 
 import '../screens/screens.dart';
 
@@ -41,19 +42,21 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
     case AddTaskToStaffScreen.routeName:
       final args = routeSettings.arguments as Map<String, dynamic>;
       final staffId = args['staffId'] as String;
+      final companyId = args['companyId'] as String;
       final List<Discussion> tasks = (args['individual_task'] as List)
           .map((taskJson) =>
               Discussion.fromJson(taskJson as Map<String, dynamic>))
           .toList();
-      final List<Customer> staffs = (args['staff_list'] as List)
-          .map((taskJson) => Customer.fromJson(taskJson as Map<String, dynamic>))
-          .toList();
+      /*final List<Staff> staffs = (args['staff_list'] as List)
+          .map((taskJson) => Staff.fromJson(taskJson as Map<String, dynamic>))
+          .toList();*/
       return MaterialPageRoute(
           settings: routeSettings,
           builder: (_) => AddTaskToStaffScreen(
                 staffId: staffId,
+                companyId: companyId,
                 tasks: tasks,
-                staffs: staffs,
+                //: staffs,
               ));
     case CommentScreen.routeName:
       final args = routeSettings.arguments as String;

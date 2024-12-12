@@ -21,11 +21,11 @@ class Strings {
       'Login using your HRIS staff ID and password.';
   static const String login = 'Login';
   static const String summary = 'Summary';
-  static const String pending_inquiry = 'Pending Inquiry';
-  static const String delayed_inquiry = 'Delayed Inquiry';
-  static const String completed_inquiry = 'Completed Inquiry';
+  static const String pending_inquiry = 'Pending';
+  static const String delayed_inquiry = 'Delayed';
+  static const String completed_inquiry = 'Completed';
   static const String inquiry = 'Inquiry';
-  static const String inquiry_view = 'Inquiry View';
+  static const String inquiry_view = 'Task View';
   static const String pending = 'Pending';
   static const String attachment = 'Attachment';
   static const String notes = 'Notes';
@@ -34,7 +34,7 @@ class Strings {
   static const String overview = 'Description';
   static const String date = 'Date';
   static const String company = 'Company';
-  static const String inquiry_type = 'Inquiry type';
+  static const String inquiry_type = 'Query type';
   static const String priority = 'Priority';
   static const String select_priority = 'Select priority';
   static const String select = 'Select';
@@ -75,6 +75,7 @@ class Strings {
   static const String failed_to_save_the_data = 'Failed to save the data';
   static const String data_is_missing = 'Data is missing or null';
   static const String some_values_are_missing = 'Some values are missing. Please make sure all fields are filled in';
+  static const String company_name_is_missing = 'company name is missing.';
   static const String is_sample = 'Sample';
   static const String tap = 'Tap';
   static const String good_night = 'Good Night';

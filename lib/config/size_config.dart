@@ -26,7 +26,7 @@ class SizeConfig {
     widthMultiplier = _blockWidth;
   }*/
 
-  void init2(BuildContext context) {
+  static void init2(BuildContext context) {
     _mediaQueryData = MediaQuery.of(context);
     _screenWidth = _mediaQueryData!.size.width; // 360
     _screenHeight = _mediaQueryData!.size.height; // 752

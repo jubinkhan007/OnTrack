@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:tmbi/models/staff_response.dart';
 import 'package:tmbi/widgets/file_attachment.dart';
 
 import '../models/models.dart';
@@ -30,8 +31,7 @@ class InquiryRepo {
     }
   }
 
-  Future<bool> saveInquiry(
-      String companyId,
+  Future<bool> saveInquiry(String companyId,
       String inquiryId,
       String inquiryName,
       String inquiryDesc,
@@ -72,13 +72,13 @@ class InquiryRepo {
       debugPrint("RESPONSE#${response.data}");
       return response.data['status'] == "200";
     } on DioException catch (error) {
+      debugPrint("RESPONSE_ERROR#${error}");
       throw Exception(error);
     }
   }
 
 
-  Future<bool> updateTask(
-      String inquiryId,
+  Future<bool> updateTask(String inquiryId,
       String taskId,
       String priorityId,
       String description,
@@ -151,7 +151,8 @@ class InquiryRepo {
     }
   }
 
-  Future<List<InquiryResponse>> getInquiries(String flag, String userId, String isAssigned) async {
+  Future<List<InquiryResponse>> getInquiries(String flag, String userId,
+      String isAssigned) async {
     try {
       final headers = {
         'vm': 'INQALL',
@@ -206,11 +207,13 @@ class InquiryRepo {
       }
     } on DioException catch (error) {
       debugPrint("Error fetching notes: ${error.message}");
-      throw Exception("Failed to fetch notes: ${error.response?.statusMessage}");
+      throw Exception(
+          "Failed to fetch notes: ${error.response?.statusMessage}");
     }
   }
 
-  Future<List<StringUrl>> getAttachments(String inquiryId, String taskId) async {
+  Future<List<StringUrl>> getAttachments(String inquiryId,
+      String taskId) async {
     try {
       final headers = {
         'vm': 'ATTACHMENT_TASK',
@@ -235,7 +238,8 @@ class InquiryRepo {
       }
     } on DioException catch (error) {
       debugPrint("Error fetching notes: ${error.message}");
-      throw Exception("Failed to fetch notes: ${error.response?.statusMessage}");
+      throw Exception(
+          "Failed to fetch notes: ${error.response?.statusMessage}");
     }
   }
 
@@ -264,12 +268,12 @@ class InquiryRepo {
       }
     } on DioException catch (error) {
       debugPrint("Error fetching notes: ${error.message}");
-      throw Exception("Failed to fetch notes: ${error.response?.statusMessage}");
+      throw Exception(
+          "Failed to fetch notes: ${error.response?.statusMessage}");
     }
   }
 
-  Future<bool> saveComment(
-      String inquiryId,
+  Future<bool> saveComment(String inquiryId,
       String body,
       String priorityId,
       String userId) async {
@@ -278,7 +282,7 @@ class InquiryRepo {
         "dtype": "TASK",
         "inqrid": inquiryId,
         "inqrdesc": body,
-        "taskid":"0",
+        "taskid": "0",
         "userid": userId,
         "priorityid": "0",
         "files": "0",
@@ -294,6 +298,27 @@ class InquiryRepo {
       throw Exception(error);
     }
   }
+
+  Future<StaffResponse> getStaffs(String staffId, String companyId) async {
+    try {
+      final headers = {
+        'vm': 'STAFF',
+        'va': companyId,
+        'vb': staffId,
+        'vc': '0',
+        'vd': 'staffs',
+      };
+      final response = await dio.get(
+        "getall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return StaffResponse.fromJson(response.data);
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
 
   /// DEMO API
 
@@ -335,7 +360,7 @@ class InquiryRepo {
     }
   }
 
-  /*Future<AttachmentViewResponse> getAttachments() async {
+/*Future<AttachmentViewResponse> getAttachments() async {
     try {
       final response = await dio.get("5dedf78a78969c55cfb3");
       debugPrint("RESPONSE#${response.data}");
@@ -345,7 +370,7 @@ class InquiryRepo {
     }
   }*/
 
-  /*Future<NoteResponse> getNotes() async {
+/*Future<NoteResponse> getNotes() async {
     try {
       final response = await dio.get("2a2ecc5de4a852629548");
       debugPrint("RESPONSE#${response.data}");
@@ -355,7 +380,7 @@ class InquiryRepo {
     }
   }*/
 
-  /*Future<CommentResponse> getComments() async {
+/*Future<CommentResponse> getComments() async {
     try {
       final response = await dio.get("c129b21084d6208d2753");
       debugPrint("RESPONSE#${response.data}");
@@ -364,4 +389,5 @@ class InquiryRepo {
       throw Exception(error);
     }
   }*/
+
 }

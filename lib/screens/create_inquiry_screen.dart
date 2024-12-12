@@ -53,7 +53,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
     ),*/
   ];
 
-  List<Customer> getStaffs() {
+  /*List<Customer> getStaffs() {
     return [
       Customer(id: '340553', name: 'Md. Salauddin', isVerified: true),
       Customer(id: '397820', name: 'Md. Imrul Kayesh', isVerified: false),
@@ -61,7 +61,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
       Customer(id: '30940', name: 'Md. Elias Hossain', isVerified: false),
       Customer(id: '486133', name: 'Adeepta Shushil Shuvo', isVerified: true),
     ];
-  }
+  }*/
 
   // customer list
   List<Customer> customers = [];
@@ -109,6 +109,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
     mInquiryId = "";
     mPriorityId = "";
     mCustomer = null;
+    imageFiles.clear();
   }
 
   @override
@@ -118,8 +119,11 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
         Provider.of<InquiryCreateViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       inquiryViewModel.getInitDataForCreateInquiry(widget.staffId);
-      // reset individual tasks if any
+      // reset individual tasks, files if any
       inquiryViewModel.removeAllTask();
+      inquiryViewModel.removeFiles();
+      // reset all
+      resetFields();
     });
   }
 
@@ -192,18 +196,24 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                         // Customize icon color
                         onPressed: () async {
                           String userId = await _getUserInfo();
-                          Navigator.pushNamed(
-                              context, AddTaskToStaffScreen.routeName,
-                              arguments: {
-                                'staffId': userId,
-                                //'individual_task': discussionList
-                                'individual_task': inquiryViewModel.discussions
-                                    .map((discussion) => discussion.toJson())
-                                    .toList(),
-                                'staff_list': getStaffs()
-                                    .map((discussion) => discussion.toJson())
-                                    .toList(),
-                              });
+                          if (mCompanyId != "") {
+                            Navigator.pushNamed(
+                                context, AddTaskToStaffScreen.routeName,
+                                arguments: {
+                                  'staffId': userId,
+                                  'companyId': mCompanyId,
+                                  //'individual_task': discussionList
+                                  'individual_task': inquiryViewModel
+                                      .discussions
+                                      .map((discussion) => discussion.toJson())
+                                      .toList(),
+                                  /*'staff_list': getStaffs()
+                                      .map((discussion) => discussion.toJson())
+                                      .toList(),*/
+                                });
+                          } else {
+                            showMessage(Strings.company_name_is_missing);
+                          }
                           debugPrint(
                               "INDEX:: ${inquiryViewModel.discussions.length}");
                         },
@@ -312,7 +322,11 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                             .initDataCreateInq!.company!,
                                         companyId));
                                     debugPrint("COMPANY_ID# $companyId");
-                                    mCompanyId = companyId;
+                                    //mCompanyId = companyId;
+                                    // test start
+                                    setState(() {
+                                      mCompanyId = companyId;
+                                    });
                                   },
                                 ),
                                 SizedBox(
@@ -356,7 +370,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                     debugPrint("COMPANY_ID# $inquiryId");
                                     mInquiryId = inquiryId;
                                     //
-                                    if (mInquiryId == "3") {
+                                    if (mInquiryId == "0") {
                                       setState(() {
                                         isTaskEntryModeEnable = true;
                                       });
@@ -608,5 +622,4 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
     }
     return "";
   }
-
 }

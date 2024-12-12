@@ -1,10 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:tmbi/config/size_config.dart';
-
 class Converts {
-/*  static bool _isInitialized = false;
-
-  static double c8 = 1 * SizeConfig.textMultiplier;
+/*  static double c8 = 1 * SizeConfig.textMultiplier;
   static double c12 = 1.5 * SizeConfig.textMultiplier;
   static double c16 = 2 * SizeConfig.textMultiplier;
   static double c20 = 2.5 * SizeConfig.textMultiplier;
@@ -47,17 +42,7 @@ class Converts {
   static double c312 = 39 * SizeConfig.textMultiplier;
   static double c320 = 40 * SizeConfig.textMultiplier;
   static double c350 = 50 * SizeConfig.textMultiplier;
-
-  // Call this method once to initialize SizeConfig
-  static void initializeSizeConfig(BuildContext context) {
-    if (!_isInitialized) {
-      //WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Initialize SizeConfig after the first frame is drawn
-        SizeConfig().init2(context);
-        _isInitialized = true; // Set the flag to true so it doesn't initialize again
-      //});
-    }
-  }*/
+}*/
   static double c8 = 1 * 6.6;
   static double c12 = 1.5 * 6.6;
   static double c16 = 2 * 6.6;
@@ -103,3 +88,48 @@ class Converts {
   static double c350 = 50 * 6.6;
 }
 
+/*class Converts2 {
+  static double c8() => 1 * SizeConfig.textMultiplier;
+  static double c12() => 1.5 * SizeConfig.textMultiplier;
+  static double c16() => 2 * SizeConfig.textMultiplier;
+  static double c20() => 2.5 * SizeConfig.textMultiplier;
+  static double c24() => 3 * SizeConfig.textMultiplier;
+  static double c32() => 4 * SizeConfig.textMultiplier;
+  static double c40() => 5 * SizeConfig.textMultiplier;
+  static double c48() => 6 * SizeConfig.textMultiplier;
+  static double c56() => 7 * SizeConfig.textMultiplier;
+  static double c64() => 8 * SizeConfig.textMultiplier;
+  static double c72() => 9 * SizeConfig.textMultiplier;
+  static double getC80() => 10 * SizeConfig.textMultiplier;
+  static double getC88() => 11 * SizeConfig.textMultiplier;
+  static double getC96() => 12 * SizeConfig.textMultiplier;
+  static double getC104() => 13 * SizeConfig.textMultiplier;
+  static double getC112() => 14 * SizeConfig.textMultiplier;
+  static double getC120() => 15 * SizeConfig.textMultiplier;
+  static double getC128() => 16 * SizeConfig.textMultiplier;
+  static double getC136() => 17 * SizeConfig.textMultiplier;
+  static double getC144() => 18 * SizeConfig.textMultiplier;
+  static double getC152() => 19 * SizeConfig.textMultiplier;
+  static double getC160() => 20 * SizeConfig.textMultiplier;
+  static double getC168() => 21 * SizeConfig.textMultiplier;
+  static double getC176() => 22 * SizeConfig.textMultiplier;
+  static double getC184() => 23 * SizeConfig.textMultiplier;
+  static double getC192() => 24 * SizeConfig.textMultiplier;
+  static double getC200() => 25 * SizeConfig.textMultiplier;
+  static double getC208() => 26 * SizeConfig.textMultiplier;
+  static double getC216() => 27 * SizeConfig.textMultiplier;
+  static double getC224() => 28 * SizeConfig.textMultiplier;
+  static double getC232() => 29 * SizeConfig.textMultiplier;
+  static double getC240() => 30 * SizeConfig.textMultiplier;
+  static double getC248() => 31 * SizeConfig.textMultiplier;
+  static double getC256() => 32 * SizeConfig.textMultiplier;
+  static double getC264() => 33 * SizeConfig.textMultiplier;
+  static double getC272() => 34 * SizeConfig.textMultiplier;
+  static double getC280() => 35 * SizeConfig.textMultiplier;
+  static double getC288() => 36 * SizeConfig.textMultiplier;
+  static double getC296() => 37 * SizeConfig.textMultiplier;
+  static double getC304() => 38 * SizeConfig.textMultiplier;
+  static double getC312() => 39 * SizeConfig.textMultiplier;
+  static double getC320() => 40 * SizeConfig.textMultiplier;
+  static double getC350() => 50 * SizeConfig.textMultiplier;
+}*/

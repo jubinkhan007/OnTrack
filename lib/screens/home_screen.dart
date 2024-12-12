@@ -149,7 +149,7 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: TextViewCustom(
-                          text: Strings.inquiry,
+                          text: "",
                           fontSize: Converts.c20,
                           tvColor: Colors.black,
                           isTextAlignCenter: false,

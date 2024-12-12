@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:tmbi/models/staff_response.dart';
 import 'package:tmbi/repo/inquiry_repo.dart';
 
 import '../models/models.dart';
@@ -25,6 +26,12 @@ class InquiryCreateViewModel extends ChangeNotifier {
 
   List<String> get files => _files;
 
+  removeFiles() {
+    if (_files.isNotEmpty) {
+      _files.clear();
+    }
+  }
+
   /// save inquiry
   bool? _isSavedInquiry;
 
@@ -34,6 +41,11 @@ class InquiryCreateViewModel extends ChangeNotifier {
   UiState _uiState = UiState.init;
 
   UiState get uiState => _uiState;
+
+  /// staff
+  StaffResponse? _staffResponse;
+
+  StaffResponse? get staffResponse => _staffResponse;
 
   /// DISCUSSION SECTION
   final List<Discussion> _discussions = [];
@@ -157,6 +169,23 @@ class InquiryCreateViewModel extends ChangeNotifier {
       final response = await inquiryRepo.updateTask(
           inquiryId, taskId, priorityId, description, userId, fileNames);
       _isSavedInquiry = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> getStaffs(String staffId, String companyId) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.getStaffs(staffId, companyId);
+      _staffResponse = response;
       _uiState = UiState.success;
     } catch (error) {
       _uiState = UiState.error;

@@ -8,6 +8,7 @@ import 'package:tmbi/screens/screens.dart';
 
 import 'config/converts.dart';
 import 'config/router.dart';
+import 'config/size_config.dart';
 import 'viewmodel/viewmodel.dart';
 
 void main() {
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
     //return LayoutBuilder(
     //builder: (context, constraints) {
     //SizeConfig().init(constraints);
-    //SizeConfig().init2(context);
+    //SizeConfig.init2(context);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
