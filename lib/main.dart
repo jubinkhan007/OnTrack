@@ -49,6 +49,19 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(
+          create: (_) => AddTaskViewModel(
+            inquiryRepo: InquiryRepo(
+              //fileDio: ApiService().fileUploadDio(),
+                fileDio: ApiService(
+                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .fileUploadDio(),
+                //dio: ApiService().provideDio()),
+                dio: ApiService(
+                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio()),
+          ),
+        ),
+        ChangeNotifierProvider(
           create: (_) => InquiryViewModel(
             inquiryRepo: InquiryRepo(
                 //fileDio: ApiService().fileUploadDio(),

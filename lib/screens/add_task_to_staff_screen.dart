@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/models/models.dart';
-import 'package:tmbi/models/staff_response.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
@@ -35,7 +34,7 @@ class AddTaskToStaffScreen extends StatefulWidget {
 class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
   final TextEditingController descriptionController = TextEditingController();
   final List<Discussion> newTasks = [];
-  late InquiryCreateViewModel inquiryCreateViewModel;
+  late AddTaskViewModel inquiryCreateViewModel;
   String selectedDate = "";
   Customer? customer;
 
@@ -44,7 +43,7 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
     // TODO: implement initState
     super.initState();
     inquiryCreateViewModel =
-        Provider.of<InquiryCreateViewModel>(context, listen: false);
+        Provider.of<AddTaskViewModel>(context, listen: false);
     // load previous tasks if any
     //if (widget.tasks.isNotEmpty) {
     //newTasks.addAll(widget.tasks);
@@ -76,7 +75,7 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
           },
         ),
       ),
-      body: Consumer<InquiryCreateViewModel>(
+      body: Consumer<AddTaskViewModel>(
           builder: (context, inquiryViewModel, child) {
         if (inquiryViewModel.uiState == UiState.loading) {
           return const Center(child: CircularProgressIndicator());
@@ -236,7 +235,9 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                                       body: descriptionController.text);
                                   newTasks.add(discussion);
                                   // add tasks into viewmodel
-                                  inquiryCreateViewModel.addTask(discussion);
+                                  Provider.of<InquiryCreateViewModel>(context,
+                                          listen: false)
+                                      .addTask(discussion);
                                   // reset fields
                                   customer = null;
                                   descriptionController.text = "";
@@ -292,7 +293,9 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                       onDismissed: (direction) {
                         if (index >= 0 && index < newTasks.length) {
                           setState(() {
-                            inquiryCreateViewModel.removeTask(index);
+                            Provider.of<InquiryCreateViewModel>(context,
+                                    listen: false)
+                                .removeTask(index);
                             newTasks.removeAt(index);
                           });
                         }

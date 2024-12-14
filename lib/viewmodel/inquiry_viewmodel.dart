@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:tmbi/repo/repo.dart';
 
@@ -56,7 +54,8 @@ class InquiryViewModel extends ChangeNotifier {
 
   UiState get uiState => _uiState;
 
-  Future<void> getInquiries(String flag, String userId, String isAssigned) async {
+  Future<void> getInquiries(
+      String flag, String userId, String isAssigned) async {
     if (_uiState == UiState.loading) return;
     _message = null;
     _uiState = UiState.loading;
@@ -152,7 +151,7 @@ class InquiryViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       final response =
-      await inquiryRepo.saveComment(inquiryId, body, priorityId, userId);
+          await inquiryRepo.saveComment(inquiryId, body, priorityId, userId);
       _isSavedInquiry = response;
       _uiState = UiState.success;
     } catch (error) {
@@ -360,5 +359,4 @@ class InquiryViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }*/
-
 }
