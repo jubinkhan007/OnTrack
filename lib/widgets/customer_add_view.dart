@@ -37,7 +37,7 @@ class _CustomerAddViewState extends State<CustomerAddView> {
                     child: TextFieldInquiry(
                         fontSize: Converts.c16,
                         fontColor: Palette.normalTv,
-                        hintColor: Palette.semiTv,
+                        hintColor: Palette.grayColor,
                         hint: Strings.customer_name,
                         hasBorder: true,
                         controller: widget.controller),

@@ -24,6 +24,17 @@ class AddTaskViewModel extends ChangeNotifier {
 
   StaffResponse? get staffResponse => _staffResponse;
 
+  // clear tasks
+  removeTasks() {
+    if (_staffResponse != null) {
+      if (_staffResponse!.staffs != null) {
+       if (_staffResponse!.staffs!.isNotEmpty){
+         _staffResponse!.staffs!.clear();
+       }
+      }
+    }
+  }
+
   Future<void> getStaffs(String staffId, String companyId) async {
     if (_uiState == UiState.loading) return;
 

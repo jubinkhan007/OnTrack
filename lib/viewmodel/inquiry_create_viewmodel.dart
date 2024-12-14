@@ -43,9 +43,9 @@ class InquiryCreateViewModel extends ChangeNotifier {
   UiState get uiState => _uiState;
 
   /// staff
-  StaffResponse? _staffResponse;
+  /*StaffResponse? _staffResponse;
 
-  StaffResponse? get staffResponse => _staffResponse;
+  StaffResponse? get staffResponse => _staffResponse;*/
 
   /// DISCUSSION SECTION
   final List<Discussion> _discussions = [];
@@ -178,7 +178,7 @@ class InquiryCreateViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> getStaffs(String staffId, String companyId) async {
+  /*Future<void> getStaffs(String staffId, String companyId) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
@@ -193,5 +193,5 @@ class InquiryCreateViewModel extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
-  }
+  }*/
 }

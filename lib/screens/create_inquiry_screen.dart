@@ -241,9 +241,9 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                           child: TextFieldInquiry(
                               fontSize: Converts.c20,
                               fontColor: Colors.black,
-                              hintColor: Palette.semiTv,
+                              hintColor: Palette.grayColor,
                               hasBorder: true,
-                              hint: "Type Title Here",
+                              hint: Strings.type_title_here,
                               controller: titleController),
                         ),
                         CheckBox(
@@ -273,7 +273,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                     TextFieldInquiry(
                       fontSize: Converts.c16,
                       fontColor: Palette.normalTv,
-                      hintColor: Palette.semiTv,
+                      hintColor: Palette.grayColor,
                       hint: Strings.enter_brief_description,
                       controller: descriptionController,
                       maxLine: 5,
@@ -323,9 +323,13 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                         companyId));
                                     debugPrint("COMPANY_ID# $companyId");
                                     //mCompanyId = companyId;
-                                    // test start
                                     setState(() {
                                       mCompanyId = companyId;
+                                      // remove tasks (if any)
+                                      Provider.of<InquiryCreateViewModel>(
+                                              context,
+                                              listen: false)
+                                          .removeAllTask();
                                     });
                                   },
                                 ),
@@ -369,16 +373,18 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                   onChanged: (inquiryId) {
                                     debugPrint("COMPANY_ID# $inquiryId");
                                     mInquiryId = inquiryId;
-                                    //
-                                    if (mInquiryId == "0") {
-                                      setState(() {
+                                    setState(() {
+                                      // clear previous task
+                                      Provider.of<InquiryCreateViewModel>(
+                                              context,
+                                              listen: false)
+                                          .removeAllTask();
+                                      if (mInquiryId == "0") {
                                         isTaskEntryModeEnable = true;
-                                      });
-                                    } else {
-                                      setState(() {
+                                      } else {
                                         isTaskEntryModeEnable = false;
-                                      });
-                                    }
+                                      }
+                                    });
                                   },
                                 ),
                                 SizedBox(
@@ -537,42 +543,47 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                             titleController.value != null &&
                             descriptionController.value != null &&
                             mCustomer != null) {
-                          // get user id
-                          String userId = await _getUserInfo();
-                          // upload files, if any are selected
-                          if (imageFiles.isNotEmpty) {
-                            await inquiryViewModel.saveFiles(imageFiles);
-                          }
-                          // save inquiry
-                          await inquiryViewModel.saveInquiry(
-                              mCompanyId,
-                              mInquiryId,
-                              titleController.text,
-                              descriptionController.text,
-                              isSample,
-                              selectedDate,
-                              mPriorityId,
-                              mCustomer!.id.toString(),
-                              mCustomer!.id != "0"
-                                  ? mCustomer!.name.toString()
-                                  : customerNameController.text.toString(),
-                              userId,
-                              _tasksToString(),
-                              inquiryViewModel.files);
-
-                          // check the status of the request
-                          if (inquiryViewModel.isSavedInquiry != null) {
-                            if (inquiryViewModel.isSavedInquiry!) {
-                              showMessage(Strings.data_saved_successfully);
-                              Navigator.pop(context);
-                            } else {
-                              showMessage(Strings.failed_to_save_the_data);
-                            }
+                          if (mInquiryId == "0" &&
+                              inquiryViewModel.discussions.isEmpty) {
+                            showMessage(Strings.please_enter_the_task);
                           } else {
-                            showMessage(Strings.data_is_missing);
+                            // get user id
+                            String userId = await _getUserInfo();
+                            // upload files, if any are selected
+                            if (imageFiles.isNotEmpty) {
+                              await inquiryViewModel.saveFiles(imageFiles);
+                            }
+                            // save inquiry
+                            await inquiryViewModel.saveInquiry(
+                                mCompanyId,
+                                mInquiryId,
+                                titleController.text,
+                                descriptionController.text,
+                                isSample,
+                                selectedDate,
+                                mPriorityId,
+                                mCustomer!.id.toString(),
+                                mCustomer!.id != "0"
+                                    ? mCustomer!.name.toString()
+                                    : customerNameController.text.toString(),
+                                userId,
+                                _tasksToString(),
+                                inquiryViewModel.files);
+
+                            // check the status of the request
+                            if (inquiryViewModel.isSavedInquiry != null) {
+                              if (inquiryViewModel.isSavedInquiry!) {
+                                showMessage(Strings.data_saved_successfully);
+                                Navigator.pop(context);
+                              } else {
+                                showMessage(Strings.failed_to_save_the_data);
+                              }
+                            } else {
+                              showMessage(Strings.data_is_missing);
+                            }
+                            // reset all values to default
+                            resetFields();
                           }
-                          // reset all values to default
-                          resetFields();
                         } else {
                           showMessage(Strings.some_values_are_missing);
                         }

@@ -42,14 +42,18 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    // clear previous task
+    /*Provider.of<InquiryCreateViewModel>(context, listen: false)
+        .removeAllTask();*/
+    // init
     inquiryCreateViewModel =
         Provider.of<AddTaskViewModel>(context, listen: false);
-    // load previous tasks if any
-    //if (widget.tasks.isNotEmpty) {
-    //newTasks.addAll(widget.tasks);
-    //}
     WidgetsBinding.instance.addPostFrameCallback((_) {
       inquiryCreateViewModel.getStaffs(widget.staffId, widget.companyId);
+      // load previous tasks if any
+      if (widget.tasks.isNotEmpty) {
+        newTasks.addAll(widget.tasks);
+      }
     });
   }
 

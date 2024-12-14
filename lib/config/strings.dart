@@ -47,6 +47,7 @@ class Strings {
   static const String update = 'Update';
   static const String description = 'Description';
   static const String enter_brief_description = 'Enter Brief Description';
+  static const String type_title_here = 'Type Title Here';
   static const String what_is_the_task = 'What is the Task?';
   static const String buyer_customer = 'Customer';
   static const String customer_name = 'Customer name';
@@ -75,6 +76,7 @@ class Strings {
   static const String failed_to_save_the_data = 'Failed to save the data';
   static const String data_is_missing = 'Data is missing or null';
   static const String some_values_are_missing = 'Some values are missing. Please make sure all fields are filled in';
+  static const String please_enter_the_task = 'Please enter the task, as you are enabled to enter tasks.';
   static const String company_name_is_missing = 'company name is missing.';
   static const String is_sample = 'Sample';
   static const String tap = 'Tap';

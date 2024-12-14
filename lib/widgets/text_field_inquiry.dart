@@ -37,7 +37,8 @@ class TextFieldInquiry extends StatelessWidget {
           hintText: hint,
           hintStyle: TextStyle(
             fontSize: fontSize, // Hint text size
-            color: hintColor, // Hint text color
+            color: hintColor,
+            fontWeight: FontWeight.normal// Hint text color
           ),
           border: hasBorder
               ? const OutlineInputBorder()

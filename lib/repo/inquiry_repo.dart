@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:tmbi/models/staff_response.dart';
 import 'package:tmbi/widgets/file_attachment.dart';
 
 import '../models/models.dart';
@@ -31,7 +30,8 @@ class InquiryRepo {
     }
   }
 
-  Future<bool> saveInquiry(String companyId,
+  Future<bool> saveInquiry(
+      String companyId,
       String inquiryId,
       String inquiryName,
       String inquiryDesc,
@@ -66,6 +66,7 @@ class InquiryRepo {
       }
 
       final response = await dio.post(
+        //"saveall2",
         "saveall",
         options: Options(headers: headers),
       );
@@ -77,13 +78,8 @@ class InquiryRepo {
     }
   }
 
-
-  Future<bool> updateTask(String inquiryId,
-      String taskId,
-      String priorityId,
-      String description,
-      String userId,
-      List<String> fileNames) async {
+  Future<bool> updateTask(String inquiryId, String taskId, String priorityId,
+      String description, String userId, List<String> fileNames) async {
     try {
       final headers = {
         "dtype": "TASK",
@@ -151,8 +147,8 @@ class InquiryRepo {
     }
   }
 
-  Future<List<InquiryResponse>> getInquiries(String flag, String userId,
-      String isAssigned) async {
+  Future<List<InquiryResponse>> getInquiries(
+      String flag, String userId, String isAssigned) async {
     try {
       final headers = {
         'vm': 'INQALL',
@@ -212,8 +208,8 @@ class InquiryRepo {
     }
   }
 
-  Future<List<StringUrl>> getAttachments(String inquiryId,
-      String taskId) async {
+  Future<List<StringUrl>> getAttachments(
+      String inquiryId, String taskId) async {
     try {
       final headers = {
         'vm': 'ATTACHMENT_TASK',
@@ -273,10 +269,8 @@ class InquiryRepo {
     }
   }
 
-  Future<bool> saveComment(String inquiryId,
-      String body,
-      String priorityId,
-      String userId) async {
+  Future<bool> saveComment(
+      String inquiryId, String body, String priorityId, String userId) async {
     try {
       final headers = {
         "dtype": "TASK",
@@ -318,7 +312,6 @@ class InquiryRepo {
       throw Exception(error);
     }
   }
-
 
   /// DEMO API
 
@@ -389,5 +382,4 @@ class InquiryRepo {
       throw Exception(error);
     }
   }*/
-
 }
