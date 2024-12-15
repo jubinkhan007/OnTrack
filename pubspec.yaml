@@ -53,6 +53,10 @@ dependencies:
   shimmer: ^3.0.0
   crypto: ^3.0.1 #test
   http: ^1.2.2 #test
+  firebase_core: ^3.8.1
+  firebase_messaging: ^15.1.6
+  flutter_local_notifications: ^17.2.1+2
+  googleapis_auth: ^1.6.0
 
 dev_dependencies:
   flutter_test:

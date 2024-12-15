@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/palette.dart';
@@ -6,14 +8,27 @@ import 'package:tmbi/repo/inquiry_repo.dart';
 import 'package:tmbi/repo/login_repo.dart';
 import 'package:tmbi/screens/screens.dart';
 
-import 'config/converts.dart';
 import 'config/router.dart';
-import 'config/size_config.dart';
+import 'firebase_options.dart';
 import 'viewmodel/viewmodel.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
+
+@pragma("vm:entry-point")
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  debugPrint(message.notification!.title.toString());
+}
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -51,13 +66,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => AddTaskViewModel(
             inquiryRepo: InquiryRepo(
-              //fileDio: ApiService().fileUploadDio(),
+                //fileDio: ApiService().fileUploadDio(),
                 fileDio: ApiService(
-                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                     .fileUploadDio(),
                 //dio: ApiService().provideDio()),
                 dio: ApiService(
-                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                     .provideDio()),
           ),
         ),

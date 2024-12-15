@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/notification/notification_server_key.dart';
+import 'package:tmbi/config/notification/notification_service.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
@@ -77,10 +79,19 @@ class _LoginOperationState extends State<LoginOperation> {
 
   bool _rememberMe = false;
 
+  // test
+  NotificationService notificationService = NotificationService();
+
   @override
   void initState() {
     super.initState();
     _loadSavedCredential();
+    // test
+    notificationService.requestNotificationPermission();
+    notificationService.firebaseInit();
+    notificationService.getDeviceToken().then((value){
+      debugPrint("TOKEN::$value");
+    });
   }
 
   @override
@@ -237,6 +248,10 @@ class _LoginOperationState extends State<LoginOperation> {
   _loadSavedCredential() async {
     bool isSaved = await SPHelper().isCredentialSaved();
     UserResponse? userResponse = await SPHelper().getUser();
+    // test
+    NotificationServerKey serverKey = NotificationServerKey();
+    String key = await serverKey.getServerKey();
+    debugPrint("SERVER_KEY::$key");
     setState(() {
       _rememberMe = isSaved;
       if (_rememberMe) {
