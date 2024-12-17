@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/notification/notification_server_key.dart';
@@ -78,18 +79,20 @@ class _LoginOperationState extends State<LoginOperation> {
   final TextEditingController _passwordTEController = TextEditingController();
 
   bool _rememberMe = false;
+  String? _firebaseDeviceToken;
 
-  // test
+  // notification service
   NotificationService notificationService = NotificationService();
 
   @override
   void initState() {
     super.initState();
     _loadSavedCredential();
-    // test
+    // init notification
     notificationService.requestNotificationPermission();
     notificationService.firebaseInit();
     notificationService.getDeviceToken().then((value){
+      _firebaseDeviceToken = value;
       debugPrint("TOKEN::$value");
     });
   }
@@ -179,8 +182,10 @@ class _LoginOperationState extends State<LoginOperation> {
                 stockColor: Palette.mainColor,
                 onTap: () async {
                   if (_loginFormKey.currentState!.validate()) {
+                    // call api for validate user
                     await loginViewModel.userAuth(
-                        _idTEController.text, _passwordTEController.text);
+                        _idTEController.text, _passwordTEController.text, _firebaseDeviceToken);
+
                     if (loginViewModel.uiState == UiState.error) {
                       _showMessage(loginViewModel.message.toString());
                     } else if (loginViewModel.uiState == UiState.success) {
@@ -248,16 +253,19 @@ class _LoginOperationState extends State<LoginOperation> {
   _loadSavedCredential() async {
     bool isSaved = await SPHelper().isCredentialSaved();
     UserResponse? userResponse = await SPHelper().getUser();
-    // test
+    // generate server key
     NotificationServerKey serverKey = NotificationServerKey();
     String key = await serverKey.getServerKey();
+    // test purpose
+    Clipboard.setData(ClipboardData(text: key));
     debugPrint("SERVER_KEY::$key");
+    // update user auth
     setState(() {
       _rememberMe = isSaved;
       if (_rememberMe) {
-        if (UserResponse != null) {
-          String? staffId = userResponse!.users![0]!.staffId;
-          String? password = userResponse!.users![0]!.password;
+        if (userResponse != null) {
+          String? staffId = userResponse.users![0].staffId;
+          String? password = userResponse.users![0].password;
           _idTEController.text = staffId ?? "";
           _passwordTEController.text = password ?? "";
         }

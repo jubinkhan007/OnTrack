@@ -30,4 +30,5 @@ class NotificationServerKey {
     final serverKey = client.credentials.accessToken.data;
     return serverKey;
   }
+
 }

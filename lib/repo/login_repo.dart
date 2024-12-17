@@ -10,12 +10,16 @@ class LoginRepo {
     required this.dio,
   });
 
-  Future<UserResponse> userAuth(String userid, String password) async {
+  Future<UserResponse> userAuth(
+      String userid, String password, String? firebaseDeviceToken) async {
     final packageInfo = await PackageInfo.fromPlatform();
     try {
       final headers = {
         'vm': 'LOGIN',
-        'va': packageInfo.buildNumber,
+        'va': firebaseDeviceToken != null
+            ? "${packageInfo.buildNumber}#$firebaseDeviceToken"
+            : packageInfo.buildNumber,
+        //'va' : packageInfo.buildNumber,
         'vb': userid,
         'vc': password,
         'vd': 'user',
