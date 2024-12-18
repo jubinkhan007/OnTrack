@@ -93,7 +93,8 @@ class NotificationService {
     });
   }
 
-  /// Firebase sends notifications according to the device ID, not the Firebase ID.
+  /// Firebase sends notifications according
+  /// to the device ID, not the Firebase ID.
   Future<String?> getDeviceToken() async {
     return await firebaseMessaging.getToken();
   }

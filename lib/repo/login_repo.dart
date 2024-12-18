@@ -16,10 +16,10 @@ class LoginRepo {
     try {
       final headers = {
         'vm': 'LOGIN',
-        'va': firebaseDeviceToken != null
+        /*'va': firebaseDeviceToken != null
             ? "${packageInfo.buildNumber}#$firebaseDeviceToken"
-            : packageInfo.buildNumber,
-        //'va' : packageInfo.buildNumber,
+            : packageInfo.buildNumber,*/
+        'va' : packageInfo.buildNumber,
         'vb': userid,
         'vc': password,
         'vd': 'user',

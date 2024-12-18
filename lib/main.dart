@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/palette.dart';
+import 'package:tmbi/config/screen_config.dart';
 import 'package:tmbi/network/api_service.dart';
 import 'package:tmbi/repo/inquiry_repo.dart';
 import 'package:tmbi/repo/login_repo.dart';
@@ -39,6 +40,8 @@ class MyApp extends StatelessWidget {
     //builder: (context, constraints) {
     //SizeConfig().init(constraints);
     //SizeConfig.init2(context);
+    ScreenConfig().init(context);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
