@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/models/models.dart';
+import 'package:tmbi/viewmodel/task_update_viewmodel.dart';
 
 import '../../config/sp_helper.dart';
 import '../../config/strings.dart';
@@ -11,21 +13,10 @@ import '../../network/ui_state.dart';
 import '../../viewmodel/viewmodel.dart';
 import '../../widgets/widgets.dart';
 
-class UpdateTaskDialog extends StatelessWidget {
-  final TextEditingController descriptionController = TextEditingController();
+class UpdateTaskDialog extends StatefulWidget {
   final Task task;
   final String inquiryId;
 
-  // files
-  final List<ImageFile> imageFiles = [];
-  final List<Priority> priorities = [
-    Priority(id: 1, name: "Started"),
-    Priority(id: 3, name: "In Progress"),
-    Priority(id: 5, name: "Hold"),
-    Priority(id: 7, name: "Completed"),
-  ];
-  String mStatusId = "";
-  String mStatusName = "";
   final Function(bool, String) onCall;
 
   UpdateTaskDialog(
@@ -33,6 +24,52 @@ class UpdateTaskDialog extends StatelessWidget {
       required this.task,
       required this.inquiryId,
       required this.onCall});
+
+  @override
+  State<UpdateTaskDialog> createState() => _UpdateTaskDialogState();
+}
+
+class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
+  final TextEditingController descriptionController = TextEditingController();
+
+  // files
+  final List<ImageFile> imageFiles = [];
+
+  final List<Priority> priorities = [
+    Priority(id: 1, name: "Started"),
+    Priority(id: 3, name: "In Progress"),
+    Priority(id: 5, name: "Hold"),
+    Priority(id: 7, name: "Completed"),
+  ];
+
+  String mStatusId = "";
+  String mStatusName = "";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final taskUpdateViewModel =
+        Provider.of<TaskUpdateViewModel>(context, listen: false);
+    _reset(taskUpdateViewModel);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    descriptionController.clear();
+  }
+
+  void _reset(TaskUpdateViewModel taskUpdateViewModel) {
+    mStatusId = "";
+    mStatusName = "";
+    imageFiles.clear();
+    taskUpdateViewModel.removeImageFiles();
+    taskUpdateViewModel.removeFiles();
+    taskUpdateViewModel.addStatus("");
+    taskUpdateViewModel.addStatusName("");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +102,7 @@ class UpdateTaskDialog extends StatelessWidget {
         isBold: true,
       ),*/
       //content: Consumer<InquiryCreateViewModel>(
-      child: Consumer<InquiryCreateViewModel>(
+      child: Consumer<TaskUpdateViewModel>(
           builder: (context, inquiryViewModel, child) {
         return Padding(
           padding: EdgeInsets.all(Converts.c16),
@@ -137,8 +174,10 @@ class UpdateTaskDialog extends StatelessWidget {
                   if (files != null) {
                     if (imageFiles.isNotEmpty) {
                       imageFiles.clear();
+                      inquiryViewModel.removeFiles();
                     }
                     imageFiles.addAll(files);
+                    inquiryViewModel.addImageFiles(files);
                     debugPrint(imageFiles.length.toString());
                   }
                 },
@@ -162,13 +201,16 @@ class UpdateTaskDialog extends StatelessWidget {
                     if (inquiryViewModel.status != null &&
                         inquiryViewModel.status != "") {
                       // upload files, if any are selected
-                      if (imageFiles.isNotEmpty) {
-                        await inquiryViewModel.saveFiles(imageFiles);
+                      //if (imageFiles.isNotEmpty) {
+                      if (inquiryViewModel.imageFiles.isNotEmpty) {
+                        //await inquiryViewModel.saveFiles(imageFiles);
+                        await inquiryViewModel
+                            .saveFiles(inquiryViewModel.imageFiles);
                       }
                       // save inquiry
                       await inquiryViewModel.updateTask(
-                          inquiryId,
-                          task.id.toString(),
+                          widget.inquiryId,
+                          widget.task.id.toString(),
                           //mStatusId,
                           inquiryViewModel.status!,
                           descriptionController.text,
@@ -184,9 +226,11 @@ class UpdateTaskDialog extends StatelessWidget {
                             showMessage(Strings.data_saved_successfully);
                             // reset value
                             inquiryViewModel.addStatus("");
+                            inquiryViewModel.removeFiles();
+                            inquiryViewModel.removeImageFiles();
                             // update task
                             //onCall(mStatusId == "7" ? true : false, mStatusName);
-                            onCall(
+                            widget.onCall(
                                 mStatusId == "7" ? true : false,
                                 inquiryViewModel.statusName != null
                                     ? inquiryViewModel.statusName!

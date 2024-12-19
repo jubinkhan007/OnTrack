@@ -10,10 +10,11 @@ class ComboBoxCompany extends StatelessWidget {
   final List<Company> items;
   final Function(String) onChanged;
 
+
   const ComboBoxCompany({super.key,
     required this.hintName,
     required this.items,
-    required this.onChanged});
+    required this.onChanged,});
 
   @override
   Widget build(BuildContext context) {

@@ -8,6 +8,7 @@ import 'package:tmbi/network/api_service.dart';
 import 'package:tmbi/repo/inquiry_repo.dart';
 import 'package:tmbi/repo/login_repo.dart';
 import 'package:tmbi/screens/screens.dart';
+import 'package:tmbi/viewmodel/task_update_viewmodel.dart';
 
 import 'config/router.dart';
 import 'firebase_options.dart';
@@ -89,6 +90,32 @@ class MyApp extends StatelessWidget {
                 //dio: ApiService().provideDio()),
                 dio: ApiService(
                         "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio()),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CommentViewModel(
+            inquiryRepo: InquiryRepo(
+              //fileDio: ApiService().fileUploadDio(),
+                fileDio: ApiService(
+                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .fileUploadDio(),
+                //dio: ApiService().provideDio()),
+                dio: ApiService(
+                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio()),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TaskUpdateViewModel(
+            inquiryRepo: InquiryRepo(
+              //fileDio: ApiService().fileUploadDio(),
+                fileDio: ApiService(
+                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .fileUploadDio(),
+                //dio: ApiService().provideDio()),
+                dio: ApiService(
+                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                     .provideDio()),
           ),
         ),

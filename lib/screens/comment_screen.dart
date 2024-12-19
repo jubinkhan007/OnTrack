@@ -26,28 +26,6 @@ class _CommentScreenState extends State<CommentScreen> {
   final TextEditingController _bodyController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  /*final List<Comments> comments = [
-    Comments(
-        id: "1",
-        body:
-            "Lorem Ipsum is simply dummy text, Lorem Ipsum is simply dummy text, Lorem Ipsum is simply dummy text",
-        date: "9 Oct, 24",
-        time: "7:12 AM",
-        owner: Owner(id: "101", name: "Mr. Alan")),
-    Comments(
-        id: "2",
-        body: "Sample looks good",
-        date: "9 Oct, 24",
-        time: "8:12 AM",
-        owner: Owner(id: "102", name: "Akash")),
-    Comments(
-        id: "3",
-        body: "Need more sample",
-        time: "9:12 AM",
-        date: "9 Oct, 24",
-        owner: Owner(id: "103", name: "Md. Alamgir")),
-  ];*/
-
   @override
   void dispose() {
     _bodyController.dispose();
@@ -60,7 +38,7 @@ class _CommentScreenState extends State<CommentScreen> {
     // delay the call to `getComments()` using addPostFrameCallback
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // fetch the comments after the widget has been built
-      Provider.of<InquiryViewModel>(context, listen: false)
+      Provider.of<CommentViewModel>(context, listen: false)
           .getComments(widget.inquiryId, "0");
       _scrollToBottom();
     });
@@ -87,7 +65,7 @@ class _CommentScreenState extends State<CommentScreen> {
           },
         ),
       ),
-      body: Consumer<InquiryViewModel>(
+      body: Consumer<CommentViewModel>(
           builder: (context, inquiryViewModel, child) {
         // handle loading view
         if (inquiryViewModel.uiState == UiState.loading) {
