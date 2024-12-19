@@ -21,6 +21,7 @@ class HomeScreen extends StatelessWidget {
   static const String routeName = '/home_screen';
   final String staffId;
   String selectedFlag = HomeFlagItem().homeFlagItems[1].title;
+  Status status = HomeFlagItem().homeFlagItems[1].status;
   String isAssigned = "1";
 
   HomeScreen({super.key, required this.staffId});
@@ -64,7 +65,9 @@ class HomeScreen extends StatelessWidget {
                 Icons.home_outlined,
                 color: Colors.white,
               ),
-              onPressed: () {},
+              onPressed: () {
+                context.showMessage(Strings.home);
+              },
             ),
             IconButton(
               icon: const Icon(
@@ -132,6 +135,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 CounterCard(
                   counters: CounterItem().counters,
+                  staffId: staffId,
                 ),
               ],
             ),
@@ -177,6 +181,7 @@ class HomeScreen extends StatelessWidget {
                   homeFlags: HomeFlagItem().homeFlagItems,
                   onPressed: (value, flag) async {
                     selectedFlag = value;
+                    status = flag;
                     selectedFlagValue = getFlag(flag);
                     await _getInquiries(
                         inquiryViewModel, getFlag(flag), isAssigned);

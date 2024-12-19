@@ -254,11 +254,11 @@ class _LoginOperationState extends State<LoginOperation> {
     bool isSaved = await SPHelper().isCredentialSaved();
     UserResponse? userResponse = await SPHelper().getUser();
     // generate server key
-    NotificationServerKey serverKey = NotificationServerKey();
+    /*NotificationServerKey serverKey = NotificationServerKey();
     String key = await serverKey.getServerKey();
     // test purpose
     Clipboard.setData(ClipboardData(text: key));
-    debugPrint("SERVER_KEY::$key");
+    debugPrint("SERVER_KEY::$key");*/
     // update user auth
     setState(() {
       _rememberMe = isSaved;

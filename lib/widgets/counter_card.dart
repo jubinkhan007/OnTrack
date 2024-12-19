@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/models/counter.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../config/strings.dart';
 import '../network/ui_state.dart';
+import '../screens/home_screen.dart';
 import '../viewmodel/viewmodel.dart';
 
 class CounterCard extends StatefulWidget {
   final List<Counter> counters;
+  final String staffId;
 
-  const CounterCard({super.key, required this.counters});
+  const CounterCard({super.key, required this.counters, required this.staffId});
 
   @override
   State<CounterCard> createState() => _CounterCardState();
@@ -38,7 +41,8 @@ class _CounterCardState extends State<CounterCard> {
                 counter.isLoading = true;
               });
               // call the getCount function to fetch the count
-              await counterViewModel.getCount();
+              await counterViewModel.getCount(
+                  widget.staffId, _getFlag(counter.flag));
 
               // update the state based on the uiState
               if (counterViewModel.uiState == UiState.success &&
@@ -56,6 +60,9 @@ class _CounterCardState extends State<CounterCard> {
                   });
                 });
               } else {
+                if (context.mounted) {
+                  context.showMessage(Strings.available_soon);
+                }
                 setState(() {
                   counter.isLoading = false;
                   counter.isSelected = false;
@@ -149,6 +156,20 @@ class _CounterCardState extends State<CounterCard> {
         return Palette.completedCardColor; // Color for Rejected
       default:
         return Palette.grayColor; // Default color
+    }
+  }
+
+  String _getFlag(Status status) {
+    switch (status) {
+      case Status.DELAYED:
+        return "1";
+      case Status.PENDING:
+        return "2";
+      case Status.UPCOMING:
+        return "3";
+      case Status.COMPLETED:
+      default:
+        return "4"; // Default flag value for unknown or unhandled statuses
     }
   }
 }

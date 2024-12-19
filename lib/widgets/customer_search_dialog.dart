@@ -9,9 +9,13 @@ import '../models/models.dart';
 class CustomerSearchDialog extends StatefulWidget {
   final List<Customer> customers;
   final Function(Customer) onCustomerSelected;
+  String hintName;
 
-  const CustomerSearchDialog(
-      {super.key, required this.customers, required this.onCustomerSelected});
+  CustomerSearchDialog(
+      {super.key,
+      required this.customers,
+      required this.onCustomerSelected,
+      this.hintName = Strings.search_customer});
 
   @override
   State<CustomerSearchDialog> createState() => _CustomerSearchDialogState();
@@ -35,7 +39,8 @@ class _CustomerSearchDialogState extends State<CustomerSearchDialog> {
         children: [
           TextField(
             decoration: InputDecoration(
-              labelText: Strings.search_customer,
+              //labelText: Strings.search_customer,
+              labelText: widget.hintName,
               labelStyle: TextStyle(fontSize: Converts.c16),
               prefixIcon: const Icon(
                 Icons.search,
@@ -59,6 +64,7 @@ class _CustomerSearchDialogState extends State<CustomerSearchDialog> {
                     onTap: () {
                       widget.onCustomerSelected(filteredCustomers[index]);
                     },
+                    behavior: HitTestBehavior.opaque,
                     child: Column(
                       children: [
                         Row(
@@ -66,7 +72,8 @@ class _CustomerSearchDialogState extends State<CustomerSearchDialog> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(Icons.account_circle,
-                                size: Converts.c20, color: Palette.navyBlueColor),
+                                size: Converts.c20,
+                                color: Palette.navyBlueColor),
                             SizedBox(
                               width: Converts.c8,
                             ),
@@ -84,8 +91,14 @@ class _CustomerSearchDialogState extends State<CustomerSearchDialog> {
                                 : const SizedBox.shrink(),
                           ],
                         ),
-                        SizedBox(
-                          height: Converts.c16,
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        const Divider(
+                          thickness: 0.5,
+                        ),
+                        const SizedBox(
+                          height: 4,
                         ),
                       ],
                     ),

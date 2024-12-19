@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/inquiry_create_viewmodel.dart';
 import 'package:tmbi/widgets/date_selection_view.dart';
@@ -74,7 +75,9 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
 
   // selected date
   String isSample = "N";
-  String selectedDate = "";
+
+  //String selectedDate = "";
+  String selectedDate = DateTime.now().toFormattedString(format: "yyyy-MM-dd");
   String mCompanyId = "";
   String mInquiryId = "";
   String mPriorityId = "";
@@ -104,7 +107,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
 
   resetFields() {
     isSample = "N";
-    selectedDate = "";
+    //selectedDate = "";
     mCompanyId = "";
     mInquiryId = "";
     mPriorityId = "";
@@ -207,6 +210,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                       .discussions
                                       .map((discussion) => discussion.toJson())
                                       .toList(),
+                                  'description': descriptionController.text.toString()
                                   /*'staff_list': getStaffs()
                                       .map((discussion) => discussion.toJson())
                                       .toList(),*/

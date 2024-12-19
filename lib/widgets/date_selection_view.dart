@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
@@ -19,7 +20,10 @@ class DateSelectionView extends StatefulWidget {
 }
 
 class _DateSelectionViewState extends State<DateSelectionView> {
-  String? _selectedDate;
+  //String? _selectedDate;
+  String? _selectedDate = DateTime.now().toFormattedString(
+    format: "yyyy-MM-dd",
+  );
 
   @override
   Widget build(BuildContext context) {

@@ -90,6 +90,7 @@ class UpdateTaskDialog extends StatelessWidget {
                 items: priorities,
                 onChanged: (id) {
                   mStatusId = id;
+                  inquiryViewModel.addStatus(mStatusId);
                   mStatusName = priorities
                           .firstWhere(
                             (priority) => priority.id.toString() == mStatusId,
@@ -97,6 +98,7 @@ class UpdateTaskDialog extends StatelessWidget {
                           )
                           .name ??
                       "Not Found";
+                  inquiryViewModel.addStatusName(mStatusName);
                 },
               ),
 
@@ -156,8 +158,9 @@ class UpdateTaskDialog extends StatelessWidget {
                   stockColor: Palette.mainColor,
                   onTap: () async {
                     String userId = await _getUserId();
-
-                    if (mStatusId != "") {
+                    //if (mStatusId != "") {
+                    if (inquiryViewModel.status != null &&
+                        inquiryViewModel.status != "") {
                       // upload files, if any are selected
                       if (imageFiles.isNotEmpty) {
                         await inquiryViewModel.saveFiles(imageFiles);
@@ -166,7 +169,8 @@ class UpdateTaskDialog extends StatelessWidget {
                       await inquiryViewModel.updateTask(
                           inquiryId,
                           task.id.toString(),
-                          mStatusId,
+                          //mStatusId,
+                          inquiryViewModel.status!,
                           descriptionController.text,
                           userId,
                           inquiryViewModel.files);
@@ -178,8 +182,15 @@ class UpdateTaskDialog extends StatelessWidget {
                         if (inquiryViewModel.isSavedInquiry != null) {
                           if (inquiryViewModel.isSavedInquiry!) {
                             showMessage(Strings.data_saved_successfully);
+                            // reset value
+                            inquiryViewModel.addStatus("");
                             // update task
-                            onCall(mStatusId == "7" ? true : false, mStatusName);
+                            //onCall(mStatusId == "7" ? true : false, mStatusName);
+                            onCall(
+                                mStatusId == "7" ? true : false,
+                                inquiryViewModel.statusName != null
+                                    ? inquiryViewModel.statusName!
+                                    : "");
                             Navigator.pop(context);
                           } else {
                             showMessage(Strings.failed_to_save_the_data);

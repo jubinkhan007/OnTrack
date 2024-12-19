@@ -16,6 +16,7 @@ class AddTaskToStaffScreen extends StatefulWidget {
   static const String routeName = '/add_task_to_staff_screen';
   final String staffId;
   final String companyId;
+  final String initDescription;
   final List<Discussion> tasks;
   final List<Staff> staffs = [];
 
@@ -24,6 +25,7 @@ class AddTaskToStaffScreen extends StatefulWidget {
     required this.staffId,
     required this.companyId,
     required this.tasks,
+    this.initDescription = ""
     //required this.staffs,
   });
 
@@ -32,16 +34,17 @@ class AddTaskToStaffScreen extends StatefulWidget {
 }
 
 class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
-  final TextEditingController descriptionController = TextEditingController();
+  late TextEditingController descriptionController;
   final List<Discussion> newTasks = [];
   late AddTaskViewModel inquiryCreateViewModel;
-  String selectedDate = "";
+  String selectedDate = DateTime.now().toFormattedString(format: "yyyy-MM-dd");
   Customer? customer;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    descriptionController = TextEditingController(text: widget.initDescription);
     // clear previous task
     /*Provider.of<InquiryCreateViewModel>(context, listen: false)
         .removeAllTask();*/
@@ -333,6 +336,7 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                 isBold: true),
             content: CustomerSearchDialog(
                 customers: customers,
+                hintName: "",
                 onCustomerSelected: (customer) {
                   if (customer != null) {
                     setState(() {

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/models/comment_response.dart';
@@ -69,9 +68,9 @@ class IndividualTaskList extends StatelessWidget {
                   TextViewCustom(
                     text: task.name!,
                     fontSize: Converts.c16,
-                    tvColor: Palette.normalTv,
+                    tvColor: Colors.blue,
                     isTextAlignCenter: false,
-                    isRubik: false,
+                    isRubik: true,
                     isBold: true,
                   ),
                   TextViewCustom(
@@ -86,14 +85,14 @@ class IndividualTaskList extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(width: Converts.c8),
+          SizedBox(height: Converts.c8),
           TextViewCustom(
             text: "Task# ${task.body!}",
             fontSize: Converts.c16,
             tvColor: Palette.normalTv,
             isTextAlignCenter: false,
             isRubik: false,
-            isBold: false,
+            isBold: true,
           ),
           SizedBox(height: Converts.c8),
           const Divider(

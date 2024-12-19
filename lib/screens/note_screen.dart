@@ -158,7 +158,7 @@ class NoteScreen extends StatelessWidget {
                         left: Converts.c16, right: Converts.c16),
                     child: TextViewCustom(
                         text:
-                            inquiryViewModel.noteResponse![index]!.description!,
+                            inquiryViewModel.noteResponse![index]!.description != null ? inquiryViewModel.noteResponse![index]!.description! : "",
                         fontSize: Converts.c16,
                         tvColor: Palette.normalTv,
                         isTextAlignCenter: false,

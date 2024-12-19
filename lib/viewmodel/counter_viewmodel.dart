@@ -23,12 +23,12 @@ class CounterViewModel extends ChangeNotifier {
 
   UiState get uiState => _uiState;
 
-  Future<void> getCount() async {
+  Future<void> getCount(String staffId, String flag) async {
     if (_uiState == UiState.loading) return;
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response = await inquiryRepo.getCount();
+      final response = await inquiryRepo.getCount(staffId, flag);
       _counter = response;
       _uiState = UiState.success;
     } catch (error) {

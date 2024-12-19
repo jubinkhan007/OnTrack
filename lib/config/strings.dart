@@ -15,6 +15,7 @@ class Strings {
   static const String lets_started = 'Lets Started';
   static const String skip = 'Skip';
   static const String next = 'Next';
+  static const String home = 'Home';
   static const String staff_id = 'Staff Id';
   static const String password = 'Password';
   static const String login_using_your_hris =

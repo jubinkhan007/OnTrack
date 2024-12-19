@@ -313,6 +313,34 @@ class InquiryRepo {
     }
   }
 
+  Future<String> getCount(String staffId, String flag) async {
+    try {
+      final headers = {
+        'vm': 'COUNTER',
+        'va': flag,
+        'vb': staffId,
+        'vc': '0',
+        'vd': 'count',
+      };
+      final response = await dio.get(
+        "getall",
+        options: Options(headers: headers),
+      );
+      // check if the response data is a Map and contains the 'count' key
+      if (response.data is Map<String, dynamic> &&
+          response.data.containsKey('count')) {
+        // access the count value
+        final String count = response.data['count'];
+        return count;
+      } else {
+        return "0"; // return 0 if 'count' is not available
+      }
+    } on DioException catch (error) {
+      debugPrint("Error fetching count: $error");
+      throw Exception(error);
+    }
+  }
+
   /// DEMO API
 
   /*Future<List<InquiryResponse>> getInquiries() async {
@@ -335,7 +363,7 @@ class InquiryRepo {
     }
   }*/
 
-  Future<String> getCount() async {
+  /*Future<String> getCount() async {
     try {
       final response = await dio.get("0b50f5fa2214288a80f0");
       // check if the response data is a Map and contains the 'count' key
@@ -351,7 +379,7 @@ class InquiryRepo {
       debugPrint("Error fetching count: $error");
       throw Exception(error);
     }
-  }
+  }*/
 
 /*Future<AttachmentViewResponse> getAttachments() async {
     try {

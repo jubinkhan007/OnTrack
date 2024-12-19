@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/models/user_response.dart';
+import 'package:tmbi/screens/home_screen.dart';
 
 import '../data/data.dart';
 import '../widgets/widgets.dart';
@@ -121,5 +122,21 @@ extension HideKeyboard on BuildContext {
   }
 }
 
+
+/*extension StatusFlagExtension on Status {
+  String getFlag() {
+    switch (this) {
+      case Status.:
+        return "1";
+      case Status.PENDING:
+        return "2";
+      case Status.UPCOMING:
+        return "3";
+      case Status.COMPLETED:
+      default:
+        return "4"; // Default flag value for unknown or unhandled statuses
+    }
+  }
+}*/
 
 

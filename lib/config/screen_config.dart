@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class ScreenConfig {
-
   ScreenConfig._privateConstructor();
 
   static final ScreenConfig? _instance = ScreenConfig._privateConstructor();
@@ -42,7 +41,7 @@ class ScreenConfig {
 
   // get dynamic font size
   double getSize(double baseSize) {
-    return baseSize * textMultiplier /** textScaleFactor*/;
+    return baseSize * textMultiplier;
   }
 
   // get dynamic image size

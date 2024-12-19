@@ -42,6 +42,7 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
     case AddTaskToStaffScreen.routeName:
       final args = routeSettings.arguments as Map<String, dynamic>;
       final staffId = args['staffId'] as String;
+      final description = args['description'] as String;
       final companyId = args['companyId'] as String;
       final List<Discussion> tasks = (args['individual_task'] as List)
           .map((taskJson) =>
@@ -56,6 +57,7 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
                 staffId: staffId,
                 companyId: companyId,
                 tasks: tasks,
+                initDescription: description,
                 //: staffs,
               ));
     case CommentScreen.routeName:

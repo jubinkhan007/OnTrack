@@ -96,9 +96,9 @@ class MyApp extends StatelessWidget {
           create: (_) => CounterViewModel(
             inquiryRepo: InquiryRepo(
                 //fileDio: ApiService().fileUploadDio(),
-                fileDio: ApiService("https://api.npoint.io/").fileUploadDio(),
+                fileDio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").fileUploadDio(),
                 //dio: ApiService().provideDio()),
-                dio: ApiService("https://api.npoint.io/").provideDio()),
+                dio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").provideDio()),
           ),
         ),
       ],

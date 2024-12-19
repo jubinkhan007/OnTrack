@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tmbi/models/staff_response.dart';
 import 'package:tmbi/repo/inquiry_repo.dart';
 
 import '../models/models.dart';
@@ -46,6 +45,23 @@ class InquiryCreateViewModel extends ChangeNotifier {
   /*StaffResponse? _staffResponse;
 
   StaffResponse? get staffResponse => _staffResponse;*/
+
+  /// STATUS
+  String? _status;
+
+  String? get status => _status;
+
+  String? _statusName;
+
+  String? get statusName => _statusName;
+
+  void addStatus(String value) {
+    _status = value;
+  }
+
+  void addStatusName(String value) {
+    _statusName = value;
+  }
 
   /// DISCUSSION SECTION
   final List<Discussion> _discussions = [];
@@ -178,7 +194,7 @@ class InquiryCreateViewModel extends ChangeNotifier {
     }
   }
 
-  /*Future<void> getStaffs(String staffId, String companyId) async {
+/*Future<void> getStaffs(String staffId, String companyId) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
