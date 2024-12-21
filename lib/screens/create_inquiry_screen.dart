@@ -375,7 +375,7 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                               : []
                                           : [],
                                   onChanged: (inquiryId) {
-                                    debugPrint("COMPANY_ID# $inquiryId");
+                                    debugPrint("INQUIRY_ID# $inquiryId");
                                     mInquiryId = inquiryId;
                                     setState(() {
                                       // clear previous task

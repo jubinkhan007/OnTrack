@@ -5,16 +5,36 @@ import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../models/models.dart';
 
-class ComboBoxCompany extends StatelessWidget {
+class ComboBoxCompany extends StatefulWidget {
   final String hintName;
   final List<Company> items;
   final Function(String) onChanged;
 
-
-  const ComboBoxCompany({super.key,
+  const ComboBoxCompany({
+    super.key,
     required this.hintName,
     required this.items,
-    required this.onChanged,});
+    required this.onChanged,
+  });
+
+  @override
+  State<ComboBoxCompany> createState() => _ComboBoxCompanyState();
+}
+
+class _ComboBoxCompanyState extends State<ComboBoxCompany> {
+  String? selectedValue;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.items.isNotEmpty && widget.items.length == 1) {
+      selectedValue = widget.items[0].id.toString();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onChanged(selectedValue!);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +53,13 @@ class ComboBoxCompany extends StatelessWidget {
         ),
         isExpanded: true,
         hint: TextViewCustom(
-          text: hintName,
+          text: widget.hintName,
           tvColor: Palette.semiTv,
           fontSize: Converts.c16,
           isBold: false,
         ),
-        items: items.map((Company company) {
+        value: selectedValue,
+        items: widget.items.map((Company company) {
           return DropdownMenuItem<String>(
             value: company.id.toString(),
             child: /*TextViewCustom(
@@ -46,7 +67,8 @@ class ComboBoxCompany extends StatelessWidget {
               tvColor: Palette.normalTv,
               fontSize: Converts.c16,
               isBold: false,
-            )*/Text(
+            )*/
+                Text(
               company.name ?? "",
               overflow: TextOverflow.ellipsis,
               // Add this line to handle overflow
@@ -60,6 +82,12 @@ class ComboBoxCompany extends StatelessWidget {
             ),
           );
         }).toList(),
-        onChanged: (value) => onChanged(value ?? ""));
+        //onChanged: (value) => onChanged(value ?? ""));
+        onChanged: (value) {
+          setState(() {
+            selectedValue = value!;
+          });
+          widget.onChanged(value ?? "");
+        });
   }
 }

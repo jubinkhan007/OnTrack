@@ -5,7 +5,7 @@ import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../models/models.dart';
 
-class ComboBoxPriority extends StatelessWidget {
+class ComboBoxPriority extends StatefulWidget {
   final String hintName;
   final List<Priority> items;
   final Function(String) onChanged;
@@ -15,6 +15,25 @@ class ComboBoxPriority extends StatelessWidget {
       required this.hintName,
       required this.items,
       required this.onChanged});
+
+  @override
+  State<ComboBoxPriority> createState() => _ComboBoxPriorityState();
+}
+
+class _ComboBoxPriorityState extends State<ComboBoxPriority> {
+  String? selectedValue;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.items.isNotEmpty && widget.items.length >= 2) {
+      selectedValue = widget.items[1].id.toString();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onChanged(selectedValue!);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +51,14 @@ class ComboBoxPriority extends StatelessWidget {
           fillColor: Colors.white, // Background color
         ),
         isExpanded: true,
+        value: selectedValue,
         hint: TextViewCustom(
-          text: hintName,
+          text: widget.hintName,
           tvColor: Palette.semiTv,
           fontSize: Converts.c16,
           isBold: false,
         ),
-        items: items.map((Priority priority) {
+        items: widget.items.map((Priority priority) {
           return DropdownMenuItem<String>(
             value: priority.id.toString(),
             child: /*TextViewCustom(
@@ -62,7 +82,10 @@ class ComboBoxPriority extends StatelessWidget {
           );
         }).toList(),
         onChanged: (value) {
-          onChanged(value ?? "");
+          setState(() {
+            selectedValue = value!;
+          });
+          widget.onChanged(value ?? "");
         });
   }
 }

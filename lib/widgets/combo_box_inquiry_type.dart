@@ -5,7 +5,7 @@ import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../models/models.dart';
 
-class ComboBoxInquiryType extends StatelessWidget {
+class ComboBoxInquiryType extends StatefulWidget {
   final String hintName;
   final List<InquiryType> items;
   final Function(String) onChanged;
@@ -15,6 +15,26 @@ class ComboBoxInquiryType extends StatelessWidget {
       required this.hintName,
       required this.items,
       required this.onChanged});
+
+  @override
+  State<ComboBoxInquiryType> createState() => _ComboBoxInquiryTypeState();
+}
+
+class _ComboBoxInquiryTypeState extends State<ComboBoxInquiryType> {
+
+  String? selectedValue;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.items.isNotEmpty) {
+      selectedValue = widget.items[0].id.toString();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onChanged(selectedValue!);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +52,14 @@ class ComboBoxInquiryType extends StatelessWidget {
           fillColor: Colors.white, // Background color
         ),
         hint: TextViewCustom(
-          text: hintName,
+          text: widget.hintName,
           tvColor: Palette.semiTv,
           fontSize: Converts.c16,
           isBold: false,
         ),
+        value: selectedValue,
         isExpanded: true,
-        items: items.map((InquiryType inquiryTYpe) {
+        items: widget.items.map((InquiryType inquiryTYpe) {
           return DropdownMenuItem<String>(
             value: inquiryTYpe.id.toString(),
             child: /*TextViewCustom(
@@ -62,7 +83,10 @@ class ComboBoxInquiryType extends StatelessWidget {
           );
         }).toList(),
         onChanged: (value) {
-          onChanged(value ?? "");
+          setState(() {
+            selectedValue = value;
+          });
+          widget.onChanged(value ?? "");
         });
   }
 }
