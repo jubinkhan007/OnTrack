@@ -20,14 +20,14 @@ class AddTaskToStaffScreen extends StatefulWidget {
   final List<Discussion> tasks;
   final List<Staff> staffs = [];
 
-  AddTaskToStaffScreen({
-    super.key,
-    required this.staffId,
-    required this.companyId,
-    required this.tasks,
-    this.initDescription = ""
-    //required this.staffs,
-  });
+  AddTaskToStaffScreen(
+      {super.key,
+      required this.staffId,
+      required this.companyId,
+      required this.tasks,
+      this.initDescription = ""
+      //required this.staffs,
+      });
 
   @override
   State<AddTaskToStaffScreen> createState() => _AddTaskToStaffScreenState();
@@ -231,27 +231,7 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                             stockColor: Palette.mainColor,
                             onTap: () async {
                               setState(() {
-                                context.hideKeyboard();
-                                if (customer != null &&
-                                    selectedDate != "" &&
-                                    descriptionController.text != "") {
-                                  Discussion discussion = Discussion(
-                                      name: customer!.name.toString(),
-                                      staffId: customer!.id,
-                                      dateTime: selectedDate,
-                                      body: descriptionController.text);
-                                  newTasks.add(discussion);
-                                  // add tasks into viewmodel
-                                  Provider.of<InquiryCreateViewModel>(context,
-                                          listen: false)
-                                      .addTask(discussion);
-                                  // reset fields
-                                  customer = null;
-                                  descriptionController.text = "";
-                                } else {
-                                  context.showMessage(
-                                      Strings.some_values_are_missing);
-                                }
+                                _saveTask();
                               });
                             }),
                       ],
@@ -343,9 +323,35 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                       this.customer = customer;
                     });
                   }
+                  _saveTask(isFromAddButton: false);
                   Navigator.of(context).pop();
                 }),
           );
         });
+  }
+
+  void _saveTask({bool isFromAddButton = true}) {
+    context.hideKeyboard();
+    if (customer != null &&
+        selectedDate != "" &&
+        descriptionController.text != "") {
+      Discussion discussion = Discussion(
+          name: customer!.name.toString(),
+          staffId: customer!.id,
+          dateTime: selectedDate,
+          //body: descriptionController.text);
+          body: Uri.encodeComponent(descriptionController.text));
+      newTasks.add(discussion);
+      // add tasks into viewmodel
+      Provider.of<InquiryCreateViewModel>(context, listen: false)
+          .addTask(discussion);
+      // reset fields
+      customer = null;
+      //descriptionController.text = "";
+    } else {
+      if (isFromAddButton) {
+        context.showMessage(Strings.some_values_are_missing);
+      }
+    }
   }
 }

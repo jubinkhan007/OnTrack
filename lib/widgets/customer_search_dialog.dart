@@ -66,10 +66,12 @@ class _CustomerSearchDialogState extends State<CustomerSearchDialog> {
                     },
                     behavior: HitTestBehavior.opaque,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Icon(Icons.account_circle,
                                 size: Converts.c20,
@@ -77,11 +79,16 @@ class _CustomerSearchDialogState extends State<CustomerSearchDialog> {
                             SizedBox(
                               width: Converts.c8,
                             ),
-                            TextViewCustom(
-                                text: filteredCustomers[index].name!,
-                                fontSize: Converts.c16,
-                                tvColor: Palette.navyBlueColor,
-                                isBold: false),
+                            Expanded(
+                              child: TextViewCustom(
+                                  //text: _getNameWithDesignation(filteredCustomers[index].name!),
+                                  text: filteredCustomers[index].name!,
+                                  //text: "Md. Akash Ahmed (Sub Assistant Manager, Export-Desk)",
+                                  fontSize: Converts.c16,
+                                  tvColor: Palette.navyBlueColor,
+                                  isTextAlignCenter: false,
+                                  isBold: false),
+                            ),
                             filteredCustomers[index].isVerified != null
                                 ? filteredCustomers[index].isVerified!
                                     ? Icon(Icons.verified_user,
@@ -109,4 +116,14 @@ class _CustomerSearchDialogState extends State<CustomerSearchDialog> {
       ),
     );
   }
+
+  String _getNameWithDesignation(String data) {
+    try {
+      var values = data.split("#");
+      return "${values[0]}\n${values[1]}\n${values[2]}";
+    } catch (e) {
+      return data;
+    }
+  }
 }
+

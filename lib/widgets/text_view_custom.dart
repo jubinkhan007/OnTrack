@@ -21,7 +21,7 @@ class TextViewCustom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      text,
+      Uri.decodeComponent(text),
       textAlign: isTextAlignCenter ? TextAlign.center : TextAlign.start,
       style: !isRubik
           ? GoogleFonts.roboto(

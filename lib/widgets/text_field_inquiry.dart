@@ -10,13 +10,14 @@ class TextFieldInquiry extends StatelessWidget {
   final bool hasBorder;
   final int maxLine;
 
-  const TextFieldInquiry({
+   const TextFieldInquiry({
     super.key,
     required this.fontSize,
     required this.fontColor,
     required this.hintColor,
     required this.hint,
     required this.controller,
+    //this.controller,
     this.hasBorder = false,
     this.maxLine = 1,
   });
@@ -26,9 +27,9 @@ class TextFieldInquiry extends StatelessWidget {
     return TextField(
       controller: controller,
       maxLines: maxLine,
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9,!.? ]')),
-      ],
+      //inputFormatters: [
+        //FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9,!.? ]')),
+      //],
       style: TextStyle(
         fontSize: fontSize, // Hint text size
         color: fontColor, // Text color

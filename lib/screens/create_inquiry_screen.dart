@@ -210,7 +210,8 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                                       .discussions
                                       .map((discussion) => discussion.toJson())
                                       .toList(),
-                                  'description': descriptionController.text.toString()
+                                  'description':
+                                      descriptionController.text.toString()
                                   /*'staff_list': getStaffs()
                                       .map((discussion) => discussion.toJson())
                                       .toList(),*/
@@ -561,8 +562,10 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                             await inquiryViewModel.saveInquiry(
                                 mCompanyId,
                                 mInquiryId,
-                                titleController.text,
-                                descriptionController.text,
+                                //titleController.text,
+                                //descriptionController.text,
+                                Uri.encodeComponent(titleController.text),
+                                Uri.encodeComponent(descriptionController.text),
                                 isSample,
                                 selectedDate,
                                 mPriorityId,

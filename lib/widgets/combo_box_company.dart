@@ -62,13 +62,7 @@ class _ComboBoxCompanyState extends State<ComboBoxCompany> {
         items: widget.items.map((Company company) {
           return DropdownMenuItem<String>(
             value: company.id.toString(),
-            child: /*TextViewCustom(
-              text: company.name ?? "",
-              tvColor: Palette.normalTv,
-              fontSize: Converts.c16,
-              isBold: false,
-            )*/
-                Text(
+            child: Text(
               company.name ?? "",
               overflow: TextOverflow.ellipsis,
               // Add this line to handle overflow

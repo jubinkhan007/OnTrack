@@ -138,7 +138,7 @@ class _CommentScreenState extends State<CommentScreen> {
                         // save comment
                         await inquiryViewModel.saveComment(
                           widget.inquiryId,
-                          _bodyController.text,
+                            Uri.encodeComponent(_bodyController.text),
                           "0", // task id must be '0'
                           userId,
                         );
@@ -154,7 +154,7 @@ class _CommentScreenState extends State<CommentScreen> {
                               setState(() {
                                 inquiryViewModel.commentResponse!.add(
                                     Discussion(
-                                        body: _bodyController.text,
+                                        body: Uri.encodeComponent(_bodyController.text),
                                         dateTime: DateTime.now()
                                             .toFormattedString(
                                                 format: "dd MMM, yy'T'h:mm a"),

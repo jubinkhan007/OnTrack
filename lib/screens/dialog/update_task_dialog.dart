@@ -106,148 +106,151 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
           builder: (context, inquiryViewModel, child) {
         return Padding(
           padding: EdgeInsets.all(Converts.c16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// title
-              TextViewCustom(
-                text: Strings.update_task,
-                tvColor: Palette.normalTv,
-                fontSize: Converts.c16,
-                isBold: true,
-              ),
-              SizedBox(
-                height: Converts.c16,
-              ),
-
-              /// status
-              ComboBoxPriority(
-                hintName: Strings.select,
-                items: priorities,
-                onChanged: (id) {
-                  mStatusId = id;
-                  inquiryViewModel.addStatus(mStatusId);
-                  mStatusName = priorities
-                          .firstWhere(
-                            (priority) => priority.id.toString() == mStatusId,
-                            orElse: () => Priority(id: 0, name: "Not Found"),
-                          )
-                          .name ??
-                      "Not Found";
-                  inquiryViewModel.addStatusName(mStatusName);
-                },
-              ),
-
-              SizedBox(
-                height: Converts.c8,
-              ),
-
-              /// description
-              TextFieldInquiry(
-                fontSize: Converts.c16,
-                fontColor: Palette.normalTv,
-                hintColor: Palette.semiTv,
-                hint: Strings.enter_brief_description,
-                controller: descriptionController,
-                maxLine: 3,
-                hasBorder: true,
-              ),
-
-              SizedBox(
-                height: Converts.c8,
-              ),
-
-              /// file
-              TextViewCustom(
-                  text: Strings.attachment,
-                  fontSize: Converts.c16,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// title
+                TextViewCustom(
+                  text: Strings.update_task,
                   tvColor: Palette.normalTv,
-                  isRubik: false,
-                  isBold: true),
-              SizedBox(
-                height: Converts.c8,
-              ),
+                  fontSize: Converts.c16,
+                  isBold: true,
+                ),
+                SizedBox(
+                  height: Converts.c16,
+                ),
 
-              FileAttachment(
-                onFileAttached: (files) {
-                  if (files != null) {
-                    if (imageFiles.isNotEmpty) {
-                      imageFiles.clear();
-                      inquiryViewModel.removeFiles();
+                /// status
+                ComboBoxPriority(
+                  hintName: Strings.select,
+                  items: priorities,
+                  onChanged: (id) {
+                    mStatusId = id;
+                    inquiryViewModel.addStatus(mStatusId);
+                    mStatusName = priorities
+                            .firstWhere(
+                              (priority) => priority.id.toString() == mStatusId,
+                              orElse: () => Priority(id: 0, name: "Not Found"),
+                            )
+                            .name ??
+                        "Not Found";
+                    inquiryViewModel.addStatusName(mStatusName);
+                  },
+                ),
+
+                SizedBox(
+                  height: Converts.c8,
+                ),
+
+                /// description
+                TextFieldInquiry(
+                  fontSize: Converts.c16,
+                  fontColor: Palette.normalTv,
+                  hintColor: Palette.semiTv,
+                  hint: Strings.enter_brief_description,
+                  controller: descriptionController,
+                  maxLine: 3,
+                  hasBorder: true,
+                ),
+
+                SizedBox(
+                  height: Converts.c8,
+                ),
+
+                /// file
+                TextViewCustom(
+                    text: Strings.attachment,
+                    fontSize: Converts.c16,
+                    tvColor: Palette.normalTv,
+                    isRubik: false,
+                    isBold: true),
+                SizedBox(
+                  height: Converts.c8,
+                ),
+
+                FileAttachment(
+                  onFileAttached: (files) {
+                    if (files != null) {
+                      if (imageFiles.isNotEmpty) {
+                        imageFiles.clear();
+                        inquiryViewModel.removeFiles();
+                      }
+                      imageFiles.addAll(files);
+                      inquiryViewModel.addImageFiles(files);
+                      debugPrint(imageFiles.length.toString());
                     }
-                    imageFiles.addAll(files);
-                    inquiryViewModel.addImageFiles(files);
-                    debugPrint(imageFiles.length.toString());
-                  }
-                },
-              ),
-              SizedBox(
-                height: Converts.c16,
-              ),
+                  },
+                ),
+                SizedBox(
+                  height: Converts.c16,
+                ),
 
-              /// update button
-              ButtonCustom1(
-                  btnText: Strings.update,
-                  btnHeight: Converts.c48,
-                  bgColor: Palette.mainColor,
-                  btnWidth: double.infinity,
-                  cornerRadius: 4,
-                  isLoading: inquiryViewModel.uiState == UiState.loading,
-                  stockColor: Palette.mainColor,
-                  onTap: () async {
-                    String userId = await _getUserId();
-                    //if (mStatusId != "") {
-                    if (inquiryViewModel.status != null &&
-                        inquiryViewModel.status != "") {
-                      // upload files, if any are selected
-                      //if (imageFiles.isNotEmpty) {
-                      if (inquiryViewModel.imageFiles.isNotEmpty) {
-                        //await inquiryViewModel.saveFiles(imageFiles);
-                        await inquiryViewModel
-                            .saveFiles(inquiryViewModel.imageFiles);
-                      }
-                      // save inquiry
-                      await inquiryViewModel.updateTask(
-                          widget.inquiryId,
-                          widget.task.id.toString(),
-                          //mStatusId,
-                          inquiryViewModel.status!,
-                          descriptionController.text,
-                          userId,
-                          inquiryViewModel.files);
-                      if (inquiryViewModel.uiState == UiState.error) {
-                        showMessage("Error: ${inquiryViewModel.message}");
-                      }
-                      // check the status of the request
-                      else {
-                        if (inquiryViewModel.isSavedInquiry != null) {
-                          if (inquiryViewModel.isSavedInquiry!) {
-                            showMessage(Strings.data_saved_successfully);
-                            // reset value
-                            inquiryViewModel.addStatus("");
-                            inquiryViewModel.removeFiles();
-                            inquiryViewModel.removeImageFiles();
-                            // update task
-                            //onCall(mStatusId == "7" ? true : false, mStatusName);
-                            widget.onCall(
-                                mStatusId == "7" ? true : false,
-                                inquiryViewModel.statusName != null
-                                    ? inquiryViewModel.statusName!
-                                    : "");
-                            Navigator.pop(context);
-                          } else {
-                            showMessage(Strings.failed_to_save_the_data);
-                          }
-                        } else {
-                          showMessage(Strings.data_is_missing);
+                /// update button
+                ButtonCustom1(
+                    btnText: Strings.update,
+                    btnHeight: Converts.c48,
+                    bgColor: Palette.mainColor,
+                    btnWidth: double.infinity,
+                    cornerRadius: 4,
+                    isLoading: inquiryViewModel.uiState == UiState.loading,
+                    stockColor: Palette.mainColor,
+                    onTap: () async {
+                      String userId = await _getUserId();
+                      //if (mStatusId != "") {
+                      if (inquiryViewModel.status != null &&
+                          inquiryViewModel.status != "") {
+                        // upload files, if any are selected
+                        //if (imageFiles.isNotEmpty) {
+                        if (inquiryViewModel.imageFiles.isNotEmpty) {
+                          //await inquiryViewModel.saveFiles(imageFiles);
+                          await inquiryViewModel
+                              .saveFiles(inquiryViewModel.imageFiles);
                         }
+                        // save inquiry
+                        await inquiryViewModel.updateTask(
+                            widget.inquiryId,
+                            widget.task.id.toString(),
+                            //mStatusId,
+                            inquiryViewModel.status!,
+                            //descriptionController.text,
+                            Uri.encodeComponent(descriptionController.text),
+                            userId,
+                            inquiryViewModel.files);
+                        if (inquiryViewModel.uiState == UiState.error) {
+                          showMessage("Error: ${inquiryViewModel.message}");
+                        }
+                        // check the status of the request
+                        else {
+                          if (inquiryViewModel.isSavedInquiry != null) {
+                            if (inquiryViewModel.isSavedInquiry!) {
+                              showMessage(Strings.data_saved_successfully);
+                              // reset value
+                              inquiryViewModel.addStatus("");
+                              inquiryViewModel.removeFiles();
+                              inquiryViewModel.removeImageFiles();
+                              // update task
+                              //onCall(mStatusId == "7" ? true : false, mStatusName);
+                              widget.onCall(
+                                  mStatusId == "7" ? true : false,
+                                  inquiryViewModel.statusName != null
+                                      ? inquiryViewModel.statusName!
+                                      : "");
+                              Navigator.pop(context);
+                            } else {
+                              showMessage(Strings.failed_to_save_the_data);
+                            }
+                          } else {
+                            showMessage(Strings.data_is_missing);
+                          }
+                        }
+                      } else {
+                        showMessage(Strings.some_values_are_missing);
                       }
-                    } else {
-                      showMessage(Strings.some_values_are_missing);
-                    }
-                  }),
-            ],
+                    }),
+              ],
+            ),
           ),
         );
       }),
