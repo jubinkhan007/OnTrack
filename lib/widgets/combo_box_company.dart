@@ -84,4 +84,5 @@ class _ComboBoxCompanyState extends State<ComboBoxCompany> {
           widget.onChanged(value ?? "");
         });
   }
+
 }
