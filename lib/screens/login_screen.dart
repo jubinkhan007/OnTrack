@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
-import 'package:tmbi/config/notification/notification_server_key.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/notification/notification_service.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/sp_helper.dart';
@@ -12,6 +11,7 @@ import 'package:tmbi/network/ui_state.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
 import 'package:tmbi/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = '/login_screen';
@@ -91,7 +91,7 @@ class _LoginOperationState extends State<LoginOperation> {
     // init notification
     notificationService.requestNotificationPermission();
     notificationService.firebaseInit();
-    notificationService.getDeviceToken().then((value){
+    notificationService.getDeviceToken().then((value) {
       _firebaseDeviceToken = value;
       debugPrint("TOKEN::$value");
     });
@@ -183,8 +183,8 @@ class _LoginOperationState extends State<LoginOperation> {
                 onTap: () async {
                   if (_loginFormKey.currentState!.validate()) {
                     // call api for validate user
-                    await loginViewModel.userAuth(
-                        _idTEController.text, _passwordTEController.text, _firebaseDeviceToken);
+                    await loginViewModel.userAuth(_idTEController.text,
+                        _passwordTEController.text, _firebaseDeviceToken);
 
                     if (loginViewModel.uiState == UiState.error) {
                       _showMessage(loginViewModel.message.toString());
@@ -210,7 +210,12 @@ class _LoginOperationState extends State<LoginOperation> {
                                     .userResponse!.users![0].staffId);
                           } else {
                             _showMessage(
-                                loginViewModel.userResponse!.status!.message!);
+                                loginViewModel.userResponse!.status!.message!,
+                                isUpdate: loginViewModel
+                                            .userResponse!.status!.code! ==
+                                        501
+                                    ? true
+                                    : false);
                           }
                         } else {
                           _showMessage(Strings.login_validation_error);
@@ -232,21 +237,26 @@ class _LoginOperationState extends State<LoginOperation> {
     });
   }
 
-  _showMessage(String message) {
+  _showMessage(String message, {bool isUpdate = false}) {
+    context.hideKeyboard;
     final snackBar = SnackBar(
-      content: TextViewCustom(
-        text: message,
-        tvColor: Colors.white,
-        fontSize: Converts.c16,
-        isBold: false,
-        isRubik: true,
-        isTextAlignCenter: false,
-      ),
-      action: SnackBarAction(
-        label: 'Ok',
-        onPressed: () {},
-      ),
-    );
+        content: TextViewCustom(
+          text: message,
+          tvColor: Colors.white,
+          fontSize: Converts.c16,
+          isBold: false,
+          isRubik: true,
+          isTextAlignCenter: false,
+        ),
+        action: SnackBarAction(
+          label: isUpdate ? 'Update' : 'Ok',
+          onPressed: () {
+            if (isUpdate) {
+              _launchAppStore();
+            }
+          },
+        ),
+        duration: Duration(seconds: isUpdate ? 1 * 60 : 5));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -274,6 +284,26 @@ class _LoginOperationState extends State<LoginOperation> {
         _passwordTEController.text = "";
       }
     });
+  }
+
+  Future<void> _launchAppStore() async {
+    String url;
+    // Check the platform (Android or iOS)
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
+      url = "";
+    } else if (Theme.of(context).platform == TargetPlatform.android) {
+      url =
+          "https://play.google.com/store/apps/details?id=com.prangroup.mis93.tmbi&pli=1";
+    } else {
+      throw 'This platform is not supported for opening the app store.';
+    }
+    // Try to launch the URL
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
 }

@@ -18,3 +18,4 @@ export 'check_box.dart';
 export 'error_container.dart';
 export 'switch_container.dart';
 export 'individual_task_list.dart';
+export 'load_image.dart';

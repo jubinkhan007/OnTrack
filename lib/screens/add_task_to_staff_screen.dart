@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/extension_file.dart';
@@ -152,37 +151,10 @@ class _AddTaskToStaffScreenState extends State<AddTaskToStaffScreen> {
                             customer != null
                                 ? Row(
                                     children: [
-                                      ClipOval(
-                                        child: SizedBox(
-                                          width: Converts.c48,
+                                      LoadImage(
+                                          id: customer!.id!,
                                           height: Converts.c48,
-                                          child: CachedNetworkImage(
-                                            imageUrl:
-                                                "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/${customer!.id}/${customer!.id}-0.jpg",
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) =>
-                                                SizedBox(
-                                              width: Converts.c16,
-                                              height: Converts.c16,
-                                              child:
-                                                  const CircularProgressIndicator(
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                            Color>(
-                                                        Palette.mainColor),
-                                                strokeWidth: 2.0,
-                                              ),
-                                            ),
-                                            errorWidget: (context, url, error) {
-                                              return Icon(
-                                                Icons.account_circle,
-                                                color: Palette.normalTv,
-                                                size: Converts.c48,
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ),
+                                          width: Converts.c48),
                                       SizedBox(
                                         width: Converts.c8,
                                       ),
