@@ -36,8 +36,8 @@ class ButtonCircularIcon extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: width,
-        height: height,
+        //width: width,
+        //height: height,
         decoration: BoxDecoration(
           color: hasOpacity ? bgColor.withOpacity(0.5) : bgColor,
           borderRadius: BorderRadius.all(
@@ -55,16 +55,20 @@ class ButtonCircularIcon extends StatelessWidget {
                     size: iconSize,
                   )
                 : const SizedBox.shrink(),
-            const SizedBox(
-              width: 4,
+            SizedBox(
+              width: iconData != null ? 4 : 0,
             ),
             text != null
-                ? TextViewCustom(
-                    text: text!,
-                    fontSize: fontSize,
-                    tvColor: tvColor != null ? tvColor! : bgColor,
-                    isTextAlignCenter: false,
-                    isBold: isTvBold)
+                ? Padding(
+                    padding: const EdgeInsets.only(
+                        left: 8.0, right: 8.0, top: 2, bottom: 2),
+                    child: TextViewCustom(
+                        text: text!,
+                        fontSize: fontSize,
+                        tvColor: tvColor != null ? tvColor! : bgColor,
+                        isTextAlignCenter: false,
+                        isBold: isTvBold),
+                  )
                 : const SizedBox.shrink(),
           ],
         ),

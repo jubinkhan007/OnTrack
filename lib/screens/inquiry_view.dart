@@ -98,7 +98,7 @@ class InquiryView extends StatelessWidget {
                     children: [
                       ButtonCircularIcon(
                           height: Converts.c32,
-                          width: Converts.c96,
+                          width: Converts.c104,
                           radius: 8,
                           bgColor: flag == HomeFlagItem().homeFlagItems[3].title
                               ? Colors.green
@@ -111,20 +111,6 @@ class InquiryView extends StatelessWidget {
                       SizedBox(
                         width: Converts.c8,
                       ),
-                      /*ButtonCircularIcon(
-                          height: Converts.c32,
-                          width: Converts.c96,
-                          radius: 8,
-                          bgColor: Colors.black,
-                          hasOpacity: false,
-                          text: inquiryResponse.endDate.split(",")[0],
-                          fontSize: Converts.c16,
-                          iconData: Icons.flag_outlined,
-                          tvColor: Colors.white,
-                          onTap: () {}),
-                      SizedBox(
-                        width: Converts.c8,
-                      ),*/
                       ButtonCircularIcon(
                           height: Converts.c32,
                           width: Converts.c152,

@@ -171,7 +171,6 @@ class InquiryList extends StatelessWidget {
                     hasOpacity: false,
                     tvColor: Colors.white,
                     onTap: () {
-                      //onCommentTap(inquiryResponse.id);
                       onCommentTap(inquiryResponse.id.toString());
                     },
                   ),
@@ -188,7 +187,6 @@ class InquiryList extends StatelessWidget {
                     hasOpacity: false,
                     tvColor: Colors.white,
                     onTap: () {
-                      //onAttachmentTap(inquiryResponse.id);
                       onAttachmentTap(inquiryResponse.id.toString());
                     },
                   ),
