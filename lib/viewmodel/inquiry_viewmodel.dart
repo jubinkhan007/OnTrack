@@ -55,13 +55,13 @@ class InquiryViewModel extends ChangeNotifier {
   UiState get uiState => _uiState;
 
   Future<void> getInquiries(
-      String flag, String userId, String isAssigned) async {
+      String flag, String userId, String isAssigned, {String vm = "INQALL"}) async {
     if (_uiState == UiState.loading) return;
     _message = null;
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response = await inquiryRepo.getInquiries(flag, userId, isAssigned);
+      final response = await inquiryRepo.getInquiries(flag, userId, isAssigned, vm);
       //final response = _getDemoTasks(); // test purpose
       _inquiries = response;
       _uiState = UiState.success;

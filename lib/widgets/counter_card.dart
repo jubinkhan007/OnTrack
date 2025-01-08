@@ -161,13 +161,13 @@ class _CounterCardState extends State<CounterCard> {
 
   String _getFlag(Status status) {
     switch (status) {
-      case Status.DELAYED:
+      case Status.delayed:
         return "1";
-      case Status.PENDING:
+      case Status.pending:
         return "2";
-      case Status.UPCOMING:
+      case Status.upcoming:
         return "3";
-      case Status.COMPLETED:
+      case Status.completed:
       default:
         return "4"; // Default flag value for unknown or unhandled statuses
     }

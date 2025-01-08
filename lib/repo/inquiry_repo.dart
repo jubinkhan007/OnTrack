@@ -148,10 +148,10 @@ class InquiryRepo {
   }
 
   Future<List<InquiryResponse>> getInquiries(
-      String flag, String userId, String isAssigned) async {
+      String flag, String userId, String isAssigned, String vm) async {
     try {
       final headers = {
-        'vm': 'INQALL',
+        'vm': vm,
         'va': flag,
         'vb': userId,
         'vc': isAssigned,
@@ -293,10 +293,10 @@ class InquiryRepo {
     }
   }
 
-  Future<StaffResponse> getStaffs(String staffId, String companyId) async {
+  Future<StaffResponse> getStaffs(String staffId, String companyId, String vm) async {
     try {
       final headers = {
-        'vm': 'STAFF',
+        'vm': vm,
         'va': companyId,
         'vb': staffId,
         'vc': '0',

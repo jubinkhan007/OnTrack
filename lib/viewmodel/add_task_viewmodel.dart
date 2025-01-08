@@ -35,18 +35,20 @@ class AddTaskViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> getStaffs(String staffId, String companyId) async {
+  Future<void> getStaffs(String staffId, String companyId, {String vm = "STAFF"}) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response = await inquiryRepo.getStaffs(staffId, companyId);
+      final response = await inquiryRepo.getStaffs(staffId, companyId, vm);
       _staffResponse = response;
       _uiState = UiState.success;
     } catch (error) {
       _uiState = UiState.error;
       _message = error.toString();
+      // set null if any exception
+      _staffResponse = null;
     } finally {
       notifyListeners();
     }

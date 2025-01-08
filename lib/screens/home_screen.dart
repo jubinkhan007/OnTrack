@@ -15,37 +15,41 @@ import 'package:tmbi/widgets/widgets.dart';
 import '../models/models.dart';
 import '../network/ui_state.dart';
 
-enum Status { DELAYED, PENDING, UPCOMING, COMPLETED }
+enum Status { delayed, pending, upcoming, completed }
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = '/home_screen';
   final String staffId;
 
-  HomeScreen({super.key, required this.staffId});
+  const HomeScreen({super.key, required this.staffId});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String selectedFlag = HomeFlagItem().homeFlagItems[1].title;
-
-  Status status = HomeFlagItem().homeFlagItems[1].status;
-
+  //String selectedFlag = HomeFlagItem().homeFlagItems[1].title;
+  //Status status = HomeFlagItem().homeFlagItems[1].status;
   String isAssigned = "1";
+  String selectedFlagValue = "";
+  String selectedFlag = "";
   Customer? customer;
 
-  // test
-  String selectedFlagValue = "";
+  // Keep track of the selected flag
+  Status? status;
+
+  // Track which flag is selected in the FeatureStatus widget
+  int selectedFlagIndex = 1;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    selectedFlagValue = getFlag(Status.PENDING);
+    selectedFlagValue = getFlag(Status.pending);
+    status = HomeFlagItem().homeFlagItems[1].status;
+    selectedFlag = HomeFlagItem().homeFlagItems[1].title;
 
     final inquiryViewModel =
-    Provider.of<InquiryViewModel>(context, listen: false);
+        Provider.of<InquiryViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       inquiryViewModel.getInquiries(
           selectedFlagValue, widget.staffId, isAssigned);
@@ -55,14 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    /*String selectedFlagValue = getFlag(Status.PENDING);
-    final inquiryViewModel =
-    Provider.of<InquiryViewModel>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      inquiryViewModel.getInquiries(
-          selectedFlagValue, widget.staffId, isAssigned);
-    });
-*/
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
@@ -155,19 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   _showCustomerDialog(
                       context,
-                      [
-                        Staff(
-                            name: "Md. Salauddin",
-                            code: "340553",
-                            designation: "MIS",
-                            id: 340553),
-                        Staff(
-                            name: "Md. Emrul",
-                            code: "397820",
-                            designation: "MIS",
-                            id: 340553)
-                      ],
-                      //inquiryViewModel,
                       Provider.of<InquiryViewModel>(context, listen: false),
                       selectedFlagValue);
                 },
@@ -203,7 +186,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: Row(
                     children: [
-
                       /// search by user
                       customer != null
                           ? userInfoCube()
@@ -222,13 +204,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: SwitchContainer(
                           onSwitchTap: (value) async {
                             isAssigned = value ? "1" : "0";
-                            await _getInquiries(
-                                //inquiryViewModel,
-                                Provider.of<InquiryViewModel>(context, listen: false),
-                                selectedFlagValue, isAssigned, widget.staffId);
-                            debugPrint("IS_ASSIGNED:: $isAssigned");
                             // reset previous value
-                            customer = null;
+                            setState(() {
+                              customer = null;
+                            });
+                            await _getInquiries(
+                                Provider.of<InquiryViewModel>(context,
+                                    listen: false),
+                                selectedFlagValue,
+                                isAssigned,
+                                widget.staffId);
+                            debugPrint("IS_ASSIGNED:: $isAssigned");
                           },
                         ),
                       ),
@@ -240,39 +226,117 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 FeatureStatus(
                   homeFlags: HomeFlagItem().homeFlagItems,
+                  selectedFlagIndex: selectedFlagIndex,
                   onPressed: (value, flag) async {
-                    selectedFlag = value;
-                    status = flag;
-                    selectedFlagValue = getFlag(flag);
+                    // handle the flag press action
+                    setState(() {
+                      selectedFlag = value;
+                      status = flag;
+                      selectedFlagValue = getFlag(flag);
+                      selectedFlagIndex = HomeFlagItem()
+                          .homeFlagItems
+                          .indexWhere((item) =>
+                              item.title == value); // Update selected index
+                    });
+
                     await _getInquiries(
-                        //inquiryViewModel,
-                        Provider.of<InquiryViewModel>(context, listen: false),
-                        getFlag(flag),
-                        isAssigned,
-                        customer != null ? customer!.id! : widget.staffId);
-                    debugPrint("TEST::$value");
+                      Provider.of<InquiryViewModel>(context, listen: false),
+                      selectedFlagValue,
+                      isAssigned,
+                      customer != null ? customer!.id! : widget.staffId,
+                    );
+                    debugPrint("Selected Flag: $value");
                   },
-                )
+                ),
               ],
             ),
           ),
           Consumer<InquiryViewModel>(
               builder: (context, inquiryViewModel, child) {
-                if (inquiryViewModel.uiState == UiState.loading) {
-                  return SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: Converts.c120,
-                        ),
-                        const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ],
+            if (inquiryViewModel.uiState == UiState.loading) {
+              return SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: Converts.c120,
                     ),
-                  );
-                } else if (inquiryViewModel.uiState == UiState.error) {
-                  return SliverToBoxAdapter(
+                    const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ],
+                ),
+              );
+            } else if (inquiryViewModel.uiState == UiState.error) {
+              return SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: Converts.c120,
+                  ),
+                  child: ErrorContainer(
+                      message: inquiryViewModel.message != null
+                          ? inquiryViewModel.message!
+                          : Strings.something_went_wrong),
+                ),
+              );
+            }
+            // null check
+            if (inquiryViewModel.inquiries?.isEmpty ?? true) {
+              return SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: Converts.c120,
+                  ),
+                  child: ErrorContainer(
+                      message: inquiryViewModel.message != null
+                          ? inquiryViewModel.message!
+                          : Strings.no_data_found),
+                ),
+              );
+            }
+
+            return inquiryViewModel.inquiries != null &&
+                    inquiryViewModel.inquiries!.isNotEmpty
+                ? SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        final inquiryResponse =
+                            inquiryViewModel.inquiries![index];
+                        return InquiryList(
+                          inquiryResponse: inquiryResponse,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              InquiryView.routeName,
+                              arguments: {
+                                'inquiryResponse': inquiryResponse,
+                                'flag': selectedFlag,
+                              },
+                            );
+                          },
+                          onCommentTap: (id) {
+                            Navigator.pushNamed(
+                              context,
+                              CommentScreen.routeName,
+                              arguments: id,
+                            );
+                          },
+                          onAttachmentTap: (id) {
+                            Navigator.pushNamed(
+                              context,
+                              AttachmentViewScreen.routeName,
+                              arguments: {
+                                'inquiryId': id,
+                                'taskId': "0",
+                              },
+                            );
+                          },
+                        );
+                      },
+                      childCount: inquiryViewModel.inquiries!
+                          .length, // Provide the total count of items
+                    ),
+                  )
+                : SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.only(
                         top: Converts.c120,
@@ -283,82 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               : Strings.something_went_wrong),
                     ),
                   );
-                }
-                // null check
-                if (inquiryViewModel.inquiries?.isEmpty ?? true) {
-                  return SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: Converts.c120,
-                      ),
-                      child: ErrorContainer(
-                          message: inquiryViewModel.message != null
-                              ? inquiryViewModel.message!
-                              : Strings.no_data_found),
-                    ),
-                  );
-                }
-
-                return inquiryViewModel.inquiries != null &&
-                    inquiryViewModel.inquiries!.isNotEmpty
-                    ? SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                      final inquiryResponse =
-                      inquiryViewModel.inquiries![index];
-                      return InquiryList(
-                        inquiryResponse: inquiryResponse,
-                        onTap: () {
-                          /*Navigator.pushNamed(
-                              context,
-                              InquiryView.routeName,
-                              arguments:
-                                  inquiryResponse,
-                            );*/
-                          Navigator.pushNamed(
-                            context,
-                            InquiryView.routeName,
-                            arguments: {
-                              'inquiryResponse': inquiryResponse,
-                              'flag': selectedFlag,
-                            },
-                          );
-                        },
-                        onCommentTap: (id) {
-                          Navigator.pushNamed(
-                            context,
-                            CommentScreen.routeName,
-                            arguments: id,
-                          );
-                        },
-                        onAttachmentTap: (id) {
-                          Navigator.pushNamed(
-                            context,
-                            AttachmentViewScreen.routeName,
-                            arguments: {
-                              'inquiryId': id,
-                              'taskId': "0",
-                            },
-                          );
-                        },
-                      );
-                    },
-                    childCount: inquiryViewModel.inquiries!
-                        .length, // Provide the total count of items
-                  ),
-                )
-                    : SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      top: Converts.c120,
-                    ),
-                    child: ErrorContainer(
-                        message: inquiryViewModel.message != null
-                            ? inquiryViewModel.message!
-                            : Strings.something_went_wrong),
-                  ),
-                );
-              }),
+          }),
           SliverPadding(
             padding: EdgeInsets.only(bottom: Converts.c24),
           ),
@@ -369,15 +358,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _getInquiries(InquiryViewModel inquiryViewModel, String flag,
       String isAssigned, String userid) async {
-    //await inquiryViewModel.getInquiries(flag, widget.staffId, isAssigned);
-    await inquiryViewModel.getInquiries(flag, userid, isAssigned);
+    await inquiryViewModel.getInquiries(flag, userid, isAssigned,
+        vm: customer == null ? "INQALL" : "SINQALL");
   }
 
   Future<String> _getUserName() async {
     try {
       UserResponse? userResponse = await SPHelper().getUser();
       String name =
-      userResponse != null ? userResponse.users![0].staffName! : "";
+          userResponse != null ? userResponse.users![0].staffName! : "";
       return name;
     } catch (e) {
       return "";
@@ -386,9 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String getGreeting() {
     // current hour of the day
-    int currentHour = DateTime
-        .now()
-        .hour;
+    int currentHour = DateTime.now().hour;
     // determine the greeting based on the time of day
     if (currentHour >= 5 && currentHour < 12) {
       return Strings.good_morning;
@@ -401,13 +388,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String getFlag(Status status) {
     switch (status) {
-      case Status.DELAYED:
+      case Status.delayed:
         return "1";
-      case Status.PENDING:
+      case Status.pending:
         return "2";
-      case Status.UPCOMING:
+      case Status.upcoming:
         return "3";
-      case Status.COMPLETED:
+      case Status.completed:
       default:
         return "4"; // Default flag value for unknown or unhandled statuses
     }
@@ -433,8 +420,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const LoginScreen()),
-                      (Route<dynamic> route) =>
-                  false, // Removes all previous routes
+                  (Route<dynamic> route) =>
+                      false, // Removes all previous routes
                 );
               },
               child: const Text(Strings.yes),
@@ -445,40 +432,45 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showCustomerDialog(BuildContext context, List<Staff> staffs,
+  void _showCustomerDialog(BuildContext context,
       InquiryViewModel inquiryViewModel, String selectedFlagValue) {
-    List<Customer> customers = [];
-    for (var staff in staffs) {
-      customers
-          .add(Customer(id: staff.code, name: staff.name, isVerified: false));
-    }
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: TextViewCustom(
-                text: Strings.search_by_name,
-                fontSize: Converts.c16,
-                tvColor: Palette.normalTv,
-                isTextAlignCenter: false,
-                isRubik: false,
-                isBold: true),
-            content: CustomerSearchDialog(
-                customers: customers,
-                hintName: "",
-                onCustomerSelected: (customer) async {
-                  if (customer != null) {
-                    setState(() {
-                      this.customer = customer;
-                    });
-                    Navigator.of(context).pop();
-                    // call data
-                    await _getInquiries(inquiryViewModel, selectedFlagValue,
-                        isAssigned, customer!.id!);
-                  }
-                }),
-          );
-        });
+    getStaffs().then((staffResponse) {
+      if (staffResponse != null && context.mounted) {
+        List<Customer> customers = [];
+        for (var staff in staffResponse!.staffs!) {
+          customers.add(
+              Customer(id: staff.code, name: staff.name, isVerified: false));
+        }
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: TextViewCustom(
+                    text: Strings.search_by_name,
+                    fontSize: Converts.c16,
+                    tvColor: Palette.normalTv,
+                    isTextAlignCenter: false,
+                    isRubik: false,
+                    isBold: true),
+                content: CustomerSearchDialog(
+                    customers: customers,
+                    hintName: "",
+                    onCustomerSelected: (customer) async {
+                      if (customer != null) {
+                        setState(() {
+                          this.customer = customer;
+                        });
+                        await _getInquiries(inquiryViewModel, selectedFlagValue,
+                            isAssigned, customer!.id!);
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      }
+                    }),
+              );
+            });
+      }
+    });
   }
 
   Widget userInfoCube() {
@@ -500,8 +492,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: LoadImage(
                 id: customer != null
                     ? customer!.id != null
-                    ? customer!.id!
-                    : ""
+                        ? customer!.id!
+                        : ""
                     : "",
                 height: Converts.c24,
                 width: Converts.c24,
@@ -513,8 +505,10 @@ class _HomeScreenState extends State<HomeScreen> {
             TextViewCustom(
                 text: customer != null
                     ? customer!.name != null
-                    ? customer!.name!
-                    : ""
+                        ? (customer!.name.toString().length > 10)
+                            ? '${customer!.name.toString().substring(0, 10)}...'
+                            : customer!.name.toString()
+                        : ""
                     : "",
                 fontSize: Converts.c16,
                 tvColor: Palette.semiTv,
@@ -523,11 +517,15 @@ class _HomeScreenState extends State<HomeScreen> {
               width: Converts.c8,
             ),
             GestureDetector(
-              onTap: () {
+              onTap: () async {
                 setState(() {
                   customer = null;
-                  //_isCustomerViewVisible = false;
                 });
+                await _getInquiries(
+                    Provider.of<InquiryViewModel>(context, listen: false),
+                    selectedFlagValue,
+                    isAssigned,
+                    widget.staffId);
               },
               child: Padding(
                 padding: EdgeInsets.all(Converts.c8),
@@ -544,4 +542,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<StaffResponse?> getStaffs() async {
+    await context
+        .read<AddTaskViewModel>()
+        .getStaffs(widget.staffId, "0", vm: "SSEARCH");
+    return mounted ? context.read<AddTaskViewModel>().staffResponse : null;
+  }
 }

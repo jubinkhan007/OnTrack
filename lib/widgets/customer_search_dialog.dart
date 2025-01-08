@@ -8,7 +8,7 @@ import '../models/models.dart';
 
 class CustomerSearchDialog extends StatefulWidget {
   final List<Customer> customers;
-  final Function(Customer) onCustomerSelected;
+  final Function(Customer?) onCustomerSelected;
   String hintName;
 
   CustomerSearchDialog(
@@ -117,13 +117,13 @@ class _CustomerSearchDialogState extends State<CustomerSearchDialog> {
     );
   }
 
-  String _getNameWithDesignation(String data) {
+  /*String _getNameWithDesignation(String data) {
     try {
       var values = data.split("#");
       return "${values[0]}\n${values[1]}\n${values[2]}";
     } catch (e) {
       return data;
     }
-  }
+  }*/
 }
 

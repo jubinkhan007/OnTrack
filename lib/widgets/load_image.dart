@@ -34,7 +34,7 @@ class LoadImage extends StatelessWidget {
             return Icon(
               Icons.account_circle,
               color: Palette.normalTv,
-              size: Converts.c48,
+              size: height,
             );
           },
         ),

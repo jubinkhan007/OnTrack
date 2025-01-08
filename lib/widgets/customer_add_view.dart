@@ -164,7 +164,7 @@ class _CustomerAddViewState extends State<CustomerAddView> {
                     });
                   }
                   widget.onCustomerSelected(customer);
-                  debugPrint("CUSTOMER_ID# ${customer.id}");
+                  //debugPrint("CUSTOMER_ID# ${customer.id}");
                   Navigator.of(context).pop();
                 }),
           );

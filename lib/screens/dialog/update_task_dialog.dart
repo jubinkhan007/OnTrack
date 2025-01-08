@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/palette.dart';
@@ -10,7 +9,6 @@ import '../../config/sp_helper.dart';
 import '../../config/strings.dart';
 import '../../models/user_response.dart';
 import '../../network/ui_state.dart';
-import '../../viewmodel/viewmodel.dart';
 import '../../widgets/widgets.dart';
 
 class UpdateTaskDialog extends StatefulWidget {
@@ -200,7 +198,8 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                       String userId = await _getUserId();
                       //if (mStatusId != "") {
                       if (inquiryViewModel.status != null &&
-                          inquiryViewModel.status != "") {
+                          inquiryViewModel.status != "" &&
+                          descriptionController.text != "") {
                         // upload files, if any are selected
                         //if (imageFiles.isNotEmpty) {
                         if (inquiryViewModel.imageFiles.isNotEmpty) {
