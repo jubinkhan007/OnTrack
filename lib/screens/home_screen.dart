@@ -149,10 +149,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                 onPressed: () {
-                  _showCustomerDialog(
-                      context,
-                      Provider.of<InquiryViewModel>(context, listen: false),
-                      selectedFlagValue);
+                  if (isAssigned == "1") {
+                    _showCustomerDialog(
+                        context,
+                        Provider.of<InquiryViewModel>(context, listen: false),
+                        selectedFlagValue);
+                  } else {
+                    context.showMessage("Please select 'Assigned' and then try again.");
+                  }
                 },
                 icon: const Icon(
                   Icons.search,

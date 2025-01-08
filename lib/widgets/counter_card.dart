@@ -27,7 +27,7 @@ class _CounterCardState extends State<CounterCard> {
     final counterViewModel = Provider.of<CounterViewModel>(context);
 
     return SizedBox(
-      height: Converts.c72,
+      height: Converts.c80,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
         scrollDirection: Axis.horizontal,
