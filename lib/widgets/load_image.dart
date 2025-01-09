@@ -25,10 +25,10 @@ class LoadImage extends StatelessWidget {
           placeholder: (context, url) => SizedBox(
             width: Converts.c16,
             height: Converts.c16,
-            child: const CircularProgressIndicator(
+            /*child: const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Palette.mainColor),
               strokeWidth: 2.0,
-            ),
+            ),*/
           ),
           errorWidget: (context, url, error) {
             return Icon(

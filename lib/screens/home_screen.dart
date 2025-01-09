@@ -155,7 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         Provider.of<InquiryViewModel>(context, listen: false),
                         selectedFlagValue);
                   } else {
-                    context.showMessage("Please select 'Assigned' and then try again.");
+                    context.showMessage(
+                        "Please select 'Assigned' and then try again.");
                   }
                 },
                 icon: const Icon(
@@ -507,16 +508,17 @@ class _HomeScreenState extends State<HomeScreen> {
               width: Converts.c8,
             ),
             TextViewCustom(
-                text: customer != null
-                    ? customer!.name != null
-                        ? (customer!.name.toString().length > 10)
-                            ? '${customer!.name.toString().substring(0, 10)}...'
-                            : customer!.name.toString()
-                        : ""
-                    : "",
-                fontSize: Converts.c16,
-                tvColor: Palette.semiTv,
-                isBold: true),
+              text: customer != null
+                  ? customer!.name != null
+                      ? (customer!.name.toString().length > 10)
+                          ? '${customer!.name.toString().substring(0, 10)}...'
+                          : customer!.name.toString()
+                      : ""
+                  : "",
+              fontSize: Converts.c16,
+              tvColor: Palette.semiTv,
+              isBold: true,
+            ),
             SizedBox(
               width: Converts.c8,
             ),

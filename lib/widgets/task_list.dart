@@ -93,7 +93,7 @@ class _TaskListState extends State<TaskList> {
             children: [
               Icon(
                 Icons.account_circle,
-                color: Palette.semiTv,
+                color: Colors.blue,
                 size: Converts.c20,
               ),
               SizedBox(
@@ -102,9 +102,9 @@ class _TaskListState extends State<TaskList> {
               TextViewCustom(
                 text: widget.task.assignedPerson,
                 fontSize: Converts.c16,
-                tvColor: Palette.semiTv,
+                tvColor: Colors.blue,
                 isTextAlignCenter: false,
-                isBold: false,
+                isBold: true,
               ),
             ],
           ),
