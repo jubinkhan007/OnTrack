@@ -49,15 +49,18 @@ class ButtonCircularIcon extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             iconData != null
-                ? Icon(
-                    iconData,
-                    color: tvColor != null ? tvColor! : bgColor,
-                    size: iconSize,
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 8, right: 4),
+                    child: Icon(
+                      iconData,
+                      color: tvColor != null ? tvColor! : bgColor,
+                      size: iconSize,
+                    ),
                   )
                 : const SizedBox.shrink(),
-            SizedBox(
+            /*SizedBox(
               width: iconData != null ? 4 : 0,
-            ),
+            ),*/
             text != null
                 ? Padding(
                     padding: const EdgeInsets.only(
