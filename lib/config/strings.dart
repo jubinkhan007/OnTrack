@@ -93,4 +93,6 @@ class Strings {
   static const String yes = 'Yes';
   static const String no = 'No';
   static const String cancel = 'Cancel';
+
+  static const String add_a_task = "Add a Task";
 }

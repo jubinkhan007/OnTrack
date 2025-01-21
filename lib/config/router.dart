@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/models.dart';
-import 'package:tmbi/models/staff_response.dart';
 
 import '../screens/screens.dart';
 
@@ -19,6 +18,9 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
           builder: (_) => HomeScreen(
                 staffId: args,
               ));
+    case TodoHomeScreen.routeName:
+      return MaterialPageRoute(
+          settings: routeSettings, builder: (_) => const TodoHomeScreen());
     case InquiryView.routeName:
       /*final args = routeSettings.arguments as InquiryResponse;
       final args1 = routeSettings.arguments as String;*/

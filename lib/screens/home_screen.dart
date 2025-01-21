@@ -63,8 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, CreateInquiryScreen.routeName,
-              arguments: widget.staffId);
+          /*Navigator.pushNamed(context, CreateInquiryScreen.routeName,
+              arguments: widget.staffId);*/
+          Navigator.pushNamed(context, TodoHomeScreen.routeName);
         },
         mini: true,
         backgroundColor: Palette.mainColor,
