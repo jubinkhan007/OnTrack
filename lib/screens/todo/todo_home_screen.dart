@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tmbi/config/palette.dart';
-import 'package:tmbi/screens/todo/demo.dart';
+import 'package:tmbi/screens/todo/custom_dropdown.dart';
 
 import '../../config/converts.dart';
 import '../../config/strings.dart';
@@ -16,26 +18,75 @@ class TodoHomeScreen extends StatefulWidget {
 }
 
 class _TodoHomeScreenState extends State<TodoHomeScreen> {
-  final List<String> tasks = [
-    'Buy groceries',
-    'Finish homework',
-    'Call mom',
-    'Go for a walk',
-  ];
-
-  TextEditingController _taskController = TextEditingController();
-  FocusNode _focusNode = FocusNode();
+  final TextEditingController _taskController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   bool _isChecked = false;
 
-  // Method to add task to the list
+  final List<String> userNames = [
+    'Md. Elias',
+    'Salauddin',
+    'Emrul Kaise',
+    'Asad',
+    'Mithun Kumar',
+  ];
+  List<String> filteredUsers = [];
+
+  void _onTextChanged(String text) {
+    final atSymbolIndex = text.indexOf('@');
+    if (atSymbolIndex != -1) {
+      final afterAtText = text.substring(atSymbolIndex + 1);
+      if (afterAtText.length >= 3) {
+        _searchForUsers(afterAtText);
+        debugPrint("Called: $afterAtText ${afterAtText.length}");
+      } else {
+        setState(() {
+          filteredUsers.clear();
+        });
+      }
+    }
+  }
+
+  // This method filters the list of users based on the query
+  void _searchForUsers(String query) {
+    setState(() {
+      filteredUsers = userNames
+          .where((user) => user.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
+  int findAtSymbol(String value) {
+    int count = 0;
+    RegExp regExp = RegExp(r'@');
+    Iterable<Match> matches = regExp.allMatches(value);
+    count = matches.length;
+    debugPrint("Count:: $count");
+    return count;
+  }
+
+  // add task to the list
   void _addTask() {
     if (_taskController.text.isNotEmpty) {
       setState(() {
-        tasks.add(_taskController.text);
+        //tasks.add(_taskController.text);
+        taskes.add({
+          'taskTitle': _taskController.text,
+          'date': 'Jan 25, 2025',
+          'imageUrls': ['340553'],
+          'isChecked': _isChecked,
+        });
         _taskController.clear(); // Clear the input after adding the task
         _focusNode.unfocus(); // Dismiss the keyboard
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _taskController.addListener(() {
+      _onTextChanged(_taskController.text);
+    });
   }
 
   @override
@@ -68,25 +119,33 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         ),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(
+            height: Converts.c8,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: CustomDropdown(items: const [
+              "Sorted by Created Date",
+              "Completed",
+              "3 days later"
+            ], hintName: "Sorted by", onChanged: (value) {}),
+          ),
+          SizedBox(
+            height: Converts.c12,
+          ),
           Expanded(
             child: ListView.builder(
-              /*itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(tasks[index]),
-                  leading: Icon(Icons.check_circle_outline),
-                );
-              },*/
               itemCount: taskes.length,
               itemBuilder: (context, index) {
                 final task = taskes[index];
-                return Demo(
-                  taskTitle: task['taskTitle'],
-                  date: task['date'],
-                  //imageUrls: List<String>.from(task['imageUrls']),
-                  isChecked: task['isChecked'],
-                );
+                return itemTodoTask(task['isChecked'], task['taskTitle'],
+                    task['date'], ['340553', "123456"], (value) {
+                  setState(() {
+                    taskes[index]['isChecked'] = value;
+                  });
+                });
               },
             ),
           ),
@@ -116,6 +175,56 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // filtered user list only if there are matches
+          if (filteredUsers.isNotEmpty)
+            Column(
+              children: [
+                SizedBox(
+                  //color: Colors.deepOrange,
+                  height: Converts.c104,
+                  // Set a fixed height for the user list
+                  child: ListView.builder(
+                    itemCount: filteredUsers.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(filteredUsers[index]),
+                        onTap: () {
+                          String selectedUser = filteredUsers[index];
+                          // Check if the string starts with "@"
+                          // Get the current text from the TextField
+                          String currentText = _taskController.text.trim();
+
+                          // Check if the string contains "@"
+                          if (currentText.contains('@')) {
+                            // Find the position of the '@' symbol
+                            int atIndex = currentText.indexOf('@');
+
+                            // Get the text before '@'
+                            String textBeforeAt =
+                                currentText.substring(0, atIndex).trim();
+
+                            // Update the text in the TextField without '@' and everything after it
+                            setState(() {
+                              _taskController.text = textBeforeAt;
+                              filteredUsers.clear();
+                            });
+
+                            // Move the cursor to the end of the updated text
+                            _taskController.selection = TextSelection.collapsed(
+                                offset: _taskController.text.length);
+
+                            debugPrint("Updated Text: $textBeforeAt");
+                          } else {
+                            debugPrint("Updated Text: not containing @");
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const Divider(),
+              ],
+            ),
           Row(
             children: [
               Checkbox(
@@ -171,7 +280,123 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
 
+  Widget itemTodoTask(
+    bool isChecked,
+    String taskName,
+    String date,
+    List<String> ids,
+    ValueChanged<bool> onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 8.0,
+        right: 8.0,
+        top: 2.0,
+        bottom: 2,
+      ),
+      child: Material(
+        borderRadius: BorderRadius.circular(8),
+        elevation: 2,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Checkbox(
+                  value: isChecked,
+                  onChanged: (bool? value) {
+                    onChanged(value!);
+                  },
+                  shape: const CircleBorder(),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        Uri.decodeComponent(taskName),
+                        style: GoogleFonts.roboto(
+                          fontSize: Converts.c16,
+                          color: Palette.semiTv,
+                          fontWeight: FontWeight.bold,
+                          decoration: isChecked
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextViewCustom(
+                            text: date,
+                            fontSize: Converts.c12,
+                            tvColor: Palette.semiNormalTv,
+                            isBold: false,
+                            isRubik: false,
+                          ),
+                          ids.isNotEmpty
+                              ? attachUsers(ids)
+                              : const SizedBox.shrink(),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: Converts.c8,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget attachUsers(List<String> users) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Row(
+        children: [
+          ...users.take(2).map((id) {
+            return ClipOval(
+              child: CachedNetworkImage(
+                imageUrl:
+                    "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/$id/$id-0.jpg",
+                width: Converts.c20,
+                height: Converts.c20,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => Icon(
+                  Icons.account_circle,
+                  size: Converts.c20,
+                ),
+              ),
+            );
+          }),
+          users.length > 2
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(9),
+                  child: Container(
+                    height: Converts.c20,
+                    width: Converts.c20,
+                    color: Colors.grey[300], // You can change the color
+                    child: Center(
+                      child: TextViewCustom(
+                        text: "${users.length - 2}+",
+                        fontSize: Converts.c12,
+                        tvColor: Colors.black,
+                        isBold: true,
+                        isRubik: false,
+                        isTextAlignCenter: true,
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink()
         ],
       ),
     );
@@ -181,32 +406,23 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     {
       'taskTitle': 'Complete Flutter task',
       'date': 'Jan 22, 2025',
-      'imageUrls': [
-        'https://www.example.com/user1.jpg',
-        'https://www.example.com/user2.jpg',
-        'https://www.example.com/user3.jpg',
-        'https://www.example.com/user4.jpg',
-      ],
+      'imageUrls': ['340553'],
       'isChecked': false,
     },
     {
       'taskTitle': 'Review PR',
       'date': 'Jan 23, 2025',
       'imageUrls': [
-        'https://www.example.com/user5.jpg',
-        'https://www.example.com/user6.jpg',
+        '340553',
+        '397820',
       ],
       'isChecked': true,
     },
     {
       'taskTitle': 'Test the app',
       'date': 'Jan 24, 2025',
-      'imageUrls': [
-        'https://www.example.com/user7.jpg',
-      ],
+      'imageUrls': ['340553'],
       'isChecked': false,
     },
   ];
-
-
 }
