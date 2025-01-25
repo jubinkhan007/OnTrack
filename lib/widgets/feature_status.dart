@@ -4,11 +4,12 @@ import 'package:tmbi/screens/home_screen.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
+import '../config/enum.dart';
 import '../config/palette.dart';
 
 class FeatureStatus extends StatelessWidget {
   final List<HomeFlag> homeFlags;
-  final Function(String, Status) onPressed;
+  final Function(String, StatusFlag) onPressed;
   final int selectedFlagIndex;
 
   const FeatureStatus({

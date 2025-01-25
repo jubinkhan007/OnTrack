@@ -116,24 +116,25 @@ class InquiryList extends StatelessWidget {
               ),
 
               /// company name
-              Row(
-                children: [
-                  Icon(
-                    Icons.label_outline,
-                    color: Palette.tabColor,
-                    size: Converts.c20,
-                  ),
-                  SizedBox(
-                    width: Converts.c8,
-                  ),
-                  TextViewCustom(
-                      text: inquiryResponse.company,
-                      fontSize: Converts.c16,
-                      tvColor: Palette.iconColor,
-                      isTextAlignCenter: false,
-                      isBold: false),
-                ],
-              ),
+              if (inquiryResponse.company != null)
+                Row(
+                  children: [
+                    Icon(
+                      Icons.label_outline,
+                      color: Palette.tabColor,
+                      size: Converts.c20,
+                    ),
+                    SizedBox(
+                      width: Converts.c8,
+                    ),
+                    TextViewCustom(
+                        text: inquiryResponse.company!,
+                        fontSize: Converts.c16,
+                        tvColor: Palette.iconColor,
+                        isTextAlignCenter: false,
+                        isBold: false),
+                  ],
+                ),
 
               /// end date
               Row(

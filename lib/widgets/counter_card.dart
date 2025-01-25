@@ -8,7 +8,6 @@ import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../config/strings.dart';
 import '../network/ui_state.dart';
-import '../screens/home_screen.dart';
 import '../viewmodel/viewmodel.dart';
 
 class CounterCard extends StatefulWidget {
@@ -42,7 +41,7 @@ class _CounterCardState extends State<CounterCard> {
               });
               // call the getCount function to fetch the count
               await counterViewModel.getCount(
-                  widget.staffId, _getFlag(counter.flag));
+                  widget.staffId, counter.flag.getFlag);
 
               // update the state based on the uiState
               if (counterViewModel.uiState == UiState.success &&
@@ -136,7 +135,7 @@ class _CounterCardState extends State<CounterCard> {
                                         : Palette.normalTv,
                                     isBold: true),
                               ],
-                            )
+                            ),
                 ],
               ),
             ),
@@ -144,32 +143,5 @@ class _CounterCardState extends State<CounterCard> {
         },
       ),
     );
-  }
-
-  Color _getColor(String name) {
-    switch (name) {
-      case "Delayed Inquiry":
-        return Palette.delayedCardColor; // Color for Pending
-      case "Pending Inquiry":
-        return Palette.pendingCardColor; // Color for Approved
-      case "Completed Inquiry":
-        return Palette.completedCardColor; // Color for Rejected
-      default:
-        return Palette.grayColor; // Default color
-    }
-  }
-
-  String _getFlag(Status status) {
-    switch (status) {
-      case Status.delayed:
-        return "1";
-      case Status.pending:
-        return "2";
-      case Status.upcoming:
-        return "3";
-      case Status.completed:
-      default:
-        return "4"; // Default flag value for unknown or unhandled statuses
-    }
   }
 }

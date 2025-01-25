@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/sp_helper.dart';
-import 'package:tmbi/models/user_response.dart';
-import 'package:tmbi/screens/home_screen.dart';
 
 import '../data/data.dart';
+import '../models/user_response.dart';
 import '../widgets/widgets.dart';
 import 'converts.dart';
 
@@ -107,14 +107,14 @@ extension UserInfoExtension on SPHelper {
     try {
       UserResponse? userResponse = await getUser();
       String id = userResponse != null ? userResponse.users![0].staffId! : "";
-      String name = userResponse != null ? userResponse.users![0].staffName! : "";
+      String name =
+          userResponse != null ? userResponse.users![0].staffName! : "";
       return isName ? name : id;
     } catch (e) {
       return "";
     }
   }
 }
-
 
 extension HideKeyboard on BuildContext {
   void hideKeyboard() {
@@ -123,20 +123,18 @@ extension HideKeyboard on BuildContext {
 }
 
 
-/*extension StatusFlagExtension on Status {
-  String getFlag() {
+extension StatusFlagExtension on StatusFlag {
+  String get getFlag {
     switch (this) {
-      case Status.:
-        return "1";
-      case Status.PENDING:
+      /*case StatusFlag.delayed:
+        return "1";*/
+      case StatusFlag.pending:
         return "2";
-      case Status.UPCOMING:
-        return "3";
-      case Status.COMPLETED:
+      /*case StatusFlag.upcoming:
+        return "3";*/
+      case StatusFlag.completed:
       default:
         return "4"; // Default flag value for unknown or unhandled statuses
     }
   }
-}*/
-
-
+}

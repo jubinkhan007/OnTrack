@@ -89,8 +89,9 @@ class InquiryView extends StatelessWidget {
                   const SizedBox(
                     height: 4,
                   ),
-                  _iconView(Icons.label_outline, "${Strings.company}:",
-                      inquiryResponse.company),
+                  if (inquiryResponse.company != null)
+                    _iconView(Icons.label_outline, "${Strings.company}:",
+                        inquiryResponse.company!),
                   SizedBox(
                     height: Converts.c20,
                   ),

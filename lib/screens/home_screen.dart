@@ -12,10 +12,9 @@ import 'package:tmbi/viewmodel/viewmodel.dart';
 import 'package:tmbi/widgets/feature_status.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
+import '../config/enum.dart';
 import '../models/models.dart';
 import '../network/ui_state.dart';
-
-enum Status { delayed, pending, upcoming, completed }
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = '/home_screen';
@@ -28,25 +27,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  //String selectedFlag = HomeFlagItem().homeFlagItems[1].title;
-  //Status status = HomeFlagItem().homeFlagItems[1].status;
   String isAssigned = "1";
   String selectedFlagValue = "";
   String selectedFlag = "";
   Customer? customer;
 
   // Keep track of the selected flag
-  Status? status;
+  StatusFlag? status;
 
   // Track which flag is selected in the FeatureStatus widget
-  int selectedFlagIndex = 1;
+  int selectedFlagIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    selectedFlagValue = getFlag(Status.pending);
-    status = HomeFlagItem().homeFlagItems[1].status;
-    selectedFlag = HomeFlagItem().homeFlagItems[1].title;
+    selectedFlagValue = StatusFlag.pending.getFlag;
+    status = HomeFlagItem().homeFlagItems[0].status;
+    selectedFlag = HomeFlagItem().homeFlagItems[0].title;
 
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
@@ -65,7 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           /*Navigator.pushNamed(context, CreateInquiryScreen.routeName,
               arguments: widget.staffId);*/
-          Navigator.pushNamed(context, TodoHomeScreen.routeName);
+          Navigator.pushNamed(context, TodoHomeScreen.routeName,
+              arguments: widget.staffId);
         },
         mini: true,
         backgroundColor: Palette.mainColor,
@@ -238,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     setState(() {
                       selectedFlag = value;
                       status = flag;
-                      selectedFlagValue = getFlag(flag);
+                      selectedFlagValue = flag.getFlag;
                       selectedFlagIndex = HomeFlagItem()
                           .homeFlagItems
                           .indexWhere((item) =>
@@ -389,20 +387,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return Strings.good_afternoon;
     } else {
       return Strings.good_night;
-    }
-  }
-
-  String getFlag(Status status) {
-    switch (status) {
-      case Status.delayed:
-        return "1";
-      case Status.pending:
-        return "2";
-      case Status.upcoming:
-        return "3";
-      case Status.completed:
-      default:
-        return "4"; // Default flag value for unknown or unhandled statuses
     }
   }
 

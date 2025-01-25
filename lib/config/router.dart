@@ -19,8 +19,12 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
                 staffId: args,
               ));
     case TodoHomeScreen.routeName:
+      final args = routeSettings.arguments as String;
       return MaterialPageRoute(
-          settings: routeSettings, builder: (_) => const TodoHomeScreen());
+          settings: routeSettings,
+          builder: (_) => TodoHomeScreen(
+                staffId: args,
+              ));
     case InquiryView.routeName:
       /*final args = routeSettings.arguments as InquiryResponse;
       final args1 = routeSettings.arguments as String;*/

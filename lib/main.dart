@@ -137,8 +137,8 @@ class MyApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(seedColor: Palette.mainColor),
               useMaterial3: true,
               scaffoldBackgroundColor: Palette.scaffold),
-          //home: const LoginScreen()),
-          home: const TodoHomeScreen()),
+          home: const LoginScreen()),
+          //home: const TodoHomeScreen()),
     );
   }
 //);

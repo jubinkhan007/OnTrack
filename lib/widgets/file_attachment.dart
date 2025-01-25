@@ -9,7 +9,6 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tmbi/config/aws_test.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
@@ -18,8 +17,16 @@ import 'package:tmbi/widgets/text_view_custom.dart';
 
 class FileAttachment extends StatefulWidget {
   final Function(List<ImageFile>?) onFileAttached;
+  bool isFromTodo;
+  bool isFileAttached;
 
-  const FileAttachment({super.key, required this.onFileAttached});
+  //FileAttachment({super.key, required this.onFileAttached});
+  FileAttachment(
+      {super.key,
+        required this.onFileAttached,
+        this.isFromTodo = false,
+        this.isFileAttached = false,
+      });
 
   @override
   State<FileAttachment> createState() => _FileAttachmentState();
@@ -45,18 +52,31 @@ class _FileAttachmentState extends State<FileAttachment> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _attachmentButton(),
-        SizedBox(
-          width: Converts.c16,
-        ),
-        Expanded(child: _imageView())
-      ],
-    );
+    return widget.isFromTodo
+        ? Material(
+            color: Colors.transparent,
+            child: IconButton(
+              icon: Icon(
+                Icons.image_outlined,
+                size: Converts.c16,
+                color: widget.isFileAttached ? Palette.mainColor : Palette.semiTv,
+              ),
+              onPressed: () {
+                _captureImage();
+              },
+            ),
+          )
+        : Row(
+            children: [
+              _attachmentButton(),
+              SizedBox(
+                width: Converts.c16,
+              ),
+              Expanded(child: _imageView())
+            ],
+          );
   }
 
   Widget _imageView() {
@@ -379,7 +399,7 @@ class _FileAttachmentState extends State<FileAttachment> {
       // test
       //awsService(_imageFileNameList);
       debugPrint("File saved at: ${file.path}");
-    } catch(e) {
+    } catch (e) {
       debugPrint("FILE_ERROR: ${e.toString()}");
     }
   }
@@ -388,7 +408,6 @@ class _FileAttachmentState extends State<FileAttachment> {
     final DateTime dateTime = DateTime.now();
     return "$type1${dateTime.year.toString().substring(2, 4)}${dateTime.month.toString().padLeft(2, '0')}_${userId}_${dateTime.millisecondsSinceEpoch}_$type2.jpg";
   }
-
 }
 
 class ImageFile {

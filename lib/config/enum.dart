@@ -1,0 +1,1 @@
+enum StatusFlag { pending, completed, /*delayed, upcoming*/ }

@@ -9,11 +9,16 @@ import '../config/strings.dart';
 class DateSelectionView extends StatefulWidget {
   final Function(String?) onDateSelected;
   String hint;
+  bool isFromTodo;
+  bool isDateSelected;
 
-  DateSelectionView(
-      {super.key,
-      required this.onDateSelected,
-      this.hint = Strings.select_a_date});
+  DateSelectionView({
+    super.key,
+    required this.onDateSelected,
+    this.hint = Strings.select_a_date,
+    this.isFromTodo = false,
+    this.isDateSelected = false,
+  });
 
   @override
   State<DateSelectionView> createState() => _DateSelectionViewState();
@@ -27,36 +32,52 @@ class _DateSelectionViewState extends State<DateSelectionView> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _selectDate(context),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey, // Border color
-            width: 1.0, // Border width
-          ),
-          borderRadius: BorderRadius.circular(Converts.c8), // Rounded corners
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextViewCustom(
-                  text: _selectedDate ?? widget.hint,
-                  fontSize: Converts.c16,
-                  tvColor: Palette.semiTv,
-                  isTextAlignCenter: false,
-                  isBold: false),
+    return widget.isFromTodo
+        ? Material(
+            color: Colors.transparent,
+            child: IconButton(
+              icon: Icon(
+                Icons.date_range,
+                size: Converts.c16,
+                color:
+                    widget.isDateSelected ? Palette.mainColor : Palette.semiTv,
+              ),
+              onPressed: () {
+                _selectDate(context);
+              },
             ),
-            Icon(
-              Icons.calendar_today,
-              color: Palette.semiTv,
-              size: Converts.c16,
+          )
+        : GestureDetector(
+            onTap: () => _selectDate(context),
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey, // Border color
+                  width: 1.0, // Border width
+                ),
+                borderRadius:
+                    BorderRadius.circular(Converts.c8), // Rounded corners
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextViewCustom(
+                        text: _selectedDate ?? widget.hint,
+                        fontSize: Converts.c16,
+                        tvColor: Palette.semiTv,
+                        isTextAlignCenter: false,
+                        isBold: false),
+                  ),
+                  Icon(
+                    Icons.calendar_today,
+                    color: Palette.semiTv,
+                    size: Converts.c16,
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 
   Future<void> _selectDate(BuildContext context) async {

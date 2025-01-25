@@ -137,7 +137,7 @@ class InquiryResponse {
 
   //final String status;
   final Comment comment;
-  final String company;
+  final String? company;
   final Customer customer;
   final String endDate;
   final User postedBy;
@@ -160,9 +160,7 @@ class InquiryResponse {
 
   factory InquiryResponse.fromJson(Map<String, dynamic> json) {
     //var tasksList = json['TASKS'] as List;
-    var tasksList = json['TASKS'] != null
-        ? json['TASKS'] as List
-        : <dynamic>[];
+    var tasksList = json['TASKS'] != null ? json['TASKS'] as List : <dynamic>[];
     List<Task> taskList = tasksList.map((task) => Task.fromJson(task)).toList();
 
     return InquiryResponse(
@@ -278,6 +276,32 @@ class User {
       staffId: json['staff'],
       name: json['name'],
       isOwner: json['is_owner'] == 'true',
+    );
+  }
+}
+
+class Todo {
+  final String title;
+  final String date;
+  final bool isChecked;
+  final List<User> assigns;
+
+  Todo(
+      {required this.title,
+      required this.date,
+      required this.isChecked,
+      required this.assigns});
+
+  factory Todo.fromJson(Map<String, dynamic> json) {
+    var usersList = (json['assigns'] as List)
+        .map((userJson) => User.fromJson(userJson))
+        .toList();
+
+    return Todo(
+      title: json['title'],
+      date: json['date'],
+      isChecked: json['isChecked'] == 'true',
+      assigns: usersList,
     );
   }
 }
