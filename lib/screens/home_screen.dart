@@ -5,7 +5,6 @@ import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
-import 'package:tmbi/data/counter_item.dart';
 import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
@@ -59,11 +58,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          /*Navigator.pushNamed(context, CreateInquiryScreen.routeName,
-              arguments: widget.staffId);*/
-          Navigator.pushNamed(context, TodoHomeScreen.routeName,
+        onPressed: () async {
+          if (await SPHelper().getFirstTaskEntryFlag()) {
+            Navigator.pushNamed(context, TodoHomeScreen.routeName,
+                arguments: widget.staffId);
+          } else {
+            Navigator.pushNamed(context, CreateInquiryScreen.routeName,
               arguments: widget.staffId);
+          }
         },
         mini: true,
         backgroundColor: Palette.mainColor,
@@ -91,6 +93,26 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 context.showMessage(Strings.home);
               },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.settings,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  SettingScreen.routeName,
+                );
+              },
+            ),
+            SizedBox(
+              height: Converts.c48,
+              width: Converts.c48,
+            ),
+            SizedBox(
+              height: Converts.c48,
+              width: Converts.c48,
             ),
             IconButton(
               icon: const Icon(
@@ -165,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          SliverToBoxAdapter(
+          /*SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -178,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-          ),
+          ),*/
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,6 +381,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
 
   Future<void> _getInquiries(InquiryViewModel inquiryViewModel, String flag,
       String isAssigned, String userid) async {

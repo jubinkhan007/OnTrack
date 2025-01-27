@@ -6,6 +6,7 @@ import 'package:tmbi/models/user_response.dart';
 class SPHelper {
   static const String _userKey = 'sp_user_key';
   static const String _cSavedKey = 'sp_saved_key';
+  static const String _taskFirstEntry = 'sp_task_first_entry_key';
 
   // Private static instance of the class
   static final SPHelper _instance = SPHelper._internal();
@@ -54,6 +55,18 @@ class SPHelper {
   Future<void> removeUser() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey); // Remove the user data
+  }
+
+  // settings
+  Future<void> saveFirstTaskEntryFlag(bool flag) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_taskFirstEntry, flag);
+  }
+
+  Future<bool> getFirstTaskEntryFlag() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool? flag = prefs.getBool(_taskFirstEntry);
+    return flag ?? true;
   }
 
 }

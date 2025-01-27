@@ -32,7 +32,10 @@ class Staff {
   Staff.fromJson(Map<String, dynamic> json) {
     name = json['USER_NAME'];
     code = json['USER_HRIS'];
-    id = json['USER_ID'];
+    //id = json['USER_ID'];
+    id = json['USER_ID'] is String
+        ? int.tryParse(json['USER_ID'])
+        : json['USER_ID'];  // If already an int, no conversion needed
     designation = json['DESIGNATION'];
   }
 

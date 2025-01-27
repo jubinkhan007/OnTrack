@@ -18,15 +18,15 @@ import 'package:tmbi/widgets/text_view_custom.dart';
 class FileAttachment extends StatefulWidget {
   final Function(List<ImageFile>?) onFileAttached;
   bool isFromTodo;
-  bool isFileAttached;
+  //bool isFileAttached;
 
   //FileAttachment({super.key, required this.onFileAttached});
-  FileAttachment(
-      {super.key,
-        required this.onFileAttached,
-        this.isFromTodo = false,
-        this.isFileAttached = false,
-      });
+  FileAttachment({
+    super.key,
+    required this.onFileAttached,
+    this.isFromTodo = false,
+    //this.isFileAttached = false,
+  });
 
   @override
   State<FileAttachment> createState() => _FileAttachmentState();
@@ -55,18 +55,46 @@ class _FileAttachmentState extends State<FileAttachment> {
   @override
   Widget build(BuildContext context) {
     return widget.isFromTodo
-        ? Material(
-            color: Colors.transparent,
-            child: IconButton(
-              icon: Icon(
-                Icons.image_outlined,
-                size: Converts.c16,
-                color: widget.isFileAttached ? Palette.mainColor : Palette.semiTv,
-              ),
-              onPressed: () {
-                _captureImage();
-              },
-            ),
+        ? Row(
+            children: [
+              !isMultipleImageSelected
+                  ? Material(
+                      color: Colors.transparent,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.image_outlined,
+                          size: Converts.c16,
+                          color: _imageFiles.isNotEmpty
+                              ? Palette.mainColor
+                              : Palette.semiTv,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isMultipleImageSelected = true;
+                          });
+                          _captureImage();
+                        },
+                      ),
+                    )
+                  : SizedBox(
+                      height: Converts.c48,
+                      width: Converts.c48,
+                      child: Center(
+                        child: SizedBox(
+                          height: Converts.c16,
+                          width: Converts.c16,
+                          child: const CircularProgressIndicator(
+                            strokeWidth:
+                                2, // Smaller stroke for a finer spinner
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Palette.tabColor),
+                          ),
+                        ),
+                      ),
+                    ),
+              if (_imageFiles.isNotEmpty) const VerticalDivider(),
+              Expanded(child: _imageViewTodo()),
+            ],
           )
         : Row(
             children: [
@@ -77,6 +105,62 @@ class _FileAttachmentState extends State<FileAttachment> {
               Expanded(child: _imageView())
             ],
           );
+  }
+
+  Widget _imageViewTodo() {
+    return Center(
+      child: SizedBox(
+        height: Converts.c48,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: _imageFiles.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: EdgeInsets.only(right: Converts.c8),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(Converts.c8),
+                    child: Image.file(
+                      File(_imageFiles[index].path),
+                      width: Converts.c48,
+                      height: Converts.c48,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned(
+                    top: 4.0, // Adjust the top position
+                    right: 4.0,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _imageFiles.removeAt(index);
+                          _imageFileList.removeAt(index);
+                          // pass files
+                          widget.onFileAttached(_imageFileList);
+                          totalImageSelected = _imageFileList.length.toString();
+                        });
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Palette.tabColor,
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          size: Converts.c16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 
   Widget _imageView() {

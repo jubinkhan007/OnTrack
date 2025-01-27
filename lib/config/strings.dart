@@ -40,6 +40,8 @@ class Strings {
   static const String select_priority = 'Select priority';
   static const String select = 'Select';
   static const String tasks = 'Tasks';
+  static const String setting = 'Setting';
+  static const String first_task_entry = 'First Task Entry';
   static const String task_distribution_for_employees = 'Task Distribution for Employees';
   static const String create_new = 'Create New';
   static const String add = 'Add';

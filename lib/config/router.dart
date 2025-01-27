@@ -18,6 +18,9 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
           builder: (_) => HomeScreen(
                 staffId: args,
               ));
+    case SettingScreen.routeName:
+      return MaterialPageRoute(
+          settings: routeSettings, builder: (_) => SettingScreen());
     case TodoHomeScreen.routeName:
       final args = routeSettings.arguments as String;
       return MaterialPageRoute(

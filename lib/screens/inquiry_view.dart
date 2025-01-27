@@ -101,7 +101,8 @@ class InquiryView extends StatelessWidget {
                           height: Converts.c32,
                           width: Converts.c104,
                           radius: 8,
-                          bgColor: flag == HomeFlagItem().homeFlagItems[3].title
+                          //bgColor: flag == HomeFlagItem().homeFlagItems[3].title
+                          bgColor: flag == HomeFlagItem().homeFlagItems[1].title
                               ? Colors.green
                               : Palette.iconColor,
                           hasOpacity: false,

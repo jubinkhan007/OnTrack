@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
+import 'package:tmbi/db/dao/staff_dao.dart';
 import 'package:tmbi/screens/todo/custom_dropdown.dart';
 
 import '../../config/converts.dart';
@@ -17,6 +18,7 @@ import '../../network/ui_state.dart';
 import '../../viewmodel/viewmodel.dart';
 import '../../widgets/date_selection_view.dart';
 import '../../widgets/widgets.dart';
+import '../inquiry_view.dart';
 
 class TodoHomeScreen extends StatefulWidget {
   static const String routeName = '/todo_home_screen';
@@ -34,18 +36,14 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
   // status flag
   String statusFlag = StatusFlag.pending.getFlag;
+  String statusFlagName = StatusFlag.pending.name;
 
   // flag
   bool _isChecked = false;
   bool _isDateSelected = false;
-  bool _isFileAttached = false;
 
   // users for assign
-  final List<Customer> users = [
-    Customer(id: "340553", name: "Md. Salauddin", isVerified: true),
-    Customer(id: "340554", name: "Md. Elias Hossain", isVerified: true),
-    Customer(id: "340556", name: "Md. Emrul Kaish", isVerified: true),
-  ];
+  final List<Customer> users = [];
 
   List<Customer> filteredNewUsers = [];
   List<Customer> _addedUsers = [];
@@ -60,7 +58,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     });
   }
 
-  void _onTextChanged(String text) {
+/*  void _onTextChanged(String text) {
     final atSymbolIndex = text.indexOf('@');
     if (atSymbolIndex != -1) {
       final afterAtText = text.substring(atSymbolIndex + 1);
@@ -73,7 +71,34 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         });
       }
     }
+  }*/
+
+  void _onTextChanged(String text) {
+    // Split the text by '@' to isolate the parts before and after each '@'
+    final atSymbols = text.split('@');
+
+    // Check if there's more than one '@'
+    if (atSymbols.length > 1) {
+      // Get the text after the last '@' symbol
+      final afterLastAt = atSymbols.last.trim();
+
+      // If the length after the last '@' is greater than or equal to 3, trigger the search
+      if (afterLastAt.isNotEmpty && afterLastAt.length >= 3) {
+        _searchForNewUsers(afterLastAt);
+      } else {
+        // If less than 3 characters after '@' or empty, clear the filtered list
+        setState(() {
+          filteredNewUsers.clear();
+        });
+      }
+    } else {
+      // If there is no '@' or only one '@', clear the filtered list
+      setState(() {
+        filteredNewUsers.clear();
+      });
+    }
   }
+
 
   // files & date
   final List<ImageFile> imageFiles = [];
@@ -104,7 +129,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      inquiryViewModel.getInquiries(statusFlag, widget.staffId, "1");
+      //inquiryViewModel.getInquiries(statusFlag, widget.staffId, "1");
+      _fetchDataAndStore();
     });
     debugPrint("Called");
   }
@@ -114,6 +140,57 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     _taskController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchDataAndStore() async {
+    try {
+      List<Future> futures = [
+        _fetchAndStoreStaffs(),
+        _fetchTodos(),
+      ];
+      await Future.wait(futures);
+      await _fetchStaffsInfo();
+    } catch (e) {
+      showMessage(e.toString());
+    }
+  }
+
+  Future<void> _fetchTodos() async {
+    final inquiryViewModel =
+        Provider.of<InquiryViewModel>(context, listen: false);
+    await inquiryViewModel.getInquiries(statusFlag, widget.staffId, "1");
+  }
+
+  Future<void> _fetchAndStoreStaffs() async {
+    final addTaskViewModel =
+        Provider.of<AddTaskViewModel>(context, listen: false);
+    await addTaskViewModel.getStaffs(widget.staffId, "0", vm: "STAFF_ALL");
+
+    if (addTaskViewModel.staffResponse != null) {
+      if (addTaskViewModel.staffResponse!.staffs != null) {
+        StaffDao staffDao = StaffDao();
+        bool result = await staffDao
+            .insertStaffsFromJson(addTaskViewModel.staffResponse!.staffs!);
+        if (result) {
+          debugPrint("Staff info inserted successfully");
+        } else {
+          debugPrint("Failed");
+        }
+      }
+    }
+  }
+
+  Future<void> _fetchStaffsInfo() async {
+    try {
+      final staffDao = StaffDao();
+      List<Staff> staffList = await staffDao.getStaffs();
+      for (var staff in staffList) {
+        users.add(Customer(
+            id: staff.code.toString(), name: staff.name, isVerified: true));
+      }
+    } catch (e) {
+      debugPrint("Error fetching staff data: $e");
+    }
   }
 
   @override
@@ -152,6 +229,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 onChanged: (value) {
                   if (value != null) {
                     statusFlag = value!.status!.getFlag!;
+                    statusFlagName = value!.status!.name;
                     Provider.of<InquiryViewModel>(context, listen: false)
                         .getInquiries(statusFlag, widget.staffId, "1");
                     debugPrint("StatusFlag::$statusFlag");
@@ -211,10 +289,16 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 itemCount: inquiryViewModel.inquiries!.length,
                 itemBuilder: (context, index) {
                   final inquiryResponse = inquiryViewModel.inquiries![index];
-                  return itemTodoTask(inquiryResponse, [], (value) {
-                    setState(() {
-                      //task = value;
-                    });
+                  return itemTodoTask(inquiryResponse, inquiryResponse.tasks, (value) async {
+                    //setState(() {
+                    //debugPrint("CHECKED: $value");
+                    //});
+                    if (value) {
+                      await updateTodos(
+                          Provider.of<InquiryCreateViewModel>(context,
+                              listen: false),
+                          inquiryResponse);
+                    }
                   });
                 },
               ),
@@ -260,9 +344,37 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     child: ListView.builder(
                       itemCount: filteredNewUsers.length,
                       itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(filteredNewUsers[index].name.toString()),
-                          onTap: () {
+                        return GestureDetector(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.account_circle_outlined,
+                                    size: 14,
+                                    color: Palette.semiTv,
+                                  ),
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      filteredNewUsers[index].name.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Palette.semiTv,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 4,
+                              ),
+                            ],
+                          ),
+                          /*onTap: () {
                             setState(() {
                               _addedUsers.add(filteredNewUsers[index]);
                             });
@@ -290,6 +402,43 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                               debugPrint("Updated Text: $textBeforeAt");
                             } else {
                               debugPrint("Updated Text: not containing @");
+                            }
+                          },*/
+                          onTap: () {
+                            bool userAlreadyAdded = _addedUsers.any((user) =>
+                                user.id == filteredNewUsers[index].id);
+                            if (!userAlreadyAdded) {
+                              setState(() {
+                                _addedUsers.add(filteredNewUsers[index]);
+                              });
+                            }
+
+                            // Get the current text from the TextField
+                            String currentText = _taskController.text.trim();
+
+                            // Check if the string contains "@" and find the position of the last "@"
+                            if (currentText.contains('@')) {
+                              int lastAtIndex = currentText.lastIndexOf('@');
+
+                              // Get the text before the last "@" (everything before it)
+                              String textBeforeLastAt =
+                                  currentText.substring(0, lastAtIndex).trim();
+
+                              // Update the text in the TextField to remove the last "@sala"
+                              setState(() {
+                                _taskController.text = textBeforeLastAt;
+                                filteredNewUsers.clear();
+                              });
+
+                              // Move the cursor to the end of the updated text
+                              _taskController.selection =
+                                  TextSelection.collapsed(
+                                offset: _taskController.text.length,
+                              );
+
+                              debugPrint("Updated Text: $textBeforeLastAt");
+                            } else {
+                              debugPrint("Updated Text: No '@' found");
                             }
                           },
                         );
@@ -329,63 +478,41 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     style: TextStyle(fontSize: Converts.c16),
                     //onEditingComplete: _addTask, // Add task on done
                     onEditingComplete: () async {
-                      if (_taskController.text != "" &&
-                          _taskController.text != null) {
-                        debugPrint("DONE:: ${_taskController.text}");
-                        String loggedUserName = await _getUserName();
-
-                        // upload files, if any are selected
-                        if (imageFiles.isNotEmpty) {
-                          await inquiryViewModel.saveFiles(imageFiles);
-                        }
-                        // save inquiry
-                        await inquiryViewModel.saveInquiry(
-                            "0",
-                            //mCompanyId,
-                            "0",
-                            //mInquiryId,
-                            //titleController.text,
-                            //descriptionController.text,
-                            Uri.encodeComponent(_taskController.text),
-                            Uri.encodeComponent(_taskController.text),
-                            "N",
-                            //isSample,
-                            _selectedDate,
-                            //selectedDate,
-                            "401",
-                            //mPriorityId,
-                            "0",
-                            //mCustomer!.id.toString(),
-                            "Other",
-                            // customerName,
-                            widget.staffId,
-                            _createAssignTaskForUsers(loggedUserName),
-                            inquiryViewModel.files);
-
-                        // check the status of the request
-                        if (inquiryViewModel.isSavedInquiry != null) {
-                          if (inquiryViewModel.isSavedInquiry!) {
-                            //showMessage(Strings.data_saved_successfully);
-                            //Navigator.pop(context);
-                            // reset all values to default
-                            setState(() {
-                              resetFields();
-                            });
-                            // refresh
-                            _getTodos();
-                          } else {
-                            showMessage(Strings.failed_to_save_the_data);
-                          }
-                        } else {
-                          showMessage(Strings.data_is_missing);
-                        }
-                        /*// reset all values to default
-                        setState(() {
-                          resetFields();
-                        });*/
-                      }
+                      await saveTodos(inquiryViewModel);
                     }, // Add task on done
                   ),
+                ),
+
+                /// save button
+                Material(
+                  color: Colors.transparent,
+                  child: !(inquiryViewModel.uiState == UiState.loading)
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.send,
+                            size: Converts.c16,
+                            color: Palette.mainColor,
+                          ),
+                          onPressed: () async {
+                            await saveTodos(inquiryViewModel);
+                          },
+                        )
+                      : SizedBox(
+                          height: Converts.c48,
+                          width: Converts.c48,
+                          child: Center(
+                            child: SizedBox(
+                              height: Converts.c16,
+                              width: Converts.c16,
+                              child: const CircularProgressIndicator(
+                                strokeWidth:
+                                    2, // Smaller stroke for a finer spinner
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Palette.tabColor),
+                              ),
+                            ),
+                          ),
+                        ),
                 )
               ],
             ),
@@ -408,87 +535,128 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                   isFromTodo: true,
                   isDateSelected: _isDateSelected,
                 ),
-                FileAttachment(
-                  onFileAttached: (files) {
-                    if (files != null) {
-                      if (imageFiles.isNotEmpty) {
-                        imageFiles.clear();
-                      }
-                      imageFiles.addAll(files);
-                      debugPrint(imageFiles.length.toString());
-                      setState(() {
-                        _isFileAttached = true;
-                      });
-                    }
-                  },
-                  isFromTodo: true,
-                  isFileAttached: _isFileAttached,
+                Expanded(
+                  child: SizedBox(
+                    height: Converts.c48,
+                    child: FileAttachment(
+                      onFileAttached: (files) {
+                        if (files != null) {
+                          if (imageFiles.isNotEmpty) {
+                            imageFiles.clear();
+                          }
+                          imageFiles.addAll(files);
+                          debugPrint(imageFiles.length.toString());
+                          /*setState(() {
+                            _isFileAttached = true;
+                          });*/
+                        }
+                      },
+                      isFromTodo: true,
+                      //isFileAttached: _isFileAttached,
+                    ),
+                  ),
                 )
               ],
             ),
 
             /// raw image view
-            if (_isFileAttached) _imageView()
+            //if (_isFileAttached) _imageView()
           ],
         ),
       );
     });
   }
 
-  Widget _imageView() {
-    return SizedBox(
-      height: Converts.c72,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: imageFiles.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.only(right: Converts.c8),
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(Converts.c16),
-                  child: Image.memory(
-                    imageFiles[index].file, // Your Uint8List data
-                    width: Converts.c56, // Set desired width
-                    height: Converts.c56, // Set desired height
-                    fit: BoxFit.cover, // Fit the image
-                  ),
-                ),
-                Positioned(
-                  top: 4.0, // Adjust the top position
-                  right: 4.0,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        imageFiles.removeAt(index);
-                        if (imageFiles.isEmpty) _isFileAttached = false;
-                      });
-                    },
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Palette.tabColor,
-                      ),
-                      child: Icon(
-                        Icons.close,
-                        size: Converts.c16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   void _getTodos() {
     Provider.of<InquiryViewModel>(context, listen: false)
         .getInquiries(statusFlag, widget.staffId, "1");
+  }
+
+  Future<void> saveTodos(InquiryCreateViewModel inquiryViewModel) async {
+    if (_taskController.text != "" && _taskController.text != null) {
+      //debugPrint("DONE:: ${_taskController.text}");
+      String loggedUserName = await _getUserName();
+
+      // upload files, if any are selected
+      if (imageFiles.isNotEmpty) {
+        await inquiryViewModel.saveFiles(imageFiles);
+      }
+      // save inquiry
+      await inquiryViewModel.saveInquiry(
+          "0",
+          //mCompanyId,
+          "0",
+          //mInquiryId,
+          //titleController.text,
+          //descriptionController.text,
+          Uri.encodeComponent(_taskController.text),
+          Uri.encodeComponent(_taskController.text),
+          "N",
+          //isSample,
+          _selectedDate,
+          //selectedDate,
+          "401",
+          //mPriorityId,
+          "0",
+          //mCustomer!.id.toString(),
+          "Other",
+          // customerName,
+          widget.staffId,
+          _createAssignTaskForUsers(loggedUserName),
+          inquiryViewModel.files);
+
+      // check the status of the request
+      if (inquiryViewModel.isSavedInquiry != null) {
+        if (inquiryViewModel.isSavedInquiry!) {
+          //showMessage(Strings.data_saved_successfully);
+          //Navigator.pop(context);
+          // reset all values to default
+          setState(() {
+            resetFields();
+          });
+          // refresh
+          _getTodos();
+        } else {
+          showMessage(Strings.failed_to_save_the_data);
+        }
+      } else {
+        showMessage(Strings.data_is_missing);
+      }
+    }
+  }
+
+  Future<void> updateTodos(InquiryCreateViewModel inquiryViewModel,
+      InquiryResponse inquiryResponse) async {
+    if (inquiryResponse.tasks.isNotEmpty) {
+      // upload files, if any are selected
+      //if (imageFiles.isNotEmpty) {
+      //await inquiryViewModel.saveFiles(imageFiles);
+      //}
+      // update inquiry
+      await inquiryViewModel.updateTask(
+          inquiryResponse.id.toString(),
+          inquiryResponse.tasks[0].id.toString(),
+          HomeFlagItem().priorities[3].id.toString(),
+          "Successfully completed the task",
+          widget.staffId, []);
+
+      // check the status of the request
+      if (inquiryViewModel.uiState == UiState.error) {
+        showMessage("Error: ${inquiryViewModel.message}");
+      } else {
+        if (inquiryViewModel.isSavedInquiry != null) {
+          if (inquiryViewModel.isSavedInquiry!) {
+            //showMessage(Strings.data_saved_successfully);
+            // refresh
+            _getTodos();
+          } else {
+            showMessage(Strings.failed_to_save_the_data);
+          }
+        } else {
+          showMessage(Strings.data_is_missing);
+        }
+      }
+    }
   }
 
   showMessage(String message) {
@@ -514,7 +682,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
     _isChecked = false;
     _isDateSelected = false;
-    _isFileAttached = false;
+    //_isFileAttached = false;
 
     filteredNewUsers.clear();
     _addedUsers.clear();
@@ -524,7 +692,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
   Widget itemTodoTask(
     InquiryResponse inquiryResponse,
-    List<User> users,
+    List<Task> users,
     ValueChanged<bool> onChanged,
   ) {
     return Padding(
@@ -534,65 +702,85 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         top: 2.0,
         bottom: 2,
       ),
-      child: Material(
-        borderRadius: BorderRadius.circular(8),
-        elevation: 2,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Checkbox(
-                  value: false,
-                  onChanged: (bool? value) {
-                    onChanged(value!);
-                  },
-                  shape: const CircleBorder(),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        Uri.decodeComponent(inquiryResponse.title),
-                        style: GoogleFonts.roboto(
-                          fontSize: Converts.c16,
-                          color: Palette.semiTv,
-                          fontWeight: FontWeight.bold,
-                          decoration: false
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextViewCustom(
-                            text: inquiryResponse.endDate,
-                            fontSize: Converts.c12,
-                            tvColor: Palette.semiNormalTv,
-                            isBold: false,
-                            isRubik: false,
-                          ),
-                          users.isNotEmpty
-                              ? attachUsers(users)
-                              : const SizedBox.shrink(),
-                        ],
-                      ),
-                    ],
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            InquiryView.routeName,
+            arguments: {
+              'inquiryResponse': inquiryResponse,
+              'flag': statusFlagName,
+            },
+          );
+        },
+        child: Material(
+          borderRadius: BorderRadius.circular(8),
+          elevation: 2,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Checkbox(
+                    value: inquiryResponse.tasks.isNotEmpty
+                        ? inquiryResponse.tasks[0].status == "Completed"
+                            ? true
+                            : false
+                        : false,
+                    onChanged: (bool? value) {
+                      onChanged(value!);
+                    },
+                    shape: const CircleBorder(),
                   ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: Converts.c8,
-            )
-          ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          Uri.decodeComponent(inquiryResponse.title),
+                          style: GoogleFonts.roboto(
+                              fontSize: Converts.c16,
+                              color: Palette.semiTv,
+                              fontWeight: FontWeight.bold,
+                              decoration: inquiryResponse.tasks.isNotEmpty
+                                  ? inquiryResponse.tasks[0].status == "Completed"
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none
+                                  : TextDecoration.none
+                              //? TextDecoration.lineThrough
+                              //: TextDecoration.none,
+                              ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextViewCustom(
+                              text: inquiryResponse.endDate,
+                              fontSize: Converts.c12,
+                              tvColor: Palette.semiNormalTv,
+                              isBold: false,
+                              isRubik: false,
+                            ),
+                            users.isNotEmpty && users.length > 1
+                                ? attachUsers(users.sublist(1))
+                                : const SizedBox.shrink(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: Converts.c8,
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget attachUsers(List<User> users) {
+  Widget attachUsers(List<Task> users) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: Row(
@@ -657,6 +845,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 }),
           ),
         ),
+        const Divider(),
       ],
     );
   }
