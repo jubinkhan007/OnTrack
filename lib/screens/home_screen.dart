@@ -46,11 +46,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
+    // test
+    selectedFlagIndex = inquiryViewModel.tabSelectedFlag;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       inquiryViewModel.getInquiries(
           selectedFlagValue, widget.staffId, isAssigned);
     });
     debugPrint("Called");
+
   }
 
   @override
@@ -66,6 +70,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.pushNamed(context, CreateInquiryScreen.routeName,
               arguments: widget.staffId);
           }
+          setState(() {
+            selectedFlagIndex = 0;
+            customer = null;
+          });
         },
         mini: true,
         backgroundColor: Palette.mainColor,
@@ -263,8 +271,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           .homeFlagItems
                           .indexWhere((item) =>
                               item.title == value); // Update selected index
+                      debugPrint(selectedFlagIndex.toString());
                     });
-
+                    // test
+                    Provider.of<InquiryViewModel>(context, listen: false)
+                        .tabSelectedFlag = selectedFlagIndex;
                     await _getInquiries(
                       Provider.of<InquiryViewModel>(context, listen: false),
                       selectedFlagValue,
@@ -562,4 +573,6 @@ class _HomeScreenState extends State<HomeScreen> {
         .getStaffs(widget.staffId, "0", vm: "SSEARCH");
     return mounted ? context.read<AddTaskViewModel>().staffResponse : null;
   }
+
+
 }

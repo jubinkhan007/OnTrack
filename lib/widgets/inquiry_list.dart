@@ -79,14 +79,16 @@ class InquiryList extends StatelessWidget {
                   SizedBox(
                     width: Converts.c8,
                   ),
-                  TextViewCustom(
-                    text: inquiryResponse.customer != null
-                        ? inquiryResponse.customer.name!
-                        : "",
-                    fontSize: Converts.c16,
-                    tvColor: Palette.semiTv,
-                    isTextAlignCenter: false,
-                    isBold: false,
+                  Expanded(
+                    child: TextViewCustom(
+                      text: inquiryResponse.customer != null
+                          ? inquiryResponse.customer.name!
+                          : "",
+                      fontSize: Converts.c16,
+                      tvColor: Palette.semiTv,
+                      isTextAlignCenter: false,
+                      isBold: false,
+                    ),
                   ),
                   const SizedBox(
                     width: 4,

@@ -132,7 +132,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       //inquiryViewModel.getInquiries(statusFlag, widget.staffId, "1");
       _fetchDataAndStore();
     });
-    debugPrint("Called");
+    debugPrint("Called: ${inquiryViewModel.tabSelectedFlag}");
   }
 
   @override
@@ -233,6 +233,10 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     Provider.of<InquiryViewModel>(context, listen: false)
                         .getInquiries(statusFlag, widget.staffId, "1");
                     debugPrint("StatusFlag::$statusFlag");
+
+                    // test
+                    Provider.of<InquiryViewModel>(context, listen: false)
+                        .tabSelectedFlag = 1;
                   }
                 }),
           ),

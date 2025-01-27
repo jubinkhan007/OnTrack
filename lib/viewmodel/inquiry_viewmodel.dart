@@ -54,6 +54,18 @@ class InquiryViewModel extends ChangeNotifier {
 
   UiState get uiState => _uiState;
 
+  /// tab index
+  int _tabSelectedFlag = 0;
+
+  int get tabSelectedFlag => _tabSelectedFlag;
+
+  set tabSelectedFlag(int value) {
+    if (_tabSelectedFlag != value) {
+      _tabSelectedFlag = value;
+      notifyListeners(); // This will trigger a UI update
+    }
+  }
+
   Future<void> getInquiries(String flag, String userId, String isAssigned,
       {String vm = "INQALL"}) async {
     if (_uiState == UiState.loading) return;
