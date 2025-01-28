@@ -18,6 +18,8 @@ import 'package:tmbi/widgets/text_view_custom.dart';
 class FileAttachment extends StatefulWidget {
   final Function(List<ImageFile>?) onFileAttached;
   bool isFromTodo;
+  bool hasToBeClear;
+
   //bool isFileAttached;
 
   //FileAttachment({super.key, required this.onFileAttached});
@@ -25,6 +27,7 @@ class FileAttachment extends StatefulWidget {
     super.key,
     required this.onFileAttached,
     this.isFromTodo = false,
+    this.hasToBeClear = false,
     //this.isFileAttached = false,
   });
 
@@ -71,6 +74,7 @@ class _FileAttachmentState extends State<FileAttachment> {
                         onPressed: () {
                           setState(() {
                             isMultipleImageSelected = true;
+                            widget.hasToBeClear = false;
                           });
                           _captureImage();
                         },

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +42,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   // flag
   bool _isChecked = false;
   bool _isDateSelected = false;
+
+  bool _hasToBeClear = false;
 
   // users for assign
   final List<Customer> users = [];
@@ -98,7 +101,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       });
     }
   }
-
 
   // files & date
   final List<ImageFile> imageFiles = [];
@@ -293,7 +295,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 itemCount: inquiryViewModel.inquiries!.length,
                 itemBuilder: (context, index) {
                   final inquiryResponse = inquiryViewModel.inquiries![index];
-                  return itemTodoTask(inquiryResponse, inquiryResponse.tasks, (value) async {
+                  return itemTodoTask(inquiryResponse, inquiryResponse.tasks,
+                      (value) async {
                     //setState(() {
                     //debugPrint("CHECKED: $value");
                     //});
@@ -555,6 +558,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                           });*/
                         }
                       },
+                      hasToBeClear: _hasToBeClear,
                       isFromTodo: true,
                       //isFileAttached: _isFileAttached,
                     ),
@@ -562,7 +566,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 )
               ],
             ),
-
             /// raw image view
             //if (_isFileAttached) _imageView()
           ],
@@ -616,6 +619,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           //Navigator.pop(context);
           // reset all values to default
           setState(() {
+            //_hasToBeClear = true;
             resetFields();
           });
           // refresh
@@ -746,7 +750,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                               color: Palette.semiTv,
                               fontWeight: FontWeight.bold,
                               decoration: inquiryResponse.tasks.isNotEmpty
-                                  ? inquiryResponse.tasks[0].status == "Completed"
+                                  ? inquiryResponse.tasks[0].status ==
+                                          "Completed"
                                       ? TextDecoration.lineThrough
                                       : TextDecoration.none
                                   : TextDecoration.none
