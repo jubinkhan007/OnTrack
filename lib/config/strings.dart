@@ -28,7 +28,9 @@ class Strings {
   static const String inquiry = 'Inquiry';
   static const String inquiry_view = 'Task View';
   static const String pending = 'Pending';
-  static const String attachment = 'Attachment';
+  //static const String attachment = 'Attachment';
+  static const String attachment = 'Images';
+  static const String comment = 'Comment';
   static const String notes = 'Notes';
   static const String project = 'Title';
   static const String owner = 'Owner';

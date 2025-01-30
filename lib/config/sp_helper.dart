@@ -57,7 +57,7 @@ class SPHelper {
     await prefs.remove(_userKey); // Remove the user data
   }
 
-  // settings
+  /// SETTING
   Future<void> saveFirstTaskEntryFlag(bool flag) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_taskFirstEntry, flag);

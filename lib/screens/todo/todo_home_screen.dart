@@ -1,12 +1,11 @@
 import 'dart:convert';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
+import 'package:tmbi/config/pair.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/db/dao/staff_dao.dart';
 import 'package:tmbi/screens/todo/custom_dropdown.dart';
@@ -61,21 +60,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     });
   }
 
-/*  void _onTextChanged(String text) {
-    final atSymbolIndex = text.indexOf('@');
-    if (atSymbolIndex != -1) {
-      final afterAtText = text.substring(atSymbolIndex + 1);
-      if (afterAtText.length >= 3) {
-        _searchForNewUsers(afterAtText);
-        //debugPrint("Called: $afterAtText ${afterAtText.length}");
-      } else {
-        setState(() {
-          filteredNewUsers.clear();
-        });
-      }
-    }
-  }*/
-
   void _onTextChanged(String text) {
     // Split the text by '@' to isolate the parts before and after each '@'
     final atSymbols = text.split('@');
@@ -106,20 +90,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   final List<ImageFile> imageFiles = [];
   String _selectedDate = DateTime.now().toFormattedString(format: "yyyy-MM-dd");
 
+  //_focusNode.unfocus(); // Dismiss the keyboard
   // add task to the list
-  void _addTask() {
-    if (_taskController.text.isNotEmpty) {
-      setState(() {
-        /*taskes.add(Todo(
-            title: _taskController.text,
-            date: _selectedDate,
-            isChecked: _isChecked,
-            assigns: []));*/
-        _taskController.clear(); // Clear the input after adding the task
-        _focusNode.unfocus(); // Dismiss the keyboard
-      });
-    }
-  }
 
   @override
   void initState() {
@@ -131,10 +103,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //inquiryViewModel.getInquiries(statusFlag, widget.staffId, "1");
       _fetchDataAndStore();
     });
-    debugPrint("Called: ${inquiryViewModel.tabSelectedFlag}");
   }
 
   @override
@@ -250,38 +220,25 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           Consumer<InquiryViewModel>(
               builder: (context, inquiryViewModel, child) {
             if (inquiryViewModel.uiState == UiState.loading) {
-              return Expanded(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: Converts.c120,
-                    ),
-                    const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  ],
+              return const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
                 ),
               );
             } else if (inquiryViewModel.uiState == UiState.error) {
               return Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: Converts.c120,
-                  ),
-                  child: ErrorContainer(
-                      message: inquiryViewModel.message != null
-                          ? inquiryViewModel.message!
-                          : Strings.something_went_wrong),
-                ),
+                child: ErrorContainer(
+                    message: inquiryViewModel.message != null
+                        ? inquiryViewModel.message!
+                        : Strings.something_went_wrong),
               );
             }
             // null check
             if (inquiryViewModel.inquiries?.isEmpty ?? true) {
               return Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: Converts.c120,
-                  ),
+                child: SizedBox(
+                  height: double.infinity,
+                  width: double.infinity,
                   child: ErrorContainer(
                       message: inquiryViewModel.message != null
                           ? inquiryViewModel.message!
@@ -381,36 +338,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                               ),
                             ],
                           ),
-                          /*onTap: () {
-                            setState(() {
-                              _addedUsers.add(filteredNewUsers[index]);
-                            });
-                            // Check if the string starts with "@"
-                            // Get the current text from the TextField
-                            String currentText = _taskController.text.trim();
-
-                            // Check if the string contains "@"
-                            if (currentText.contains('@')) {
-                              // Find the position of the '@' symbol
-                              int atIndex = currentText.indexOf('@');
-                              // Get the text before '@'
-                              String textBeforeAt =
-                                  currentText.substring(0, atIndex).trim();
-                              // Update the text in the TextField without '@' and everything after it
-                              setState(() {
-                                _taskController.text = textBeforeAt;
-                                filteredNewUsers.clear();
-                              });
-                              // Move the cursor to the end of the updated text
-                              _taskController.selection =
-                                  TextSelection.collapsed(
-                                      offset: _taskController.text.length);
-
-                              debugPrint("Updated Text: $textBeforeAt");
-                            } else {
-                              debugPrint("Updated Text: not containing @");
-                            }
-                          },*/
                           onTap: () {
                             bool userAlreadyAdded = _addedUsers.any((user) =>
                                 user.id == filteredNewUsers[index].id);
@@ -546,6 +473,25 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                   child: SizedBox(
                     height: Converts.c48,
                     child: FileAttachment(
+                          onFileAttached: (files) {
+                            if (files != null) {
+                              if (imageFiles.isNotEmpty) {
+                                imageFiles.clear();
+                              }
+                              imageFiles.addAll(files);
+                              debugPrint("${imageFiles.length.toString()}");
+                              if (imageFiles.isNotEmpty)
+                                debugPrint("${imageFiles[0].name}");
+                               setState(() {
+                            //_isFileAttached = true;
+                          });
+                            }
+                          },
+                          hasToBeClear: _hasToBeClear,
+                          isFromTodo: true,
+                          //isFileAttached: _isFileAttached,
+                        ),
+                        /*FileAttachment2(
                       onFileAttached: (files) {
                         if (files != null) {
                           if (imageFiles.isNotEmpty) {
@@ -553,19 +499,15 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                           }
                           imageFiles.addAll(files);
                           debugPrint(imageFiles.length.toString());
-                          /*setState(() {
-                            _isFileAttached = true;
-                          });*/
                         }
                       },
-                      hasToBeClear: _hasToBeClear,
-                      isFromTodo: true,
                       //isFileAttached: _isFileAttached,
-                    ),
+                    ),*/
                   ),
                 )
               ],
             ),
+
             /// raw image view
             //if (_isFileAttached) _imageView()
           ],
@@ -586,7 +528,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
       // upload files, if any are selected
       if (imageFiles.isNotEmpty) {
+      //if (inquiryViewModel.imageFiles.isNotEmpty) {
         await inquiryViewModel.saveFiles(imageFiles);
+        //await inquiryViewModel.saveFiles(inquiryViewModel.imageFiles);
       }
       // save inquiry
       await inquiryViewModel.saveInquiry(
@@ -621,6 +565,10 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           setState(() {
             //_hasToBeClear = true;
             resetFields();
+            // test
+            //inquiryViewModel.clearImages();
+            //context.read<InquiryCreateViewModel>().clearImages();
+            //debugPrint("${imageFiles.length} ${context.read<InquiryCreateViewModel>().imageFiles.length}");
           });
           // refresh
           _getTodos();
@@ -636,32 +584,40 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   Future<void> updateTodos(InquiryCreateViewModel inquiryViewModel,
       InquiryResponse inquiryResponse) async {
     if (inquiryResponse.tasks.isNotEmpty) {
+      Pair<Task?, String?> pair = getOwnTaskForUpdate(inquiryResponse.tasks);
+
       // upload files, if any are selected
       //if (imageFiles.isNotEmpty) {
       //await inquiryViewModel.saveFiles(imageFiles);
       //}
       // update inquiry
-      await inquiryViewModel.updateTask(
-          inquiryResponse.id.toString(),
-          inquiryResponse.tasks[0].id.toString(),
-          HomeFlagItem().priorities[3].id.toString(),
-          "Successfully completed the task",
-          widget.staffId, []);
+      if (pair.first != null) {
+        await inquiryViewModel.updateTask(
+            inquiryResponse.id.toString(),
+            pair.first!.id.toString(),
+            HomeFlagItem().priorities[3].id.toString(),
+            "Successfully completed the task",
+            widget.staffId, []);
 
-      // check the status of the request
-      if (inquiryViewModel.uiState == UiState.error) {
-        showMessage("Error: ${inquiryViewModel.message}");
-      } else {
-        if (inquiryViewModel.isSavedInquiry != null) {
-          if (inquiryViewModel.isSavedInquiry!) {
-            //showMessage(Strings.data_saved_successfully);
-            // refresh
-            _getTodos();
-          } else {
-            showMessage(Strings.failed_to_save_the_data);
-          }
+        // check the status of the request
+        if (inquiryViewModel.uiState == UiState.error) {
+          showMessage("Error: ${inquiryViewModel.message}");
         } else {
-          showMessage(Strings.data_is_missing);
+          if (inquiryViewModel.isSavedInquiry != null) {
+            if (inquiryViewModel.isSavedInquiry!) {
+              //showMessage(Strings.data_saved_successfully);
+              // refresh
+              _getTodos();
+            } else {
+              showMessage(Strings.failed_to_save_the_data);
+            }
+          } else {
+            showMessage(Strings.data_is_missing);
+          }
+        }
+      } else {
+        if (pair.second != null) {
+          showMessage(pair.second!);
         }
       }
     }
@@ -700,9 +656,10 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
   Widget itemTodoTask(
     InquiryResponse inquiryResponse,
-    List<Task> users,
+    List<Task> tasks,
     ValueChanged<bool> onChanged,
   ) {
+    var otherTasks = filterOtherTasks(tasks);
     return Padding(
       padding: const EdgeInsets.only(
         left: 8.0,
@@ -729,11 +686,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               Row(
                 children: [
                   Checkbox(
-                    value: inquiryResponse.tasks.isNotEmpty
-                        ? inquiryResponse.tasks[0].status == "Completed"
-                            ? true
-                            : false
-                        : false,
+                    value: areAllTasksCompleted(tasks),
                     onChanged: (bool? value) {
                       onChanged(value!);
                     },
@@ -749,15 +702,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                               fontSize: Converts.c16,
                               color: Palette.semiTv,
                               fontWeight: FontWeight.bold,
-                              decoration: inquiryResponse.tasks.isNotEmpty
-                                  ? inquiryResponse.tasks[0].status ==
-                                          "Completed"
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none
-                                  : TextDecoration.none
-                              //? TextDecoration.lineThrough
-                              //: TextDecoration.none,
-                              ),
+                              decoration: areAllTasksCompleted(tasks)
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -769,8 +716,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                               isBold: false,
                               isRubik: false,
                             ),
-                            users.isNotEmpty && users.length > 1
-                                ? attachUsers(users.sublist(1))
+                            otherTasks.isNotEmpty
+                                ? attachUsers(otherTasks)
                                 : const SizedBox.shrink(),
                           ],
                         ),
@@ -796,7 +743,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         children: [
           ...users.take(2).map((user) {
             return ClipOval(
-              child: CachedNetworkImage(
+              child: /*CachedNetworkImage(
                 imageUrl:
                     "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/${user.id}/${user.id}-0.jpg",
                 width: Converts.c20,
@@ -806,6 +753,11 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                   Icons.account_circle,
                   size: Converts.c20,
                 ),
+              ),*/
+                  Icon(
+                Icons.account_circle_outlined,
+                size: Converts.c20,
+                color: Palette.mainColor,
               ),
             );
           }),
@@ -832,6 +784,43 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         ],
       ),
     );
+  }
+
+  List<Task> filterOtherTasks(List<Task> tasks) {
+    // filter tasks where hasAccess is false
+    return tasks.where((task) => !task.hasAccess).toList();
+  }
+
+  bool areAllTasksCompleted(List<Task> tasks) {
+    // check if all tasks have hasAccess set to true
+    return tasks.every((task) => task.isUpdated);
+  }
+
+  bool hasOwnTask(List<Task> tasks) {
+    // check if all tasks have hasAccess set to true
+    return tasks.every((task) => task.isUpdated);
+  }
+
+  Pair<Task?, String?> getOwnTaskForUpdate(List<Task> tasks) {
+    // check if there are no tasks or no tasks with access
+    if (tasks.isEmpty || !tasks.any((task) => task.hasAccess)) {
+      return Pair(null, "You don't have access to update other tasks.");
+    }
+    for (var task in tasks) {
+      if (!task.hasAccess) continue;
+      if (tasks.length == 1) {
+        if (task.isUpdated) {
+          return Pair(null, "Your task has already been completed.");
+        } else {
+          return Pair(task, null);
+        }
+      } else if (!task.isUpdated) {
+        // if there are multiple tasks, provide a message about possible updating
+        return Pair(task,
+            "Your task is being updated, but other tasks may not be completed yet. Please check");
+      }
+    }
+    return Pair(null, "You don't have access to update other tasks.");
   }
 
   Widget assignedUser() {
@@ -914,15 +903,18 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   }
 
   String _createAssignTaskForUsers(String name) {
-    // add a logged user discussion first
-    _assignedTaskToUser.add(Discussion(
+    // if user assign enabled, then user own task
+    // not add, else then only
+    // add a logged user discussion
+
+    /*_assignedTaskToUser.add(Discussion(
       name: name,
       staffId: widget.staffId,
       dateTime: _selectedDate,
       body: _taskController.text.isNotEmpty
           ? _taskController.text.toString()
           : '',
-    ));
+    ));*/
 
     if (_addedUsers.isNotEmpty) {
       for (var user in _addedUsers) {
@@ -932,6 +924,15 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             dateTime: _selectedDate,
             body: _taskController.text.toString()));
       }
+    } else {
+      _assignedTaskToUser.add(Discussion(
+        name: name,
+        staffId: widget.staffId,
+        dateTime: _selectedDate,
+        body: _taskController.text.isNotEmpty
+            ? _taskController.text.toString()
+            : '',
+      ));
     }
     if (_assignedTaskToUser.isNotEmpty) {
       List<Map<String, dynamic>> tasksJson =

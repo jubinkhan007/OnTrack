@@ -166,7 +166,7 @@ class InquiryResponse {
     return InquiryResponse(
       id: json['ID'],
       tasks: taskList,
-      title: json['TITLE'],
+      title: json['TITLE'].toString(),
       //status: json['STATUS'],
       //comment: Comment.fromJson(json['COMMENT']),
       company: json['COMPANY'],
@@ -182,7 +182,7 @@ class InquiryResponse {
       // Decode JSON string to Map
       comment: Comment.fromJson(jsonDecode(json['COMMENTS'])),
       // Decode JSON string to Map
-      description: json['DESCRIPTION'],
+      description: json['DESCRIPTION'].toString(),
     );
   }
 }
@@ -219,7 +219,7 @@ class Task {
     return Task(
       id: json['TASK_ID'],
       date: json['DATETIME'],
-      name: json['TASK_NAME'],
+      name: json['TASK_NAME'].toString(),
       hasAccess: json['HAS_ACCESS'],
       isUpdated: json['IS_UPDATED'],
       totalTime: json['TOTAL_TIME'],

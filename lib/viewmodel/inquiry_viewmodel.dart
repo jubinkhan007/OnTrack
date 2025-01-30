@@ -67,7 +67,8 @@ class InquiryViewModel extends ChangeNotifier {
   }
 
   Future<void> getInquiries(String flag, String userId, String isAssigned,
-      {String vm = "INQALL"}) async {
+      //{String vm = "INQALL"}) async {
+      {String vm = "INQALL_ALL"}) async {
     if (_uiState == UiState.loading) return;
     _message = null;
     _uiState = UiState.loading;

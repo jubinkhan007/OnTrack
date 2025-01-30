@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "293076147542",
-    "project_id": "track-all-42507",
-    "storage_bucket": "track-all-42507.firebasestorage.app"
+    "project_number": "228314848211",
+    "project_id": "track-all-prg",
+    "storage_bucket": "track-all-prg.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:293076147542:android:7fc7520b9e1642a7128af7",
+        "mobilesdk_app_id": "1:228314848211:android:138c5eb8d14a8aac00ed26",
         "android_client_info": {
           "package_name": "com.prangroup.mis93.tmbi"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDSo8hPerqHqSqA1ySCgZv5pmLJY-zUwkg"
+          "current_key": "AIzaSyBOKYjunRYTiasvxsktut2iVJTpVWqfzN4"
         }
       ],
       "services": {

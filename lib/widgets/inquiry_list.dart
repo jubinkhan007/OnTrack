@@ -184,7 +184,7 @@ class InquiryList extends StatelessWidget {
                     height: Converts.c32,
                     width: Converts.c72,
                     text: inquiryResponse.attachment.count,
-                    iconData: Icons.attach_file,
+                    iconData: Icons.image,
                     radius: Converts.c20,
                     bgColor: Palette.iconColor,
                     hasOpacity: false,

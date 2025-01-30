@@ -300,15 +300,17 @@ class _FileAttachmentState extends State<FileAttachment> {
         File file = File(image.path);
         Uint8List compressedBytes = await _processImage(file);
         //_imageFileList.add(ImageFile(compressedBytes, _fileName("340553")));
-        _imageFileList.add(ImageFile(compressedBytes, _fileName(staffId)));
+        //_imageFileList.add(ImageFile(compressedBytes, _fileName(staffId)));
 
         setState(() {
+          _imageFileList.add(ImageFile(compressedBytes, _fileName(staffId)));
           _imageFiles.add(image);
           // pass files
           widget.onFileAttached(_imageFileList);
           totalImageSelected = _imageFileList.length.toString();
           // hide loading
           isMultipleImageSelected = false;
+
         });
       } else {
         // hide loading
@@ -403,7 +405,7 @@ class _FileAttachmentState extends State<FileAttachment> {
     return result;
   }*/
 
-  Future<Uint8List> _processImage(File imageFile, {quality = 80}) async {
+/*  Future<Uint8List> _processImage(File imageFile, {quality = 50}) async {
     try {
       // read image as bytes
       List<int> imageBytes = await imageFile.readAsBytes();
@@ -430,6 +432,37 @@ class _FileAttachmentState extends State<FileAttachment> {
       debugPrint("ERROR::${e.toString()}");
     }
     // return original image if something goes wrong
+    return await imageFile.readAsBytes();
+  }*/
+
+
+  Future<Uint8List> _processImage(File imageFile, {int quality = 50}) async {
+    try {
+      // Read image as bytes
+      Uint8List imageBytes = await imageFile.readAsBytes();
+
+      // Decode the image to check properties
+      img.Image? image = img.decodeImage(imageBytes);
+
+      if (image != null) {
+        // Compress the image with the specified quality (without resizing)
+        Uint8List compressedBytes = await FlutterImageCompress.compressWithList(
+          imageBytes,
+          quality: quality,
+          format: CompressFormat.jpeg,
+        );
+
+        // Return the compressed image bytes
+        return compressedBytes;
+      } else {
+        // If image decoding fails, return original bytes
+        debugPrint("Image decoding failed.");
+      }
+    } catch (e) {
+      debugPrint("ERROR::${e.toString()}");
+    }
+
+    // Return original image if something goes wrong
     return await imageFile.readAsBytes();
   }
 

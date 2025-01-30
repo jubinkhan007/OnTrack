@@ -113,6 +113,7 @@ class InquiryView extends StatelessWidget {
                       SizedBox(
                         width: Converts.c8,
                       ),
+                      /// show image
                       ButtonCircularIcon(
                           height: Converts.c32,
                           width: Converts.c152,
@@ -121,7 +122,7 @@ class InquiryView extends StatelessWidget {
                           hasOpacity: false,
                           text: Strings.attachment,
                           fontSize: Converts.c16,
-                          iconData: Icons.attach_file,
+                          iconData: Icons.image,
                           tvColor: Colors.white,
                           onTap: () {
                             Navigator.pushNamed(
@@ -131,6 +132,27 @@ class InquiryView extends StatelessWidget {
                                 'inquiryId': inquiryResponse.id.toString(),
                                 'taskId': "0",
                               },
+                            );
+                          }),
+                      SizedBox(
+                        width: Converts.c8,
+                      ),
+                      /// comment
+                      ButtonCircularIcon(
+                          height: Converts.c32,
+                          width: Converts.c152,
+                          radius: 8,
+                          bgColor: Colors.blueAccent,
+                          hasOpacity: false,
+                          text: Strings.comment,
+                          fontSize: Converts.c16,
+                          iconData: Icons.comment,
+                          tvColor: Colors.white,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              CommentScreen.routeName,
+                              arguments: inquiryResponse.id.toString(),
                             );
                           }),
                     ],

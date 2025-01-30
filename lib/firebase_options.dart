@@ -47,29 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC3NA4y7Tyegu62vDkMotdiCvlsFx-qDxA',
-    appId: '1:293076147542:web:511f603b97c98137128af7',
-    messagingSenderId: '293076147542',
-    projectId: 'track-all-42507',
-    authDomain: 'track-all-42507.firebaseapp.com',
-    storageBucket: 'track-all-42507.firebasestorage.app',
-    measurementId: 'G-DCW7EH6QYS',
+    apiKey: 'AIzaSyCC0rOC930AMQ2isEjiXPHEFqz-WmQ7plc',
+    appId: '1:228314848211:web:31e414226672767a00ed26',
+    messagingSenderId: '228314848211',
+    projectId: 'track-all-prg',
+    authDomain: 'track-all-prg.firebaseapp.com',
+    storageBucket: 'track-all-prg.firebasestorage.app',
+    measurementId: 'G-PBQRJ0CCV2',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDSo8hPerqHqSqA1ySCgZv5pmLJY-zUwkg',
-    appId: '1:293076147542:android:7fc7520b9e1642a7128af7',
-    messagingSenderId: '293076147542',
-    projectId: 'track-all-42507',
-    storageBucket: 'track-all-42507.firebasestorage.app',
+    apiKey: 'AIzaSyBOKYjunRYTiasvxsktut2iVJTpVWqfzN4',
+    appId: '1:228314848211:android:138c5eb8d14a8aac00ed26',
+    messagingSenderId: '228314848211',
+    projectId: 'track-all-prg',
+    storageBucket: 'track-all-prg.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDpLqBqKKRiXC_1sOdjJfxDJmIVD80fzQM',
-    appId: '1:293076147542:ios:acc691c85d994ec6128af7',
-    messagingSenderId: '293076147542',
-    projectId: 'track-all-42507',
-    storageBucket: 'track-all-42507.firebasestorage.app',
+    apiKey: 'AIzaSyB-bfctVJedcnekksK7JpzIrtJ3Ix5-shU',
+    appId: '1:228314848211:ios:6ec16ad8c5d444c700ed26',
+    messagingSenderId: '228314848211',
+    projectId: 'track-all-prg',
+    storageBucket: 'track-all-prg.firebasestorage.app',
     iosBundleId: 'com.prangroup.mis93.tmbi',
   );
+
 }

@@ -54,26 +54,26 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedFlagValue, widget.staffId, isAssigned);
     });
     debugPrint("Called");
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      drawer: drawerMenu(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (await SPHelper().getFirstTaskEntryFlag()) {
+            setState(() {
+              selectedFlagIndex = 0;
+              customer = null;
+            });
             Navigator.pushNamed(context, TodoHomeScreen.routeName,
                 arguments: widget.staffId);
           } else {
             Navigator.pushNamed(context, CreateInquiryScreen.routeName,
-              arguments: widget.staffId);
+                arguments: widget.staffId);
           }
-          setState(() {
-            selectedFlagIndex = 0;
-            customer = null;
-          });
         },
         mini: true,
         backgroundColor: Palette.mainColor,
@@ -93,35 +93,17 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              icon: const Icon(
-                Icons.home_outlined,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                context.showMessage(Strings.home);
-              },
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.settings,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  SettingScreen.routeName,
-                );
-              },
-            ),
-            SizedBox(
-              height: Converts.c48,
-              width: Converts.c48,
-            ),
-            SizedBox(
-              height: Converts.c48,
-              width: Converts.c48,
-            ),
+            Builder(builder: (context) {
+              return IconButton(
+                icon: const Icon(
+                  Icons.menu,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              );
+            }),
             IconButton(
               icon: const Icon(
                 Icons.logout,
@@ -136,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: CustomScrollView(
         slivers: [
+          /// app bar
           SliverAppBar(
             centerTitle: false,
             backgroundColor: Palette.mainColor,
@@ -144,18 +127,14 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FutureBuilder<String>(
-                    future: _getUserName(),
-                    builder: (context, snapshot) {
-                      return TextViewCustom(
-                        text: "${getGreeting()} ${snapshot.data}",
-                        fontSize: Converts.c20,
-                        tvColor: Colors.white,
-                        isRubik: false,
-                        isTextAlignCenter: false,
-                        isBold: true,
-                      );
-                    }),
+                TextViewCustom(
+                  text: DateTime.now().getGreeting(),
+                  fontSize: Converts.c20,
+                  tvColor: Colors.white,
+                  isRubik: false,
+                  isTextAlignCenter: false,
+                  isBold: true,
+                ),
                 TextViewCustom(
                   text: DateTime.now().toFormattedString(),
                   fontSize: Converts.c16,
@@ -195,6 +174,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
+
+          /// counter view (tap view)
           /*SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,6 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),*/
+
+          /// flag(pending, update), searched user, flag(created, assigned)
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +203,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: Row(
                     children: [
-                      /// search by user
                       customer != null
                           ? userInfoCube()
                           : const SizedBox.shrink(),
@@ -273,9 +255,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               item.title == value); // Update selected index
                       debugPrint(selectedFlagIndex.toString());
                     });
-                    // test
+                    // test start
                     Provider.of<InquiryViewModel>(context, listen: false)
                         .tabSelectedFlag = selectedFlagIndex;
+                    // test end
                     await _getInquiries(
                       Provider.of<InquiryViewModel>(context, listen: false),
                       selectedFlagValue,
@@ -288,6 +271,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+
+          /// inquiry list
           Consumer<InquiryViewModel>(
               builder: (context, inquiryViewModel, child) {
             if (inquiryViewModel.uiState == UiState.loading) {
@@ -330,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             }
-
+            // set data
             return inquiryViewModel.inquiries != null &&
                     inquiryViewModel.inquiries!.isNotEmpty
                 ? SliverList(
@@ -340,6 +325,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             inquiryViewModel.inquiries![index];
                         return InquiryList(
                           inquiryResponse: inquiryResponse,
+
+                          /// detail view
                           onTap: () {
                             Navigator.pushNamed(
                               context,
@@ -350,6 +337,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               },
                             );
                           },
+
+                          /// comment view
                           onCommentTap: (id) {
                             Navigator.pushNamed(
                               context,
@@ -357,6 +346,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               arguments: id,
                             );
                           },
+
+                          /// attachment view
                           onAttachmentTap: (id) {
                             Navigator.pushNamed(
                               context,
@@ -393,34 +384,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Future<void> _getInquiries(InquiryViewModel inquiryViewModel, String flag,
       String isAssigned, String userid) async {
     await inquiryViewModel.getInquiries(flag, userid, isAssigned,
         vm: customer == null ? "INQALL" : "SINQALL");
   }
 
-  Future<String> _getUserName() async {
+  Future<UserResponse?> _getUserInfo() async {
     try {
       UserResponse? userResponse = await SPHelper().getUser();
-      String name =
-          userResponse != null ? userResponse.users![0].staffName! : "";
-      return name;
+      return userResponse;
     } catch (e) {
-      return "";
-    }
-  }
-
-  String getGreeting() {
-    // current hour of the day
-    int currentHour = DateTime.now().hour;
-    // determine the greeting based on the time of day
-    if (currentHour >= 5 && currentHour < 12) {
-      return Strings.good_morning;
-    } else if (currentHour >= 12 && currentHour < 18) {
-      return Strings.good_afternoon;
-    } else {
-      return Strings.good_night;
+      return null;
     }
   }
 
@@ -574,5 +549,103 @@ class _HomeScreenState extends State<HomeScreen> {
     return mounted ? context.read<AddTaskViewModel>().staffResponse : null;
   }
 
+  /// DRAWER
+  Widget drawerMenu() {
+    return FutureBuilder<UserResponse?>(
+      future: _getUserInfo(), // The Future that gets the user data
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Show a loading indicator while waiting for the future
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          // Handle error case
+          return const Center(child: Text("Error loading user info"));
+        } else if (!snapshot.hasData || snapshot.data == null) {
+          // Handle no data case
+          return const Center(child: Text("No user info available"));
+        } else {
+          // Once the data is fetched, display the Drawer
+          UserResponse userResponse = snapshot.data!;
 
+          return Drawer(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                /// Header
+                DrawerHeader(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      LoadImage(
+                        id: userResponse.users![0]!.staffId!,
+                        height: Converts.c56,
+                        width: Converts.c56,
+                      ),
+                      SizedBox(
+                        height: Converts.c16,
+                      ),
+                      TextViewCustom(
+                          text: userResponse.users![0]!.staffName!,
+                          fontSize: Converts.c20,
+                          tvColor: Palette.normalTv,
+                          isRubik: false,
+                          isBold: true),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      TextViewCustom(
+                          text: userResponse.users![0]!.mailId!,
+                          fontSize: Converts.c12,
+                          tvColor: Palette.semiTv,
+                          isRubik: false,
+                          isBold: false),
+                    ],
+                  ),
+                ),
+
+                /// Settings
+                drawerItem(Icons.settings, Strings.setting, () {
+                  Navigator.pushNamed(
+                    context,
+                    SettingScreen.routeName,
+                  );
+                }),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget drawerItem(IconData icon, String title, Function() onTap) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(
+              icon,
+              size: Converts.c20,
+              color: Palette.semiTv,
+            ),
+            SizedBox(
+              width: Converts.c16,
+            ),
+            Expanded(
+              child: TextViewCustom(
+                  text: title,
+                  fontSize: Converts.c20,
+                  tvColor: Palette.semiTv,
+                  isTextAlignCenter: false,
+                  isRubik: false,
+                  isBold: false),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

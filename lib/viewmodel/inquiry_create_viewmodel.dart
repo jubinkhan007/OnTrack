@@ -31,6 +31,23 @@ class InquiryCreateViewModel extends ChangeNotifier {
     }
   }
 
+  /// TEST START \\\
+  final List<ImageFile> _imageFiles = [];
+  List<ImageFile> get imageFiles => _imageFiles;
+  void setImageFile(ImageFile imageFile) {
+    _imageFiles!.add(imageFile);
+    notifyListeners();
+  }
+  void deleteImageFile(int index) {
+    _imageFiles!.removeAt(index);
+    notifyListeners();
+  }
+  void clearImages() {
+    _imageFiles!.clear();
+    notifyListeners();
+  }
+  /// TEST END \\\
+
   /// save inquiry
   bool? _isSavedInquiry;
 

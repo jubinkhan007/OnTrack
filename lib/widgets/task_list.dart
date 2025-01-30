@@ -249,7 +249,7 @@ class _TaskListState extends State<TaskList> {
                         ),
                         padding: EdgeInsets.all(Converts.c8),
                         child: Icon(
-                          Icons.attach_file,
+                          Icons.image,
                           color: Colors.white,
                           size: Converts.c20,
                         ),

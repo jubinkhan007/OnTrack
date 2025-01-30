@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/sp_helper.dart';
+import 'package:tmbi/config/strings.dart';
 
 import '../data/data.dart';
 import '../models/user_response.dart';
@@ -135,6 +136,21 @@ extension StatusFlagExtension on StatusFlag {
       case StatusFlag.completed:
       default:
         return "4"; // Default flag value for unknown or unhandled statuses
+    }
+  }
+}
+
+extension GreetingExtension on DateTime {
+  String getGreeting() {
+    // current hour of the day
+    int currentHour = hour;
+    // determine the greeting based on the time of day
+    if (currentHour >= 5 && currentHour < 12) {
+      return Strings.good_morning;
+    } else if (currentHour >= 12 && currentHour < 18) {
+      return Strings.good_afternoon;
+    } else {
+      return Strings.good_night;
     }
   }
 }
