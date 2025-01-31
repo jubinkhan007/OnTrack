@@ -310,7 +310,6 @@ class _FileAttachmentState extends State<FileAttachment> {
           totalImageSelected = _imageFileList.length.toString();
           // hide loading
           isMultipleImageSelected = false;
-
         });
       } else {
         // hide loading
@@ -435,7 +434,6 @@ class _FileAttachmentState extends State<FileAttachment> {
     return await imageFile.readAsBytes();
   }*/
 
-
   Future<Uint8List> _processImage(File imageFile, {int quality = 50}) async {
     try {
       // Read image as bytes
@@ -465,6 +463,7 @@ class _FileAttachmentState extends State<FileAttachment> {
     // Return original image if something goes wrong
     return await imageFile.readAsBytes();
   }
+
 
   Future<void> _saveIntoLocalDir(Uint8List compressedBytes,
       {String folderName = "track_all"}) async {

@@ -97,6 +97,11 @@ class Strings {
   static const String yes = 'Yes';
   static const String no = 'No';
   static const String cancel = 'Cancel';
-
   static const String add_a_task = "Add a Task";
+
+  /// permission
+  static const String cameraPermissionRequired = "Camera permission is required.";
+  static const String errorCaptureImage = "Error capturing image. Please try again.";
+  static const String failedToDecodeImage = "Failed to decode image";
+
 }

@@ -472,26 +472,26 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 Expanded(
                   child: SizedBox(
                     height: Converts.c48,
-                    child: FileAttachment(
-                          onFileAttached: (files) {
-                            if (files != null) {
-                              if (imageFiles.isNotEmpty) {
-                                imageFiles.clear();
-                              }
-                              imageFiles.addAll(files);
-                              debugPrint("${imageFiles.length.toString()}");
-                              if (imageFiles.isNotEmpty)
-                                debugPrint("${imageFiles[0].name}");
-                               setState(() {
+                    child: /*FileAttachment(
+                      onFileAttached: (files) {
+                        if (files != null) {
+                          if (imageFiles.isNotEmpty) {
+                            imageFiles.clear();
+                          }
+                          imageFiles.addAll(files);
+                          debugPrint("${imageFiles.length.toString()}");
+                          if (imageFiles.isNotEmpty)
+                            debugPrint("${imageFiles[0].name}");
+                          setState(() {
                             //_isFileAttached = true;
                           });
-                            }
-                          },
-                          hasToBeClear: _hasToBeClear,
-                          isFromTodo: true,
-                          //isFileAttached: _isFileAttached,
-                        ),
-                        /*FileAttachment2(
+                        }
+                      },
+                      hasToBeClear: _hasToBeClear,
+                      isFromTodo: true,
+                      //isFileAttached: _isFileAttached,
+                    ),*/
+                        FileAttachment2(
                       onFileAttached: (files) {
                         if (files != null) {
                           if (imageFiles.isNotEmpty) {
@@ -502,7 +502,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                         }
                       },
                       //isFileAttached: _isFileAttached,
-                    ),*/
+                    ),
                   ),
                 )
               ],
@@ -527,10 +527,10 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       String loggedUserName = await _getUserName();
 
       // upload files, if any are selected
-      if (imageFiles.isNotEmpty) {
-      //if (inquiryViewModel.imageFiles.isNotEmpty) {
-        await inquiryViewModel.saveFiles(imageFiles);
-        //await inquiryViewModel.saveFiles(inquiryViewModel.imageFiles);
+      //if (imageFiles.isNotEmpty) {
+      if (inquiryViewModel.imageFiles.isNotEmpty) {
+        //await inquiryViewModel.saveFiles(imageFiles);
+        await inquiryViewModel.saveFiles(inquiryViewModel.imageFiles);
       }
       // save inquiry
       await inquiryViewModel.saveInquiry(
@@ -566,9 +566,10 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             //_hasToBeClear = true;
             resetFields();
             // test
-            //inquiryViewModel.clearImages();
+            inquiryViewModel.clearImages();
+            inquiryViewModel.removeFiles();
             //context.read<InquiryCreateViewModel>().clearImages();
-            //debugPrint("${imageFiles.length} ${context.read<InquiryCreateViewModel>().imageFiles.length}");
+            debugPrint("${imageFiles.length} ${context.read<InquiryCreateViewModel>().imageFiles.length}");
           });
           // refresh
           _getTodos();
