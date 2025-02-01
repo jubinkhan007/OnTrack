@@ -15,6 +15,8 @@ import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
+import '../config/strings.dart';
+
 class FileAttachment extends StatefulWidget {
   final Function(List<ImageFile>?) onFileAttached;
   bool isFromTodo;
@@ -434,7 +436,7 @@ class _FileAttachmentState extends State<FileAttachment> {
     return await imageFile.readAsBytes();
   }*/
 
-  Future<Uint8List> _processImage(File imageFile, {int quality = 50}) async {
+  /*Future<Uint8List> _processImage(File imageFile, {int quality = 50}) async {
     try {
       // Read image as bytes
       Uint8List imageBytes = await imageFile.readAsBytes();
@@ -462,6 +464,28 @@ class _FileAttachmentState extends State<FileAttachment> {
 
     // Return original image if something goes wrong
     return await imageFile.readAsBytes();
+  }*/
+
+  Future<Uint8List> _processImage(File imageFile, {int quality = 50}) async {
+    try {
+      // read image as bytes
+      Uint8List imageBytes = await imageFile.readAsBytes();
+      // decode image to check if it's valid
+      img.Image? image = img.decodeImage(imageBytes);
+      if (image == null) {
+        throw Exception(Strings.failedToDecodeImage);
+      }
+      // compress the image with the specified quality (without resizing)
+      return await FlutterImageCompress.compressWithList(
+        imageBytes,
+        quality: quality,
+        format: CompressFormat.jpeg,
+      );
+    } catch (e) {
+      debugPrint("ERROR::${e.toString()}");
+      // return the original image bytes in case of an error
+      return imageFile.readAsBytes();
+    }
   }
 
 

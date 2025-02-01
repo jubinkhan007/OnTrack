@@ -87,7 +87,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   }
 
   // files & date
-  final List<ImageFile> imageFiles = [];
+  //final List<ImageFile> imageFiles = [];
   String _selectedDate = DateTime.now().toFormattedString(format: "yyyy-MM-dd");
 
   //_focusNode.unfocus(); // Dismiss the keyboard
@@ -492,7 +492,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                       //isFileAttached: _isFileAttached,
                     ),*/
                         FileAttachment2(
-                      onFileAttached: (files) {
+                      /*nFileAttached: (files) {
                         if (files != null) {
                           if (imageFiles.isNotEmpty) {
                             imageFiles.clear();
@@ -500,7 +500,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                           imageFiles.addAll(files);
                           debugPrint(imageFiles.length.toString());
                         }
-                      },
+                      },*/
                       //isFileAttached: _isFileAttached,
                     ),
                   ),
@@ -521,7 +521,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         .getInquiries(statusFlag, widget.staffId, "1");
   }
 
-  Future<void> saveTodos(InquiryCreateViewModel inquiryViewModel) async {
+  /*Future<void> saveTodos(InquiryCreateViewModel inquiryViewModel) async {
     if (_taskController.text != "" && _taskController.text != null) {
       //debugPrint("DONE:: ${_taskController.text}");
       String loggedUserName = await _getUserName();
@@ -569,7 +569,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             inquiryViewModel.clearImages();
             inquiryViewModel.removeFiles();
             //context.read<InquiryCreateViewModel>().clearImages();
-            debugPrint("${imageFiles.length} ${context.read<InquiryCreateViewModel>().imageFiles.length}");
+            debugPrint(
+                "${imageFiles.length} ${context.read<InquiryCreateViewModel>().imageFiles.length}");
           });
           // refresh
           _getTodos();
@@ -581,7 +582,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       }
     }
   }
-
+*/
   Future<void> updateTodos(InquiryCreateViewModel inquiryViewModel,
       InquiryResponse inquiryResponse) async {
     if (inquiryResponse.tasks.isNotEmpty) {
@@ -652,7 +653,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     filteredNewUsers.clear();
     _addedUsers.clear();
     _assignedTaskToUser.clear();
-    imageFiles.clear();
+    //imageFiles.clear();
   }
 
   Widget itemTodoTask(
@@ -907,16 +908,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     // if user assign enabled, then user own task
     // not add, else then only
     // add a logged user discussion
-
-    /*_assignedTaskToUser.add(Discussion(
-      name: name,
-      staffId: widget.staffId,
-      dateTime: _selectedDate,
-      body: _taskController.text.isNotEmpty
-          ? _taskController.text.toString()
-          : '',
-    ));*/
-
     if (_addedUsers.isNotEmpty) {
       for (var user in _addedUsers) {
         _assignedTaskToUser.add(Discussion(
@@ -951,6 +942,71 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       return name;
     } catch (e) {
       return "";
+    }
+  }
+
+  /// NETWORK CALL FOR SAVE TASK \\\
+  Future<void> _saveFilesIfNeeded(
+      InquiryCreateViewModel inquiryViewModel) async {
+    if (inquiryViewModel.imageFiles.isNotEmpty) {
+      await inquiryViewModel.saveFiles(inquiryViewModel.imageFiles);
+    }
+  }
+
+  Future<void> _saveInquiry(InquiryCreateViewModel inquiryViewModel,
+      String task, String loggedUserName) async {
+    String encodedTask = Uri.encodeComponent(task);
+    String companyId = "0";
+    String inquiryId = "0";
+    String priorityId = "401";
+    String customerId = "0";
+    String customerName = "Other";
+    String isSample = "N";
+
+    await inquiryViewModel.saveInquiry(
+        companyId,
+        inquiryId,
+        encodedTask,
+        encodedTask,
+        isSample,
+        _selectedDate,
+        priorityId,
+        customerId,
+        customerName,
+        widget.staffId,
+        _createAssignTaskForUsers(loggedUserName),
+        inquiryViewModel.files);
+  }
+
+  Future<void> saveTodos(InquiryCreateViewModel inquiryViewModel) async {
+    if (_taskController.text.isNotEmpty) {
+      String loggedUserName = await _getUserName();
+
+      // save files if necessary
+      await _saveFilesIfNeeded(inquiryViewModel);
+
+      // save the inquiry
+      await _saveInquiry(
+          inquiryViewModel, _taskController.text, loggedUserName);
+
+      // check the status of the inquiry save request
+      if (inquiryViewModel.isSavedInquiry == null) {
+        showMessage(Strings.data_is_missing);
+      } else if (inquiryViewModel.isSavedInquiry == false) {
+        showMessage(Strings.failed_to_save_the_data);
+      } else {
+        // if saved successfully, reset fields and refresh
+        setState(() {
+          resetFields();
+          inquiryViewModel.clearImages();
+          inquiryViewModel.removeFiles();
+        });
+
+        // refresh todos after saving
+        _getTodos();
+      }
+    } else {
+      showMessage("Task description cannot be empty.");
     }
   }
 }

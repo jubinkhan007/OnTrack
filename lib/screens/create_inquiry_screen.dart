@@ -581,6 +581,9 @@ class _CreateInquiryScreenState extends State<CreateInquiryScreen> {
                             if (inquiryViewModel.isSavedInquiry != null) {
                               if (inquiryViewModel.isSavedInquiry!) {
                                 showMessage(Strings.data_saved_successfully);
+                                // clear files name
+                                inquiryViewModel.clearImages();
+                                inquiryViewModel.removeFiles();
                                 Navigator.pop(context);
                               } else {
                                 showMessage(Strings.failed_to_save_the_data);

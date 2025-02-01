@@ -19,11 +19,11 @@ import '../config/strings.dart';
 import 'file_attachment.dart';
 
 class FileAttachment2 extends StatefulWidget {
-  final Function(List<ImageFile>?) onFileAttached;
+  //final Function(List<ImageFile>?) onFileAttached;
 
   const FileAttachment2({
     super.key,
-    required this.onFileAttached,
+    //required this.onFileAttached,
   });
 
   @override

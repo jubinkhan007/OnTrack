@@ -28,6 +28,7 @@ class InquiryCreateViewModel extends ChangeNotifier {
   removeFiles() {
     if (_files.isNotEmpty) {
       _files.clear();
+      notifyListeners();
     }
   }
 
