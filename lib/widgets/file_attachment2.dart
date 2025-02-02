@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,13 +17,16 @@ import 'package:tmbi/viewmodel/inquiry_create_viewmodel.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../config/strings.dart';
+import '../network/ui_state.dart';
 import 'file_attachment.dart';
 
 class FileAttachment2 extends StatefulWidget {
   //final Function(List<ImageFile>?) onFileAttached;
+  final InquiryCreateViewModel? inquiryViewModel;
 
   const FileAttachment2({
     super.key,
+    required this.inquiryViewModel,
     //required this.onFileAttached,
   });
 
@@ -63,24 +67,27 @@ class _FileAttachment2State extends State<FileAttachment2> {
             : Material(
                 color: Colors.transparent,
                 child: IconButton(
-                  icon: Icon(
-                    Icons.image_outlined,
-                    size: Converts.c16,
-                    //color: _imageFiles.isNotEmpty
-                    color: context
-                            .read<InquiryCreateViewModel>()
-                            .imageFiles
-                            .isNotEmpty
-                        ? Palette.mainColor
-                        : Palette.semiTv,
+                  icon: GestureDetector(
+                    onDoubleTap: () {
+                      _pickImages();
+                    },
+                    child: Icon(
+                      Icons.image_outlined,
+                      size: Converts.c16,
+                      //color: _imageFiles.isNotEmpty
+                      color: //context.read<InquiryCreateViewModel>()
+                          widget.inquiryViewModel!.imageFiles.isNotEmpty
+                              ? Palette.mainColor
+                              : Palette.semiTv,
+                    ),
                   ),
                   onPressed: () {
                     _captureImage();
                   },
                 ),
               ),
-        //if (_imageFiles.isNotEmpty) const VerticalDivider(),
-        if (context.read<InquiryCreateViewModel>().imageFiles.isNotEmpty)
+        //if (context.read<InquiryCreateViewModel>().imageFiles.isNotEmpty)
+        if (widget.inquiryViewModel!.imageFiles.isNotEmpty)
           const VerticalDivider(),
         Expanded(child: _imageViewTodo()),
       ],
@@ -88,12 +95,14 @@ class _FileAttachment2State extends State<FileAttachment2> {
   }
 
   Widget _imageViewTodo() {
+    debugPrint("COUNT::${widget.inquiryViewModel!.imageFiles.length}");
     return Center(
       child: SizedBox(
         height: Converts.c48,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: context.read<InquiryCreateViewModel>().imageFiles.length,
+          //itemCount: context.read<InquiryCreateViewModel>().imageFiles.length,
+          itemCount: widget.inquiryViewModel!.imageFiles.length,
           itemBuilder: (context, index) {
             return Padding(
               padding: EdgeInsets.only(right: Converts.c8),
@@ -102,10 +111,8 @@ class _FileAttachment2State extends State<FileAttachment2> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(Converts.c8),
                     child: Image.memory(
-                      context
-                          .read<InquiryCreateViewModel>()
-                          .imageFiles[index]
-                          .file,
+                      //context.read<InquiryCreateViewModel>()
+                      widget.inquiryViewModel!.imageFiles[index].file,
                       width: Converts.c48,
                       height: Converts.c48,
                       fit: BoxFit.cover,
@@ -116,14 +123,13 @@ class _FileAttachment2State extends State<FileAttachment2> {
                     right: 4.0,
                     child: GestureDetector(
                       onTap: () {
-                        setState(() {
-                          context
-                              .read<InquiryCreateViewModel>()
-                              .deleteImageFile(index);
-                          /*widget.onFileAttached(context
+                        //setState(() {
+                        //context.read<InquiryCreateViewModel>()
+                        widget.inquiryViewModel!.deleteImageFile(index);
+                        /*widget.onFileAttached(context
                               .read<InquiryCreateViewModel>()
                               .imageFiles);*/
-                        });
+                        //});
                       },
                       child: Container(
                         decoration: const BoxDecoration(
@@ -147,6 +153,74 @@ class _FileAttachment2State extends State<FileAttachment2> {
     );
   }
 
+  /*
+  *
+  *  Widget _imageViewTodo() {
+    debugPrint("COUNT::${context.read<InquiryCreateViewModel>().imageFiles.length}");
+    return Consumer<InquiryCreateViewModel>(
+        builder: (context, inquiryViewModel, child) {
+        return Center(
+          child: SizedBox(
+            height: Converts.c48,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              //itemCount: context.read<InquiryCreateViewModel>().imageFiles.length,
+              itemCount: inquiryViewModel.imageFiles.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: EdgeInsets.only(right: Converts.c8),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(Converts.c8),
+                        child: Image.memory(
+                          //context.read<InquiryCreateViewModel>()
+                          inquiryViewModel
+                              .imageFiles[index]
+                              .file,
+                          width: Converts.c48,
+                          height: Converts.c48,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        top: 4.0, // Adjust the top position
+                        right: 4.0,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              //context.read<InquiryCreateViewModel>()
+                              inquiryViewModel
+                                  .deleteImageFile(index);
+                              /*widget.onFileAttached(context
+                                  .read<InquiryCreateViewModel>()
+                                  .imageFiles);*/
+                            });
+                          },
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Palette.tabColor,
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              size: Converts.c16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      }
+    );
+  }*/
+
   Future<bool> _checkPermissions(Permission permission) async {
     final status = await permission.request();
     if (status.isGranted) {
@@ -166,7 +240,9 @@ class _FileAttachment2State extends State<FileAttachment2> {
   Future<void> _captureImage() async {
     String staffId = await SPHelper().getUserInfo();
     if (await _checkPermissions(Permission.camera)) {
-      setState(() => isLoading = true);
+      //setState(() => isLoading = true);
+      widget.inquiryViewModel!.uiState = UiState.loading;
+      isLoading = widget.inquiryViewModel!.uiState == UiState.loading;
 
       try {
         final XFile? image =
@@ -175,19 +251,72 @@ class _FileAttachment2State extends State<FileAttachment2> {
           File file = File(image.path);
           Uint8List compressedBytes = await _processImage(file);
 
-          setState(() {
-            context
-                .read<InquiryCreateViewModel>()
-                .setImageFile(ImageFile(compressedBytes, _fileName(staffId)));
-            /*widget.onFileAttached(
+          //setState(() {
+          //context.read<InquiryCreateViewModel>()
+          widget.inquiryViewModel!
+              .setImageFile(ImageFile(compressedBytes, _fileName(staffId)));
+          /*widget.onFileAttached(
                 context.read<InquiryCreateViewModel>().imageFiles);*/
-          });
+          //});
         }
       } catch (e) {
         debugPrint("Error capturing image: $e");
         showMessage(Strings.errorCaptureImage);
       } finally {
-        setState(() => isLoading = false);
+        //setState(() => isLoading = false);
+        widget.inquiryViewModel!.uiState = UiState.success;
+        isLoading = widget.inquiryViewModel!.uiState == UiState.loading;
+      }
+    }
+  }
+
+  Future<void> _pickImages() async {
+    String staffId = await SPHelper().getUserInfo();
+    bool isStoragePermission = true;
+    bool isPhotosPermission = true;
+
+    // check for photo permission only for Android version 33 and above
+    if (Platform.isAndroid) {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+
+      if (androidInfo.version.sdkInt >= 33) {
+        isPhotosPermission = await _checkPermissions(Permission.photos);
+      } else {
+        isStoragePermission = await _checkPermissions(Permission.storage);
+      }
+    } else {
+      isStoragePermission = await _checkPermissions(Permission.storage);
+    }
+
+    // if all permissions are granted
+    if (isPhotosPermission && isStoragePermission) {
+      //setState(() => isLoading = true);
+      widget.inquiryViewModel!.uiState = UiState.loading;
+      isLoading = widget.inquiryViewModel!.uiState == UiState.loading;
+      try {
+        final List<XFile>? selectedImages = await _picker.pickMultiImage();
+        if (selectedImages != null && selectedImages.isNotEmpty) {
+          List<XFile> limitedImages = selectedImages.length > 5
+              ? selectedImages.sublist(0, 5)
+              : selectedImages;
+          for (var image in limitedImages) {
+            File file = File(image.path);
+            Uint8List compressedBytes = await _processImage(file);
+            setState(() {
+              context
+                  .read<InquiryCreateViewModel>()
+                  .setImageFile(ImageFile(compressedBytes, _fileName(staffId)));
+            });
+          }
+        }
+      } catch (e) {
+        debugPrint("Error selecting image: $e");
+        showMessage(Strings.errorSelectingImage);
+      } finally {
+        //setState(() => isLoading = false);
+        widget.inquiryViewModel!.uiState = UiState.success;
+        isLoading = widget.inquiryViewModel!.uiState == UiState.loading;
       }
     }
   }
@@ -214,8 +343,6 @@ class _FileAttachment2State extends State<FileAttachment2> {
     }
   }
 
-
-
   String _fileName(String userId, {String type1 = "5", String type2 = "img"}) {
     final DateTime dateTime = DateTime.now();
     return "$type1${dateTime.year.toString().substring(2, 4)}${dateTime.month.toString().padLeft(2, '0')}_${userId}_${dateTime.millisecondsSinceEpoch}_$type2.jpg";
@@ -239,4 +366,3 @@ class _FileAttachment2State extends State<FileAttachment2> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
-//376427

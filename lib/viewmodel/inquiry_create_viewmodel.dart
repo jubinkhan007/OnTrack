@@ -59,6 +59,13 @@ class InquiryCreateViewModel extends ChangeNotifier {
 
   UiState get uiState => _uiState;
 
+  set uiState(UiState newState) {
+    if (_uiState != newState) {  // only notify if the state has actually changed
+      _uiState = newState;
+      notifyListeners();
+    }
+  }
+
   /// staff
   /*StaffResponse? _staffResponse;
 

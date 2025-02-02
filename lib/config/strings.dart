@@ -102,6 +102,7 @@ class Strings {
   /// permission
   static const String cameraPermissionRequired = "Camera permission is required.";
   static const String errorCaptureImage = "Error capturing image. Please try again.";
+  static const String errorSelectingImage = "Error selecting image. Please try again.";
   static const String failedToDecodeImage = "Failed to decode image";
 
 }

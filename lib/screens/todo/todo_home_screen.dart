@@ -18,6 +18,7 @@ import '../../network/ui_state.dart';
 import '../../viewmodel/viewmodel.dart';
 import '../../widgets/date_selection_view.dart';
 import '../../widgets/widgets.dart';
+import '../comment_screen.dart';
 import '../inquiry_view.dart';
 
 class TodoHomeScreen extends StatefulWidget {
@@ -252,18 +253,53 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 itemCount: inquiryViewModel.inquiries!.length,
                 itemBuilder: (context, index) {
                   final inquiryResponse = inquiryViewModel.inquiries![index];
-                  return itemTodoTask(inquiryResponse, inquiryResponse.tasks,
-                      (value) async {
-                    //setState(() {
-                    //debugPrint("CHECKED: $value");
-                    //});
-                    if (value) {
-                      await updateTodos(
-                          Provider.of<InquiryCreateViewModel>(context,
-                              listen: false),
-                          inquiryResponse);
-                    }
-                  });
+                  return Dismissible(
+                    key: Key(inquiryResponse.id.toString()),
+                    direction: DismissDirection.horizontal,
+                    background: Container(
+                      color: Colors.green,
+                      // Background color for left swipe
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.symmetric(horizontal: Converts.c16),
+                      child: const Icon(Icons.check,
+                          color: Colors.white), // Icon for update on left swipe
+                    ),
+                    secondaryBackground: Container(
+                      color: Colors.blueAccent,
+                      // Background color for right swipe
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.symmetric(horizontal: Converts.c16),
+                      child: const Icon(Icons.comment,
+                          color: Colors
+                              .white), // Icon for completion on right swipe
+                    ),
+                    confirmDismiss: (direction) async {
+                      if (direction == DismissDirection.startToEnd) {
+                        updateTodos(Provider.of<InquiryCreateViewModel>(context,
+                            listen: false), inquiryResponse);
+                      }
+                      else if (direction == DismissDirection.endToStart) {
+                        Navigator.pushNamed(
+                          context,
+                          CommentScreen.routeName,
+                          arguments: inquiryResponse.id.toString(),
+                        );
+                      }
+                      return false;
+                    },
+                    child: itemTodoTask(inquiryResponse, inquiryResponse.tasks,
+                        (value) async {
+                      //setState(() {
+                      //debugPrint("CHECKED: $value");
+                      //});
+                      if (value) {
+                        await updateTodos(
+                            Provider.of<InquiryCreateViewModel>(context,
+                                listen: false),
+                            inquiryResponse);
+                      }
+                    }),
+                  );
                 },
               ),
             );
@@ -472,36 +508,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 Expanded(
                   child: SizedBox(
                     height: Converts.c48,
-                    child: /*FileAttachment(
-                      onFileAttached: (files) {
-                        if (files != null) {
-                          if (imageFiles.isNotEmpty) {
-                            imageFiles.clear();
-                          }
-                          imageFiles.addAll(files);
-                          debugPrint("${imageFiles.length.toString()}");
-                          if (imageFiles.isNotEmpty)
-                            debugPrint("${imageFiles[0].name}");
-                          setState(() {
-                            //_isFileAttached = true;
-                          });
-                        }
-                      },
-                      hasToBeClear: _hasToBeClear,
-                      isFromTodo: true,
-                      //isFileAttached: _isFileAttached,
-                    ),*/
-                        FileAttachment2(
-                      /*nFileAttached: (files) {
-                        if (files != null) {
-                          if (imageFiles.isNotEmpty) {
-                            imageFiles.clear();
-                          }
-                          imageFiles.addAll(files);
-                          debugPrint(imageFiles.length.toString());
-                        }
-                      },*/
-                      //isFileAttached: _isFileAttached,
+                    child: FileAttachment2(
+                      inquiryViewModel: inquiryViewModel,
                     ),
                   ),
                 )
@@ -521,68 +529,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         .getInquiries(statusFlag, widget.staffId, "1");
   }
 
-  /*Future<void> saveTodos(InquiryCreateViewModel inquiryViewModel) async {
-    if (_taskController.text != "" && _taskController.text != null) {
-      //debugPrint("DONE:: ${_taskController.text}");
-      String loggedUserName = await _getUserName();
-
-      // upload files, if any are selected
-      //if (imageFiles.isNotEmpty) {
-      if (inquiryViewModel.imageFiles.isNotEmpty) {
-        //await inquiryViewModel.saveFiles(imageFiles);
-        await inquiryViewModel.saveFiles(inquiryViewModel.imageFiles);
-      }
-      // save inquiry
-      await inquiryViewModel.saveInquiry(
-          "0",
-          //mCompanyId,
-          "0",
-          //mInquiryId,
-          //titleController.text,
-          //descriptionController.text,
-          Uri.encodeComponent(_taskController.text),
-          Uri.encodeComponent(_taskController.text),
-          "N",
-          //isSample,
-          _selectedDate,
-          //selectedDate,
-          "401",
-          //mPriorityId,
-          "0",
-          //mCustomer!.id.toString(),
-          "Other",
-          // customerName,
-          widget.staffId,
-          _createAssignTaskForUsers(loggedUserName),
-          inquiryViewModel.files);
-
-      // check the status of the request
-      if (inquiryViewModel.isSavedInquiry != null) {
-        if (inquiryViewModel.isSavedInquiry!) {
-          //showMessage(Strings.data_saved_successfully);
-          //Navigator.pop(context);
-          // reset all values to default
-          setState(() {
-            //_hasToBeClear = true;
-            resetFields();
-            // test
-            inquiryViewModel.clearImages();
-            inquiryViewModel.removeFiles();
-            //context.read<InquiryCreateViewModel>().clearImages();
-            debugPrint(
-                "${imageFiles.length} ${context.read<InquiryCreateViewModel>().imageFiles.length}");
-          });
-          // refresh
-          _getTodos();
-        } else {
-          showMessage(Strings.failed_to_save_the_data);
-        }
-      } else {
-        showMessage(Strings.data_is_missing);
-      }
-    }
-  }
-*/
   Future<void> updateTodos(InquiryCreateViewModel inquiryViewModel,
       InquiryResponse inquiryResponse) async {
     if (inquiryResponse.tasks.isNotEmpty) {
@@ -944,6 +890,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       return "";
     }
   }
+
+  /// BOTTOM VIEW \\\
 
   /// NETWORK CALL FOR SAVE TASK \\\
   Future<void> _saveFilesIfNeeded(
