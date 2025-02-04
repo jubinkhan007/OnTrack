@@ -20,34 +20,36 @@ class InquiryCreateViewModel extends ChangeNotifier {
 
   InitDataCreateInq? get initDataCreateInq => _initDataCreateInq;
 
-  /// file names
+  /// image files & names
   final List<String> _files = [];
 
   List<String> get files => _files;
 
-  removeFiles() {
+  void removeFiles() {
     if (_files.isNotEmpty) {
       _files.clear();
       notifyListeners();
     }
   }
 
-  /// TEST START \\\
   final List<ImageFile> _imageFiles = [];
+
   List<ImageFile> get imageFiles => _imageFiles;
+
   void setImageFile(ImageFile imageFile) {
     _imageFiles!.add(imageFile);
     notifyListeners();
   }
+
   void deleteImageFile(int index) {
     _imageFiles!.removeAt(index);
     notifyListeners();
   }
+
   void clearImages() {
     _imageFiles!.clear();
     notifyListeners();
   }
-  /// TEST END \\\
 
   /// save inquiry
   bool? _isSavedInquiry;
@@ -60,7 +62,8 @@ class InquiryCreateViewModel extends ChangeNotifier {
   UiState get uiState => _uiState;
 
   set uiState(UiState newState) {
-    if (_uiState != newState) {  // only notify if the state has actually changed
+    if (_uiState != newState) {
+      // only notify if the state has actually changed
       _uiState = newState;
       notifyListeners();
     }
@@ -235,4 +238,6 @@ class InquiryCreateViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }*/
+
+
 }

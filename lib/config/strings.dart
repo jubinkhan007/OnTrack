@@ -99,6 +99,9 @@ class Strings {
   static const String cancel = 'Cancel';
   static const String add_a_task = "Add a Task";
 
+  /// TODOs
+  static const String upToFiveImages = "Up to five images at a time";
+
   /// permission
   static const String cameraPermissionRequired = "Camera permission is required.";
   static const String errorCaptureImage = "Error capturing image. Please try again.";

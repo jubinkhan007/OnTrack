@@ -8,7 +8,6 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
@@ -82,7 +81,13 @@ class _FileAttachment2State extends State<FileAttachment2> {
                     ),
                   ),
                   onPressed: () {
-                    _captureImage();
+                    if (widget.inquiryViewModel != null) {
+                      if (widget.inquiryViewModel!.imageFiles.length < 5) {
+                        _captureImage();
+                      } else {
+                        showMessage(Strings.upToFiveImages);
+                      }
+                    }
                   },
                 ),
               ),
@@ -95,7 +100,7 @@ class _FileAttachment2State extends State<FileAttachment2> {
   }
 
   Widget _imageViewTodo() {
-    debugPrint("COUNT::${widget.inquiryViewModel!.imageFiles.length}");
+    //debugPrint("COUNT::${widget.inquiryViewModel!.imageFiles.length}");
     return Center(
       child: SizedBox(
         height: Converts.c48,
@@ -118,18 +123,14 @@ class _FileAttachment2State extends State<FileAttachment2> {
                       fit: BoxFit.cover,
                     ),
                   ),
+
+                  /// remove button
                   Positioned(
                     top: 4.0, // Adjust the top position
                     right: 4.0,
                     child: GestureDetector(
                       onTap: () {
-                        //setState(() {
-                        //context.read<InquiryCreateViewModel>()
                         widget.inquiryViewModel!.deleteImageFile(index);
-                        /*widget.onFileAttached(context
-                              .read<InquiryCreateViewModel>()
-                              .imageFiles);*/
-                        //});
                       },
                       child: Container(
                         decoration: const BoxDecoration(
@@ -144,6 +145,34 @@ class _FileAttachment2State extends State<FileAttachment2> {
                       ),
                     ),
                   ),
+
+                  /// counter view
+                  Positioned(
+                    bottom: 0.0,
+                    left: 0.0,
+                    right: 0.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        //shape: BoxShape.circle,
+                        color: Palette.tabColor.withOpacity(.5),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(Converts.c8),
+                          // Adjust the value as needed
+                          bottomRight: Radius.circular(
+                              Converts.c8), // Adjust the value as needed
+                        ),
+                      ),
+                      child: TextViewCustom(
+                        text: widget.inquiryViewModel != null
+                            ? "${widget.inquiryViewModel!.imageFiles.length}/5"
+                            : "",
+                        tvColor: Colors.white,
+                        fontSize: 8,
+                        isRubik: true,
+                        isBold: true,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             );
@@ -152,74 +181,6 @@ class _FileAttachment2State extends State<FileAttachment2> {
       ),
     );
   }
-
-  /*
-  *
-  *  Widget _imageViewTodo() {
-    debugPrint("COUNT::${context.read<InquiryCreateViewModel>().imageFiles.length}");
-    return Consumer<InquiryCreateViewModel>(
-        builder: (context, inquiryViewModel, child) {
-        return Center(
-          child: SizedBox(
-            height: Converts.c48,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              //itemCount: context.read<InquiryCreateViewModel>().imageFiles.length,
-              itemCount: inquiryViewModel.imageFiles.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: EdgeInsets.only(right: Converts.c8),
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(Converts.c8),
-                        child: Image.memory(
-                          //context.read<InquiryCreateViewModel>()
-                          inquiryViewModel
-                              .imageFiles[index]
-                              .file,
-                          width: Converts.c48,
-                          height: Converts.c48,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Positioned(
-                        top: 4.0, // Adjust the top position
-                        right: 4.0,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              //context.read<InquiryCreateViewModel>()
-                              inquiryViewModel
-                                  .deleteImageFile(index);
-                              /*widget.onFileAttached(context
-                                  .read<InquiryCreateViewModel>()
-                                  .imageFiles);*/
-                            });
-                          },
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Palette.tabColor,
-                            ),
-                            child: Icon(
-                              Icons.close,
-                              size: Converts.c16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      }
-    );
-  }*/
 
   Future<bool> _checkPermissions(Permission permission) async {
     final status = await permission.request();
@@ -303,11 +264,11 @@ class _FileAttachment2State extends State<FileAttachment2> {
           for (var image in limitedImages) {
             File file = File(image.path);
             Uint8List compressedBytes = await _processImage(file);
-            setState(() {
-              context
-                  .read<InquiryCreateViewModel>()
-                  .setImageFile(ImageFile(compressedBytes, _fileName(staffId)));
-            });
+            //setState(() {
+            //context.read<InquiryCreateViewModel>()
+            widget.inquiryViewModel!
+                .setImageFile(ImageFile(compressedBytes, _fileName(staffId)));
+            //});
           }
         }
       } catch (e) {

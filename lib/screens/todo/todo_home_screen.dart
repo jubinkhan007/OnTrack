@@ -515,9 +515,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 )
               ],
             ),
-
-            /// raw image view
-            //if (_isFileAttached) _imageView()
           ],
         ),
       );
@@ -897,6 +894,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   Future<void> _saveFilesIfNeeded(
       InquiryCreateViewModel inquiryViewModel) async {
     if (inquiryViewModel.imageFiles.isNotEmpty) {
+      if (inquiryViewModel.imageFiles.length > 5) inquiryViewModel.imageFiles.sublist(0, 5);
       await inquiryViewModel.saveFiles(inquiryViewModel.imageFiles);
     }
   }
@@ -957,4 +955,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       showMessage("Task description cannot be empty.");
     }
   }
+
+
+
 }
