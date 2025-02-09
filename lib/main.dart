@@ -31,7 +31,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint(message.notification!.title.toString());
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -94,7 +93,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(
-          create: (_) => CommentViewModel(
+          create: (_) => TodoViewModel(
             inquiryRepo: InquiryRepo(
               //fileDio: ApiService().fileUploadDio(),
                 fileDio: ApiService(
@@ -107,15 +106,28 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(
-          create: (_) => TaskUpdateViewModel(
+          create: (_) => CommentViewModel(
             inquiryRepo: InquiryRepo(
-              //fileDio: ApiService().fileUploadDio(),
+                //fileDio: ApiService().fileUploadDio(),
                 fileDio: ApiService(
-                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                     .fileUploadDio(),
                 //dio: ApiService().provideDio()),
                 dio: ApiService(
-                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio()),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TaskUpdateViewModel(
+            inquiryRepo: InquiryRepo(
+                //fileDio: ApiService().fileUploadDio(),
+                fileDio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .fileUploadDio(),
+                //dio: ApiService().provideDio()),
+                dio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                     .provideDio()),
           ),
         ),
@@ -123,10 +135,17 @@ class MyApp extends StatelessWidget {
           create: (_) => CounterViewModel(
             inquiryRepo: InquiryRepo(
                 //fileDio: ApiService().fileUploadDio(),
-                fileDio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").fileUploadDio(),
+                fileDio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .fileUploadDio(),
                 //dio: ApiService().provideDio()),
-                dio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/").provideDio()),
+                dio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio()),
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SettingsViewModel(),
         ),
       ],
       child: MaterialApp(
@@ -138,7 +157,7 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
               scaffoldBackgroundColor: Palette.scaffold),
           home: const LoginScreen()),
-          //home: const TodoHomeScreen()),
+      //home: const TodoHomeScreen()),
     );
   }
 //);

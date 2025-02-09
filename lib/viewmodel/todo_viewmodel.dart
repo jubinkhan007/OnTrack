@@ -4,10 +4,10 @@ import 'package:tmbi/repo/repo.dart';
 import '../models/models.dart';
 import '../network/ui_state.dart';
 
-class InquiryViewModel extends ChangeNotifier {
+class TodoViewModel extends ChangeNotifier {
   final InquiryRepo inquiryRepo;
 
-  InquiryViewModel({required this.inquiryRepo});
+  TodoViewModel({required this.inquiryRepo});
 
   /// message
   String? _message;
@@ -66,8 +66,8 @@ class InquiryViewModel extends ChangeNotifier {
   }
 
   Future<void> getInquiries(String flag, String userId, String isAssigned,
-      {String vm = "INQALL"}) async {
-      //{String vm = "INQALL_ALL"}) async {
+      //{String vm = "INQALL"}) async {
+      {String vm = "INQALL_ALL"}) async {
     if (_uiState == UiState.loading) return;
     _message = null;
     _uiState = UiState.loading;

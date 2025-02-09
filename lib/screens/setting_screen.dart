@@ -1,37 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:tmbi/config/sp_helper.dart';
+import 'package:provider/provider.dart';
+import 'package:tmbi/config/pair.dart';
+import 'package:tmbi/viewmodel/settings_viewmodel.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
 import '../config/strings.dart';
 import '../widgets/text_view_custom.dart';
 
-class SettingScreen extends StatefulWidget {
+class SettingScreen extends StatelessWidget {
   static const String routeName = '/setting_screen';
 
-  @override
-  _SettingScreenState createState() => _SettingScreenState();
-}
-
-class _SettingScreenState extends State<SettingScreen> {
-  bool _isToggled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadToggleFlag();
-  }
-
-  void _loadToggleFlag() async {
-    bool flag = await SPHelper().getFirstTaskEntryFlag();
-    setState(() {
-      _isToggled = flag;
-    });
-  }
-
-  void _savePreferences() async {
-    SPHelper().saveFirstTaskEntryFlag(_isToggled);
-  }
+  const SettingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,63 +37,86 @@ class _SettingScreenState extends State<SettingScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  height: Converts.c32,
-                  width: Converts.c32,
-                  decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Icon(
-                    Icons.task,
-                    color: Colors.white,
-                    size: Converts.c24,
-                  ),
-                ), // Your icon
-                SizedBox(width: Converts.c16),
-                Expanded(
-                  child: TextViewCustom(
-                    text: Strings.first_task_entry,
-                    fontSize: Converts.c20,
-                    tvColor: Palette.normalTv,
-                    isTextAlignCenter: false,
-                    isRubik: false,
-                    isBold: true,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isToggled = !_isToggled;
-                      _savePreferences(); // Save the toggle state when tapped
-                    });
-                  },
-                  child: Text(
-                    _isToggled ? 'ON' : 'OFF',
-                    style: TextStyle(
-                      color: _isToggled ? Colors.green : Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Switch(
-                  value: _isToggled,
-                  onChanged: (value) {
-                    setState(() {
-                      _isToggled = value;
-                      _savePreferences(); // Save the toggle state when changed
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
+        child: Consumer<SettingsViewModel>(
+            builder: (context, settingsViewModel, child) {
+          return Column(
+            children: [
+              _buildToggleRow(
+                  Icons.task, Strings.first_task_entry, settingsViewModel,
+                  (value) {
+                settingsViewModel.toggleFirstTaskEntryFlag();
+              }),
+            ],
+          );
+        }),
       ),
     );
   }
+
+  Widget _buildToggleRow(IconData icon, String title,
+      SettingsViewModel settingsViewModel, Function(bool) onTap) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+          height: Converts.c32,
+          width: Converts.c32,
+          decoration: BoxDecoration(
+              color: Colors.grey, borderRadius: BorderRadius.circular(8)),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: Converts.c24,
+          ),
+        ),
+        SizedBox(width: Converts.c16),
+        Expanded(
+          child: TextViewCustom(
+            //text: Strings.first_task_entry,
+            text: title,
+            fontSize: Converts.c20,
+            tvColor: Palette.normalTv,
+            isTextAlignCenter: false,
+            isRubik: false,
+            isBold: true,
+          ),
+        ),
+        Text(
+          settingsViewModel.isFirstTaskEntryToggled ? 'ON' : 'OFF',
+          style: TextStyle(
+            color: settingsViewModel.isFirstTaskEntryToggled
+                ? Colors.green
+                : Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Switch(
+          value: settingsViewModel.isFirstTaskEntryToggled,
+          onChanged: (value) {
+            onTap(value);
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class Setting {
+  final int id;
+  final String name;
+  bool isSynced;
+  bool isChecked;
+  final IconData iconData;
+  final Function(bool) onCheckedChanged;
+  final Function(Pair<bool, String>) onTap;
+
+  Setting({
+    required this.id,
+    required this.name,
+    required this.iconData,
+    this.isSynced = false,
+    this.isChecked = false,
+    required this.onCheckedChanged,
+    required this.onTap,
+  });
 }

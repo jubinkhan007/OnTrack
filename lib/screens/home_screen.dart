@@ -9,6 +9,7 @@ import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
 import 'package:tmbi/widgets/feature_status.dart';
+import 'package:tmbi/widgets/report_pie_chart.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/enum.dart';
@@ -64,10 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (await SPHelper().getFirstTaskEntryFlag()) {
-            setState(() {
+            /*setState(() {
               selectedFlagIndex = 0;
               customer = null;
-            });
+            });*/
             Navigator.pushNamed(context, TodoHomeScreen.routeName,
                 arguments: widget.staffId);
           } else {
@@ -268,7 +269,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     debugPrint("Selected Flag: $value");
                   },
                 ),
+
+                /// Report: Pie Chart view
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Material(
+                    color: Colors.white,
+                    elevation: 4,
+                    child: Column(
+                      children: [
+                        TextViewCustom(
+                            text: "Reports from the last month",
+                            fontSize: Converts.c20,
+                            tvColor: Palette.tabColor,
+                            isRubik: false,
+                            isBold: true),
+                        ReportPieChart(),
+                      ],
+                    ),
+                  ),
+                ),
               ],
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 8,
+                top: 16,
+                bottom: 8,
+              ),
+              child: TextViewCustom(
+                text: "List of all $selectedFlag Tasks ${isAssigned == "1" ?"Assigned to you" : "Created by you" }",
+                fontSize: Converts.c16,
+                tvColor: Palette.grayColor,
+                isTextAlignCenter: false,
+                isRubik: false,
+                isBold: true,
+              ),
             ),
           ),
 
@@ -315,6 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             }
+
             // set data
             return inquiryViewModel.inquiries != null &&
                     inquiryViewModel.inquiries!.isNotEmpty

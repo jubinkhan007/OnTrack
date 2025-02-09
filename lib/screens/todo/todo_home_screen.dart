@@ -87,12 +87,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     }
   }
 
-  // files & date
-  //final List<ImageFile> imageFiles = [];
   String _selectedDate = DateTime.now().toFormattedString(format: "yyyy-MM-dd");
-
-  //_focusNode.unfocus(); // Dismiss the keyboard
-  // add task to the list
 
   @override
   void initState() {
@@ -100,9 +95,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     _taskController.addListener(() {
       _onTextChanged(_taskController.text);
     });
-    // fetch tasks
-    final inquiryViewModel =
-        Provider.of<InquiryViewModel>(context, listen: false);
+
+    Provider.of<TodoViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchDataAndStore();
     });
@@ -128,9 +122,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     }
   }
 
-  Future<void> _fetchTodos() async {
+  Future<void> _fetchTodos({String vm = "INQALL_ALL"}) async {
     final inquiryViewModel =
-        Provider.of<InquiryViewModel>(context, listen: false);
+        Provider.of<TodoViewModel>(context, listen: false);
     await inquiryViewModel.getInquiries(statusFlag, widget.staffId, "1");
   }
 
@@ -203,12 +197,12 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                   if (value != null) {
                     statusFlag = value!.status!.getFlag!;
                     statusFlagName = value!.status!.name;
-                    Provider.of<InquiryViewModel>(context, listen: false)
+                    Provider.of<TodoViewModel>(context, listen: false)
                         .getInquiries(statusFlag, widget.staffId, "1");
                     debugPrint("StatusFlag::$statusFlag");
 
                     // test
-                    Provider.of<InquiryViewModel>(context, listen: false)
+                    Provider.of<TodoViewModel>(context, listen: false)
                         .tabSelectedFlag = 1;
                   }
                 }),
@@ -218,7 +212,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
 
           /// task list
-          Consumer<InquiryViewModel>(
+          Consumer<TodoViewModel>(
               builder: (context, inquiryViewModel, child) {
             if (inquiryViewModel.uiState == UiState.loading) {
               return const Expanded(
@@ -275,10 +269,11 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     ),
                     confirmDismiss: (direction) async {
                       if (direction == DismissDirection.startToEnd) {
-                        updateTodos(Provider.of<InquiryCreateViewModel>(context,
-                            listen: false), inquiryResponse);
-                      }
-                      else if (direction == DismissDirection.endToStart) {
+                        updateTodos(
+                            Provider.of<InquiryCreateViewModel>(context,
+                                listen: false),
+                            inquiryResponse);
+                      } else if (direction == DismissDirection.endToStart) {
                         Navigator.pushNamed(
                           context,
                           CommentScreen.routeName,
@@ -522,7 +517,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   }
 
   void _getTodos() {
-    Provider.of<InquiryViewModel>(context, listen: false)
+    Provider.of<TodoViewModel>(context, listen: false)
         .getInquiries(statusFlag, widget.staffId, "1");
   }
 
@@ -894,7 +889,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   Future<void> _saveFilesIfNeeded(
       InquiryCreateViewModel inquiryViewModel) async {
     if (inquiryViewModel.imageFiles.isNotEmpty) {
-      if (inquiryViewModel.imageFiles.length > 5) inquiryViewModel.imageFiles.sublist(0, 5);
+      if (inquiryViewModel.imageFiles.length > 5)
+        inquiryViewModel.imageFiles.sublist(0, 5);
       await inquiryViewModel.saveFiles(inquiryViewModel.imageFiles);
     }
   }
@@ -955,7 +951,4 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       showMessage("Task description cannot be empty.");
     }
   }
-
-
-
 }

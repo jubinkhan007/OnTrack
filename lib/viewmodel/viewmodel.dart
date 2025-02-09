@@ -4,3 +4,5 @@ export 'inquiry_viewmodel.dart';
 export 'counter_viewmodel.dart';
 export 'add_task_viewmodel.dart';
 export 'comment_viewmodel.dart';
+export 'settings_viewmodel.dart';
+export 'todo_viewmodel.dart';
