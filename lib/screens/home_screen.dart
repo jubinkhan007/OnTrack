@@ -149,7 +149,8 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: [
               IconButton(
                 onPressed: () {
-                  context.showMessage(Strings.available_soon);
+                  //context.showMessage(Strings.available_soon);
+                  Navigator.pushNamed(context, NotificationScreen.routeName);
                 },
                 icon: const Icon(
                   Icons.notifications,
@@ -274,21 +275,69 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Material(
+                    borderRadius: BorderRadius.circular(4),
                     color: Colors.white,
                     elevation: 4,
-                    child: Column(
-                      children: [
-                        TextViewCustom(
-                            text: "Reports from the last month",
-                            fontSize: Converts.c20,
-                            tvColor: Palette.tabColor,
-                            isRubik: false,
-                            isBold: true),
-                        ReportPieChart(),
-                      ],
+                    child: InkWell(
+                      onTap: () {
+                        // Toggle the value of isOpenReportView
+                        Provider.of<InquiryViewModel>(context, listen: false)
+                            .isOpenReportView = !Provider.of<InquiryViewModel>(
+                                context,
+                                listen: false)
+                            .isOpenReportView;
+                      },
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextViewCustom(
+                                  text: "Reports from the last month",
+                                  fontSize: Converts.c20,
+                                  tvColor: Palette.tabColor,
+                                  isRubik: false,
+                                  isBold: true,
+                                ),
+                              ),
+                              // Use Consumer to rebuild the icon when the state changes
+                              Consumer<InquiryViewModel>(
+                                builder: (context, inquiryViewModel, child) {
+                                  return inquiryViewModel.isOpenReportView
+                                      ? const Icon(Icons.keyboard_arrow_down)
+                                      : const Icon(Icons.keyboard_arrow_up);
+                                },
+                              ),
+                            ],
+                          ),
+                          // Use Consumer to rebuild the pie chart when the state changes
+                          Consumer<InquiryViewModel>(
+                            builder: (context, inquiryViewModel, child) {
+                              return inquiryViewModel.isOpenReportView
+                                  ? const ReportPieChart(
+                                      dataMap: {
+                                        "Pending": 5,
+                                        "Delayed": 3,
+                                        "Completed": 2,
+                                        "Upcoming": 5
+                                      },
+                                      colorList: [
+                                        Color(0xffFA4A42),
+                                        Color(0xffFE9539),
+                                        Color(0xff3EE094),
+                                        Color(0xff3398F6),
+                                      ],
+                                    )
+                                  : const SizedBox.shrink();
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
@@ -300,7 +349,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 bottom: 8,
               ),
               child: TextViewCustom(
-                text: "List of all $selectedFlag Tasks ${isAssigned == "1" ?"Assigned to you" : "Created by you" }",
+                text:
+                    "List of all $selectedFlag Tasks ${isAssigned == "1" ? "Assigned to you" : "Created by you"}",
                 fontSize: Converts.c16,
                 tvColor: Palette.grayColor,
                 isTextAlignCenter: false,

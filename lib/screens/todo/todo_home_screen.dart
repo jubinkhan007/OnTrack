@@ -123,8 +123,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   }
 
   Future<void> _fetchTodos({String vm = "INQALL_ALL"}) async {
-    final inquiryViewModel =
-        Provider.of<TodoViewModel>(context, listen: false);
+    final inquiryViewModel = Provider.of<TodoViewModel>(context, listen: false);
     await inquiryViewModel.getInquiries(statusFlag, widget.staffId, "1");
   }
 
@@ -212,8 +211,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
 
           /// task list
-          Consumer<TodoViewModel>(
-              builder: (context, inquiryViewModel, child) {
+          Consumer<TodoViewModel>(builder: (context, inquiryViewModel, child) {
             if (inquiryViewModel.uiState == UiState.loading) {
               return const Expanded(
                 child: Center(

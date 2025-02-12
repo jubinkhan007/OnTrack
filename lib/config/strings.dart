@@ -99,6 +99,9 @@ class Strings {
   static const String cancel = 'Cancel';
   static const String add_a_task = "Add a Task";
 
+  /// Notification
+  static const String notification = "Notification";
+
   /// TODOs
   static const String upToFiveImages = "Up to five images at a time";
 

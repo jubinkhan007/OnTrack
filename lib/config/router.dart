@@ -20,7 +20,10 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
               ));
     case SettingScreen.routeName:
       return MaterialPageRoute(
-          settings: routeSettings, builder: (_) => SettingScreen());
+          settings: routeSettings, builder: (_) => const SettingScreen());
+    case NotificationScreen.routeName:
+      return MaterialPageRoute(
+          settings: routeSettings, builder: (_) => const NotificationScreen());
     case TodoHomeScreen.routeName:
       final args = routeSettings.arguments as String;
       return MaterialPageRoute(
