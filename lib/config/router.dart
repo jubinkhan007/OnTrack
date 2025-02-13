@@ -21,6 +21,9 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
     case SettingScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const SettingScreen());
+    case ReportScreen.routeName:
+      return MaterialPageRoute(
+          settings: routeSettings, builder: (_) => const ReportScreen());
     case NotificationScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const NotificationScreen());

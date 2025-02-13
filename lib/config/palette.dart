@@ -23,6 +23,13 @@ class Palette {
   static const Color errorColor = Color(0xFFB3261E);
   static const Color cardColor = Color(0xFFF0F2F8);
 
+  static const Color progressColor = Color(0xFF9D9BFF);
+  static const Color reviewColor = Color(0xFFEDA7FF);
+  static const Color topBuyerColor = Color(0xFF2B7FFC);
+  static const Color onHoldColor = Color(0xFFF6BB54);
+  static const Color completedColor = Color(0xFF5CD669);
+  static const Color delayedColor = Color(0xFFB3261E);
+
   static const LinearGradient createRoomGradient = LinearGradient(
     //colors: [mainColor, tabColor],
     colors: [Colors.red, Colors.pink],

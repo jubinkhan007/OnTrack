@@ -699,6 +699,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     SettingScreen.routeName,
                   );
                 }),
+
+                /// Report
+                drawerItem(Icons.dashboard, Strings.reportDashboard, () {
+                  Navigator.pushNamed(
+                    context,
+                    ReportScreen.routeName,
+                  );
+                }),
               ],
             ),
           );
