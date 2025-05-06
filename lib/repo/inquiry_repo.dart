@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:tmbi/widgets/file_attachment.dart';
+import 'package:http_parser/http_parser.dart';
 
+import '../models/image_file.dart';
 import '../models/models.dart';
 
 class InquiryRepo {
@@ -73,7 +76,7 @@ class InquiryRepo {
       debugPrint("RESPONSE#${response.data}");
       return response.data['status'] == "200";
     } on DioException catch (error) {
-      debugPrint("RESPONSE_ERROR#${error}");
+      debugPrint("RESPONSE_ERROR#$error");
       throw Exception(error);
     }
   }
@@ -119,9 +122,13 @@ class InquiryRepo {
         MultipartFile.fromBytes(
           files[i].file,
           filename: files[i].name, // Provide a unique filename for each file
+          //contentType: MediaType("image", "jpeg"),
         ),
       ));
     }
+
+    debugPrint("FORM DATA: ${formData.fields}");
+
     // save image into server
     try {
       final response = await fileDio.post("ImageUpload/upload", data: formData);
@@ -146,6 +153,73 @@ class InquiryRepo {
       throw Exception(error);
     }
   }
+
+
+  Future<List<Map<String, dynamic>>> saveImages2(
+      List<Uint8List> files,
+      List<String> paths,
+      String invoiceId,
+      String dbId,
+      ) async {
+    final formData = FormData();
+
+    // Add additional form fields
+    formData.fields.addAll([
+      MapEntry('challanno', invoiceId),
+      MapEntry('dbid', dbId),
+    ]);
+
+    // Add files to form data
+    for (int i = 0; i < files.length; i++) {
+      formData.files.add(MapEntry(
+        'files', // key expected by the server
+        MultipartFile.fromBytes(
+          files[i],
+          filename: paths[i], // make sure filenames are unique and valid
+        ),
+      ));
+    }
+
+    debugPrint("FORM DATA: ${formData.fields}");
+
+    try {
+      /*final response = await APIService.instance.request(
+        "ImageUpload/upload",
+        DioMethod.post,
+        null,
+        null,
+        formData,
+      );*/
+      final response = await fileDio.post("ImageUpload/upload", data: formData);
+
+      // Check for success
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        // Handle success case where response is a list
+        if (data is List) {
+          return data.map((item) => Map<String, dynamic>.from(item)).toList();
+        }
+
+        // Handle failure message in response as map
+        else if (data is Map && data['status'] == 'N') {
+          final errorMsg = data['FileName'] ?? 'Unknown error';
+          throw Exception('Server error: $errorMsg');
+        }
+
+        // Unknown format fallback
+        else {
+          throw Exception('Unexpected response format: $data');
+        }
+      } else {
+        throw Exception('API failed with status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('❌ Upload failed: $e');
+      throw Exception("Upload failed: ${e.toString()}");
+    }
+  }
+
 
   Future<List<InquiryResponse>> getInquiries(
       String flag, String userId, String isAssigned, String vm) async {

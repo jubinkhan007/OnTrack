@@ -7,6 +7,7 @@ import 'package:tmbi/viewmodel/task_update_viewmodel.dart';
 
 import '../../config/sp_helper.dart';
 import '../../config/strings.dart';
+import '../../models/image_file.dart';
 import '../../models/user_response.dart';
 import '../../network/ui_state.dart';
 import '../../widgets/widgets.dart';

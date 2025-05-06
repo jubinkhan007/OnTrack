@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
@@ -16,8 +15,8 @@ import 'package:tmbi/viewmodel/inquiry_create_viewmodel.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../config/strings.dart';
+import '../models/image_file.dart';
 import '../network/ui_state.dart';
-import 'file_attachment.dart';
 
 class FileAttachment2 extends StatefulWidget {
   //final Function(List<ImageFile>?) onFileAttached;
@@ -67,7 +66,7 @@ class _FileAttachment2State extends State<FileAttachment2> {
                 color: Colors.transparent,
                 child: IconButton(
                   icon: GestureDetector(
-                    onDoubleTap: () {
+                    onLongPress: () {
                       _pickImages();
                     },
                     child: Icon(
@@ -231,6 +230,28 @@ class _FileAttachment2State extends State<FileAttachment2> {
     }
   }
 
+  Future<Uint8List> _processImage(File imageFile, {int quality = 50}) async {
+    try {
+      // read image as bytes
+      Uint8List imageBytes = await imageFile.readAsBytes();
+      // decode image to check if it's valid
+      img.Image? image = img.decodeImage(imageBytes);
+      if (image == null) {
+        throw Exception(Strings.failedToDecodeImage);
+      }
+      // compress the image with the specified quality (without resizing)
+      return await FlutterImageCompress.compressWithList(
+        imageBytes,
+        quality: quality,
+        format: CompressFormat.jpeg,
+      );
+    } catch (e) {
+      debugPrint("ERROR::${e.toString()}");
+      // return the original image bytes in case of an error
+      return imageFile.readAsBytes();
+    }
+  }
+
   Future<void> _pickImages() async {
     String staffId = await SPHelper().getUserInfo();
     bool isStoragePermission = true;
@@ -279,28 +300,6 @@ class _FileAttachment2State extends State<FileAttachment2> {
         widget.inquiryViewModel!.uiState = UiState.success;
         isLoading = widget.inquiryViewModel!.uiState == UiState.loading;
       }
-    }
-  }
-
-  Future<Uint8List> _processImage(File imageFile, {int quality = 50}) async {
-    try {
-      // read image as bytes
-      Uint8List imageBytes = await imageFile.readAsBytes();
-      // decode image to check if it's valid
-      img.Image? image = img.decodeImage(imageBytes);
-      if (image == null) {
-        throw Exception(Strings.failedToDecodeImage);
-      }
-      // compress the image with the specified quality (without resizing)
-      return await FlutterImageCompress.compressWithList(
-        imageBytes,
-        quality: quality,
-        format: CompressFormat.jpeg,
-      );
-    } catch (e) {
-      debugPrint("ERROR::${e.toString()}");
-      // return the original image bytes in case of an error
-      return imageFile.readAsBytes();
     }
   }
 

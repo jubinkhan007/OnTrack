@@ -95,13 +95,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => TodoViewModel(
             inquiryRepo: InquiryRepo(
-              //fileDio: ApiService().fileUploadDio(),
+                //fileDio: ApiService().fileUploadDio(),
                 fileDio: ApiService(
-                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                     .fileUploadDio(),
                 //dio: ApiService().provideDio()),
                 dio: ApiService(
-                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                     .provideDio()),
           ),
         ),

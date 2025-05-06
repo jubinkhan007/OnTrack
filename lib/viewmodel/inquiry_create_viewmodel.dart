@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:tmbi/repo/inquiry_repo.dart';
 
+import 'package:flutter/foundation.dart';
+import '../models/image_file.dart';
 import '../models/models.dart';
 import '../network/ui_state.dart';
 import '../widgets/file_attachment.dart';
@@ -145,7 +147,14 @@ class InquiryCreateViewModel extends ChangeNotifier {
     _uiState = UiState.loading;
     notifyListeners();
     try {
+      List<String> paths = [];
+      List<Uint8List> data = [];
+      for (var file in files) {
+        data.add(file.file!);
+        paths = [file.name];
+      }
       final response = await inquiryRepo.saveImages(files);
+      //final response = await inquiryRepo.saveImages2(data, paths, "XXXX", "XXX");
       if (response != null && response is List) {
         for (var name in response) {
           if (name is Map<String, dynamic> && name.containsKey('FileName')) {
@@ -161,6 +170,31 @@ class InquiryCreateViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /*Future<void> saveFiles(
+    List<ImageFile> files,
+  ) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.saveImages(files);
+      if (response != null && response is List) {
+        for (var name in response) {
+          if (name is Map<String, dynamic> && name.containsKey('FileName')) {
+            _files.add(name['FileName']);
+          }
+        }
+      }
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }*/
 
   Future<void> saveInquiry(
       String companyId,

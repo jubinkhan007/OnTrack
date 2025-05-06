@@ -1,7 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -16,6 +16,7 @@ import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/widgets/text_view_custom.dart';
 
 import '../config/strings.dart';
+import '../models/image_file.dart';
 
 class FileAttachment extends StatefulWidget {
   final Function(List<ImageFile>?) onFileAttached;
@@ -552,11 +553,4 @@ class _FileAttachmentState extends State<FileAttachment> {
     final DateTime dateTime = DateTime.now();
     return "$type1${dateTime.year.toString().substring(2, 4)}${dateTime.month.toString().padLeft(2, '0')}_${userId}_${dateTime.millisecondsSinceEpoch}_$type2.jpg";
   }
-}
-
-class ImageFile {
-  Uint8List file;
-  String name;
-
-  ImageFile(this.file, this.name);
 }

@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 
+import '../models/image_file.dart';
 import '../network/ui_state.dart';
 import '../repo/repo.dart';
 import '../widgets/widgets.dart';

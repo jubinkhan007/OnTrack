@@ -11,6 +11,7 @@ import '../config/converts.dart';
 import '../config/palette.dart';
 import '../config/sp_helper.dart';
 import '../config/strings.dart';
+import '../models/image_file.dart';
 import '../models/models.dart';
 import '../models/user_response.dart';
 import '../network/ui_state.dart';

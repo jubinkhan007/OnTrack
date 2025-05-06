@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -73,7 +74,7 @@ class AttachmentViewScreen extends StatelessWidget {
           }
           return Column(
             children: [
-              Expanded(
+              /*Expanded(
                 child: PageView.builder(
                   controller: _controller,
                   itemCount: inquiryViewModel.attachmentViewResponse != null
@@ -84,6 +85,21 @@ class AttachmentViewScreen extends StatelessWidget {
                       _imageUrls[index],
                       fit: BoxFit.cover,
                       width: double.infinity,
+                    );
+                  },
+                ),
+              ),*/
+              Expanded(
+                child: PageView.builder(
+                  controller: _controller,
+                  itemCount: inquiryViewModel.attachmentViewResponse?.length ?? _imageUrls.length,
+                  itemBuilder: (context, index) {
+                    return CachedNetworkImage(
+                      imageUrl: _imageUrls[index],
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
                     );
                   },
                 ),

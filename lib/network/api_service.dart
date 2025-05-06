@@ -5,7 +5,7 @@ class ApiService {
   // test start
   static String _baseUrl = "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/";
   // test end
-  final _baseUrlFile = "http://swift.prangroup.com:8521/alpha/";
+  final _baseUrlFile = "http://swift.prangroup.com:8521/alphan/";
   //final _baseUrl = "https://api.npoint.io/";
   //final _baseUrl = "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/";
   final _receiveTimeout = const Duration(seconds: 30);
