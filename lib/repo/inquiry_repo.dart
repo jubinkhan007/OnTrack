@@ -6,6 +6,7 @@ import 'package:http_parser/http_parser.dart';
 
 import '../models/image_file.dart';
 import '../models/models.dart';
+import '../models/searched_staff_response.dart';
 
 class InquiryRepo {
   final Dio dio;
@@ -386,6 +387,54 @@ class InquiryRepo {
       throw Exception(error);
     }
   }
+
+  Future<SearchedStaffResponse> searchStaff(String staffId, String vm) async {
+    try {
+      final headers = {
+        'vm': vm,
+        'va': '0',
+        'vb': staffId,
+        'vc': '0',
+        'vd': 'staffs',
+      };
+      final response = await dio.get(
+        "getall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return SearchedStaffResponse.fromJson(response.data);
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
+  Future<bool> saveSearchedStaff(
+      SearchedStaff staff, String userId) async {
+    try {
+      final headers = {
+        "dtype": "NEWSTAFF",
+        "compid": staff.department,
+        "inqrdesc": staff.designation,
+        "inqrname": staff.name,
+        "userid": userId,
+        "priorityid": staff.code,
+        "custid": staff.mail,
+        "custname": staff.mobileNo
+      };
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      debugPrint("Error# $error");
+      throw Exception(error);
+    }
+  }
+
+
 
   Future<String> getCount(String staffId, String flag) async {
     try {

@@ -295,7 +295,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: InkWell(
                           onTap: () {
                             // Toggle the value of isOpenReportView
-                            Provider.of<InquiryViewModel>(context, listen: false)
+                            Provider.of<InquiryViewModel>(context,
+                                        listen: false)
                                     .isOpenReportView =
                                 !Provider.of<InquiryViewModel>(context,
                                         listen: false)
@@ -304,7 +305,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -318,9 +320,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   // Use Consumer to rebuild the icon when the state changes
                                   Consumer<InquiryViewModel>(
-                                    builder: (context, inquiryViewModel, child) {
+                                    builder:
+                                        (context, inquiryViewModel, child) {
                                       return inquiryViewModel.isOpenReportView
-                                          ? const Icon(Icons.keyboard_arrow_down)
+                                          ? const Icon(
+                                              Icons.keyboard_arrow_down)
                                           : const Icon(Icons.keyboard_arrow_up);
                                     },
                                   ),
@@ -716,6 +720,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }),
 
+                /// add staff
+                drawerItem(Icons.add_task, Strings.add_staff, () {
+                  /*Navigator.pushNamed(
+                    context,
+                    SettingScreen.routeName,
+                  );*/
+                  _showAddStaffDialog(context);
+                }),
+
                 /// Report
                 drawerItem(Icons.dashboard, Strings.reportDashboard, () {
                   /*Navigator.pushNamed(
@@ -761,6 +774,167 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  /*void _showAddStaffDialog(BuildContext context) {
+    final searchController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: TextViewCustom(
+            text: Strings.add_staff,
+            tvColor: Palette.normalTv,
+            fontSize: Converts.c16,
+            isTextAlignCenter: false,
+            isBold: true,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  hintText: Strings.staff_id,
+                    hintStyle: TextStyle(
+                      color: Colors.grey,
+                      fontSize: Converts.c16 - 2,
+                    ),
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      // Handle the tap (e.g., trigger a search)
+                      debugPrint("Right icon tapped: ${searchController.text}");
+                    },
+                    child: const Icon(Icons.search), // Or any other icon
+                  ),
+                  //border: OutlineInputBorder(),
+                ),
+              ),
+              TextViewCustom(
+                text: "Staff Info# Md: XYZ Hasan [123456]\nExport",
+                tvColor: Palette.semiTv,
+                fontSize: Converts.c16,
+                isTextAlignCenter: false,
+                isBold: false,
+              )
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String searchTerm = searchController.text;
+                print('Saved: $searchTerm');
+                Navigator.pop(context);
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }*/
+
+  void _showAddStaffDialog(BuildContext context) {
+    final searchController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Consumer<AddTaskViewModel>(
+          builder: (context, provider, _) {
+            return AlertDialog(
+              title: TextViewCustom(
+                text: Strings.add_staff,
+                tvColor: Palette.normalTv,
+                fontSize: Converts.c16,
+                isTextAlignCenter: false,
+                isBold: true,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: Strings.staff_id,
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
+                        fontSize: Converts.c16 - 2,
+                      ),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          // Trigger search using Provider
+                          provider.searchStaffs(searchController.text);
+                        },
+                        child: const Icon(Icons.search),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  provider.uiState == UiState.loading
+                      ? const CircularProgressIndicator()
+                      : TextViewCustom(
+                          text: provider.decoText != null
+                              ? provider.decoText!
+                              : "",
+                          tvColor: Palette.semiTv,
+                          fontSize: Converts.c16,
+                          isTextAlignCenter: false,
+                          isBold: false,
+                        )
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    provider.resetSearchStaffs();
+                    Navigator.pop(context);
+                  },
+                  child: const Text(Strings.cancel),
+                ),
+                provider.uiState == UiState.commentLoading
+                    ? SizedBox(
+                        height: Converts.c12,
+                        width: Converts.c12,
+                        child: const CircularProgressIndicator(),
+                      )
+                    : ElevatedButton(
+                        onPressed: () async {
+                          if (provider.decoText != null) {
+                            await provider.saveSearchedStaff(widget.staffId);
+                            if (provider.isSavedStaff != null) {
+                              if (provider.isSavedStaff!) {
+                                provider.setMessage(
+                                    Strings.data_saved_successfully);
+                              }
+                            }
+                          }
+                        },
+                        child: const Text(Strings.add),
+                      ),
+                provider.message != null
+                    ? TextViewCustom(
+                        text: provider.message!,
+                        tvColor: Palette.completedColor,
+                        fontSize: Converts.c16,
+                        isTextAlignCenter: false,
+                        isBold: true,
+                      )
+                    : const SizedBox.shrink(),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
