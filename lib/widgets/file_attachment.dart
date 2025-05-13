@@ -296,7 +296,7 @@ class _FileAttachmentState extends State<FileAttachment> {
 
   Future<void> _captureImage() async {
     String staffId = await SPHelper().getUserInfo();
-    if (await _checkPermissions(Permission.camera)) {
+    //if (await _checkPermissions(Permission.camera)) {
       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
       if (image != null) {
         // process selected image
@@ -320,7 +320,7 @@ class _FileAttachmentState extends State<FileAttachment> {
           isMultipleImageSelected = false;
         });
       }
-    }
+    //}
   }
 
   Future<void> _pickImages() async {

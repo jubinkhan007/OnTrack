@@ -39,7 +39,7 @@ class _FileAttachment2State extends State<FileAttachment2> {
   @override
   void initState() {
     super.initState();
-    _checkCameraPermission();
+    //_checkCameraPermission();
   }
 
   @override
@@ -199,7 +199,7 @@ class _FileAttachment2State extends State<FileAttachment2> {
 
   Future<void> _captureImage() async {
     String staffId = await SPHelper().getUserInfo();
-    if (await _checkPermissions(Permission.camera)) {
+    //if (await _checkPermissions(Permission.camera)) {
       //setState(() => isLoading = true);
       widget.inquiryViewModel!.uiState = UiState.loading;
       isLoading = widget.inquiryViewModel!.uiState == UiState.loading;
@@ -227,7 +227,7 @@ class _FileAttachment2State extends State<FileAttachment2> {
         widget.inquiryViewModel!.uiState = UiState.success;
         isLoading = widget.inquiryViewModel!.uiState == UiState.loading;
       }
-    }
+    //}
   }
 
   Future<Uint8List> _processImage(File imageFile, {int quality = 50}) async {
