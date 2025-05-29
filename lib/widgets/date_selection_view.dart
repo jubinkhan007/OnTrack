@@ -38,7 +38,7 @@ class _DateSelectionViewState extends State<DateSelectionView> {
             child: IconButton(
               icon: Icon(
                 Icons.date_range,
-                size: Converts.c16,
+                size: Converts.c24,
                 color:
                     widget.isDateSelected ? Palette.mainColor : Palette.semiTv,
               ),

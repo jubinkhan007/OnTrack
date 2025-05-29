@@ -155,4 +155,23 @@ class InquiryViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteInq(
+      String inquiryId) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response =
+      await inquiryRepo.deleteInq(inquiryId);
+      _isSavedInquiry = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
 }

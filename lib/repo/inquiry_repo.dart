@@ -368,6 +368,26 @@ class InquiryRepo {
     }
   }
 
+
+  Future<bool> deleteInq(
+      String inquiryId) async {
+    try {
+      final headers = {
+        "dtype": "DELETE",
+        "inqrid": inquiryId,
+      };
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
   Future<StaffResponse> getStaffs(String staffId, String companyId, String vm) async {
     try {
       final headers = {

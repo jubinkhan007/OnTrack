@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/screens/dialog/update_task_dialog.dart';
 import 'package:tmbi/screens/note_screen.dart';
@@ -6,14 +7,26 @@ import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
+import '../config/strings.dart';
 import '../models/models.dart';
 import '../screens/attachment_view_screen.dart';
+import '../viewmodel/add_task_viewmodel.dart';
+import '../viewmodel/inquiry_viewmodel.dart';
 
 class TaskList extends StatefulWidget {
   final Task task;
   final String inquiryId;
+  final String endDate;
+  final bool isOwner;
+  final String? ownerId;
 
-  const TaskList({super.key, required this.task, required this.inquiryId});
+  const TaskList(
+      {super.key,
+      required this.task,
+      required this.inquiryId,
+      this.isOwner = false,
+      this.ownerId,
+      required this.endDate});
 
   @override
   State<TaskList> createState() => _TaskListState();
@@ -56,6 +69,54 @@ class _TaskListState extends State<TaskList> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// menu
+          /*widget.task.hasAccess | widget.isOwner
+              ? Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    // Allows padding to be tappable
+                    onTapDown: (TapDownDetails details) {
+                      showMenu(
+                        context: context,
+                        position: RelativeRect.fromLTRB(
+                          details.globalPosition.dx,
+                          details.globalPosition.dy,
+                          0,
+                          0,
+                        ),
+                        items: [
+                          const PopupMenuItem(
+                              value: 'forward', child: Text('Forward')),
+                          //const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                        ],
+                      ).then((value) {
+                        if (value == 'forward') {
+                          if (context.mounted) {
+                            debugPrint('Forward tapped');
+                            _showCustomerDialog(
+                              context,
+                              Provider.of<InquiryViewModel>(context,
+                                  listen: false),
+                            );
+                          }
+                        } *//*else if (value == 'edit') {
+                    print('Edit tapped');
+                  }*//*
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8), // Increase tap area
+                      child: Icon(
+                        Icons.more_vert,
+                        size: Converts.c16 - 2,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),*/
+
           /// title & status
           Row(
             children: [
@@ -71,7 +132,6 @@ class _TaskListState extends State<TaskList> {
               Container(
                 decoration: BoxDecoration(
                   color: widget.task.status.statusColor,
-                  // Set your desired background color here
                   // Set your desired background color here
                   borderRadius: BorderRadius.circular(
                       Converts.c12), // Adjust the radius for roundness
@@ -99,12 +159,14 @@ class _TaskListState extends State<TaskList> {
               SizedBox(
                 width: Converts.c8,
               ),
-              TextViewCustom(
-                text: widget.task.assignedPerson,
-                fontSize: Converts.c16,
-                tvColor: Colors.blue,
-                isTextAlignCenter: false,
-                isBold: true,
+              Expanded(
+                child: TextViewCustom(
+                  text: widget.task.assignedPerson,
+                  fontSize: Converts.c16,
+                  tvColor: Colors.blue,
+                  isTextAlignCenter: false,
+                  isBold: true,
+                ),
               ),
             ],
           ),
@@ -144,25 +206,40 @@ class _TaskListState extends State<TaskList> {
                       height: Converts.c24,
                       width: Converts.c96,
                       radius: 4,
-                      bgColor: widget.task.hasAccess
+                      /*bgColor: widget.task.hasAccess
                           ? widget.task.isUpdated
                               ? Colors.green
                               : Colors.purple
                           : widget.task.isUpdated
                               ? Colors.green
-                              : Palette.iconColor,
+                              : Palette.iconColor,*/
+                      bgColor: widget.task.hasAccess
+                          ? widget.task.isUpdated
+                          ? Colors.green
+                          : widget.endDate.isOverdue() ? Palette.iconColor : Colors.purple
+                          : widget.task.isUpdated
+                          ? Colors.green
+                          : Palette.iconColor,
                       hasOpacity: false,
                       tvColor: Colors.white,
                       fontSize: 14,
-                      text: widget.task.hasAccess
+                      /*text: widget.task.hasAccess
                           ? widget.task.isUpdated
                               ? "Complete"
                               : "Update"
                           : widget.task.isUpdated
                               ? "Complete"
-                              : "Pending",
+                              : "Pending",*/
+                      text: widget.task.hasAccess
+                          ? widget.task.isUpdated
+                          ? "Complete"
+                          : widget.endDate.isOverdue() ? "Expired" : "Update"
+                          : widget.task.isUpdated
+                          ? "Complete"
+                          : widget.endDate.isOverdue() ? "Expired" :"Pending",
                       onTap: () {
-                        if (widget.task.hasAccess && !widget.task.isUpdated) {
+                        //if (widget.task.hasAccess && !widget.task.isUpdated) {
+                        if (widget.task.hasAccess && !widget.task.isUpdated && !widget.endDate.isOverdue()) {
                           _showDialog(context);
                         }
                       }),
@@ -179,7 +256,7 @@ class _TaskListState extends State<TaskList> {
                       fontSize: 14,
                       iconData: Icons.flag_outlined,
                       text: widget.task.date.split("To")[1].trim(),
-                      onTap: () {})
+                      onTap: () {}),
                 ],
               ),
               // icon
@@ -264,4 +341,63 @@ class _TaskListState extends State<TaskList> {
       ),
     );
   }
+
+  void _showCustomerDialog(
+    BuildContext context,
+    InquiryViewModel inquiryViewModel,
+    /*String selectedFlagValue*/
+  ) {
+    getStaffs().then((staffResponse) {
+      if (staffResponse != null && context.mounted) {
+        List<Customer> customers = [];
+        for (var staff in staffResponse!.staffs!) {
+          customers.add(
+              Customer(id: staff.code, name: staff.name, isVerified: false));
+        }
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: TextViewCustom(
+                    text: Strings.search_by_name,
+                    fontSize: Converts.c16,
+                    tvColor: Palette.normalTv,
+                    isTextAlignCenter: false,
+                    isRubik: false,
+                    isBold: true),
+                content: CustomerSearchDialog(
+                    customers: customers,
+                    hintName: "",
+                    onCustomerSelected: (customer) async {
+                      if (customer != null) {
+                        setState(() {
+                          //this.customer = customer;
+                          widget.task.assignedPerson = customer.name!;
+                        });
+                        /*await _getInquiries(inquiryViewModel, selectedFlagValue,
+                            isAssigned, customer!.id!);
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }*/
+                      }
+                    }),
+              );
+            });
+      }
+    });
+  }
+
+  Future<StaffResponse?> getStaffs() async {
+    await context
+        .read<AddTaskViewModel>()
+        .getStaffs(widget.ownerId ?? "", "0", vm: "SSEARCH");
+    return mounted ? context.read<AddTaskViewModel>().staffResponse : null;
+  }
+
+/*bool _isDateOverdue(String inputDateString) {
+    final dateFormat = DateFormat("d MMM, yy");
+    final DateTime targetDate = dateFormat.parse(inputDateString);
+    final DateTime currentDate = DateTime.now();
+    return currentDate.isAfter(targetDate);
+  }*/
 }

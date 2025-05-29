@@ -191,8 +191,9 @@ class Task {
   //final String id;
   final int id;
   final String date;
-  final String name;
-  final bool hasAccess;
+  //final String name;
+  String name;
+  /*final*/ bool hasAccess;
 
   //final String totalTime;
   final int totalTime;
@@ -202,7 +203,8 @@ class Task {
 
   //final String status;
   String status;
-  final String assignedPerson;
+  //final String assignedPerson;
+  String assignedPerson;
 
   Task({
     required this.id,
@@ -225,6 +227,30 @@ class Task {
       totalTime: json['TOTAL_TIME'],
       status: json['STATUS'],
       assignedPerson: json['ASSIGNED_PERSON'],
+    );
+  }
+
+  // TEST
+  // CopyWith method to create a copy of the Task with some modified fields
+  Task copyWith({
+    int? id,
+    String? date,
+    String? name,
+    bool? hasAccess,
+    int? totalTime,
+    bool? isUpdated,
+    String? status,
+    String? assignedPerson,
+  }) {
+    return Task(
+      id: id ?? this.id,  // Use the current value if null is passed
+      date: date ?? this.date,
+      name: name ?? this.name,
+      hasAccess: hasAccess ?? this.hasAccess,
+      totalTime: totalTime ?? this.totalTime,
+      isUpdated: isUpdated ?? this.isUpdated,
+      status: status ?? this.status,
+      assignedPerson: assignedPerson ?? this.assignedPerson,
     );
   }
 }
@@ -252,7 +278,8 @@ class Attachment {
   factory Attachment.fromJson(Map<String, dynamic> json) {
     return Attachment(
       id: json['id'],
-      count: json['count'] ?? "0", // count is returned as a String in the JSON
+      //count: json['count'] ?? "0", // count is returned as a String in the JSON
+      count: json['count'] as String? ?? "0",
     );
   }
 }

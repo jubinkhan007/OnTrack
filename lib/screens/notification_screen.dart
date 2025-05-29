@@ -87,6 +87,7 @@ class NotificationScreen extends StatelessWidget {
     );
   }
 
+
   Widget notyItem(
       String name, String id, String title1, String title2, String title3, String date) {
     return Padding(

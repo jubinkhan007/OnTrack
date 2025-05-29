@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
@@ -7,16 +8,29 @@ import '../models/models.dart';
 
 class InquiryList extends StatelessWidget {
   final InquiryResponse inquiryResponse;
+  final int selectedFlagIndex;
+  final String staffId;
   final VoidCallback onTap;
   final Function(String) onCommentTap;
   final Function(String) onAttachmentTap;
+  final Function(String) onDeleteTap;
 
   const InquiryList(
       {super.key,
       required this.inquiryResponse,
+      required this.selectedFlagIndex,
+      required this.staffId,
       required this.onTap,
       required this.onCommentTap,
-      required this.onAttachmentTap});
+      required this.onAttachmentTap,
+      required this.onDeleteTap});
+
+  /*bool _isDateOverdue(String inputDateString) {
+    final dateFormat = DateFormat("d MMM, yy");
+    final DateTime targetDate = dateFormat.parse(inputDateString);
+    final DateTime currentDate = DateTime.now();
+    return currentDate.isAfter(targetDate);
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -29,21 +43,73 @@ class InquiryList extends StatelessWidget {
           borderRadius: BorderRadius.circular(4), // Rounded corners
           //side: BorderSide(color: Colors.blue, width: 2), // Border color and width
         ),
-        elevation: 4, // Shadow effect
-        color: Colors.white,
+        elevation: 4,
+        // Shadow effect
+        //color: _isDateOverdue(inquiryResponse.endDate) && selectedFlagIndex == 0
+        color: inquiryResponse.endDate.isOverdue() && selectedFlagIndex == 0
+            ? Colors.deepOrange.withOpacity(0.3)
+            : Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// title
-              TextViewCustom(
-                  text: inquiryResponse.title,
-                  fontSize: Converts.c20,
-                  tvColor: Palette.normalTv,
-                  isTextAlignCenter: false,
-                  isRubik: false,
-                  isBold: true),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextViewCustom(
+                        text: inquiryResponse.title,
+                        fontSize: Converts.c20,
+                        tvColor: Palette.normalTv,
+                        isTextAlignCenter: false,
+                        isRubik: false,
+                        isBold: true),
+                  ),
+                  staffId == inquiryResponse.postedBy.staffId &&
+                          selectedFlagIndex == 0
+                      ? Align(
+                          alignment: Alignment.centerRight,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            // Allows padding to be tappable
+                            onTapDown: (TapDownDetails details) {
+                              showMenu(
+                                context: context,
+                                position: RelativeRect.fromLTRB(
+                                  details.globalPosition.dx,
+                                  details.globalPosition.dy,
+                                  0,
+                                  0,
+                                ),
+                                items: [
+                                  const PopupMenuItem(
+                                      value: 'delete', child: Text('Delete')),
+                                  //const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                                ],
+                              ).then((value) {
+                                if (value == 'delete') {
+                                  onDeleteTap(inquiryResponse.id.toString());
+                                } /*else if (value == 'edit') {
+                                    print('Edit tapped');
+                                }*/
+                              });
+                            },
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.all(4), // Increase tap area
+                              child: Icon(
+                                Icons.more_vert,
+                                size: Converts.c16,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ],
+              ),
 
               /// user & buyer info
               Row(
@@ -79,17 +145,18 @@ class InquiryList extends StatelessWidget {
                   SizedBox(
                     width: Converts.c8,
                   ),
-                  Expanded(
-                    child: TextViewCustom(
-                      text: inquiryResponse.customer != null
-                          ? inquiryResponse.customer.name!
-                          : "",
-                      fontSize: Converts.c16,
-                      tvColor: Palette.semiTv,
-                      isTextAlignCenter: false,
-                      isBold: false,
-                    ),
+                  //Expanded(
+                  //child:
+                  TextViewCustom(
+                    text: inquiryResponse.customer != null
+                        ? inquiryResponse.customer.name!
+                        : "",
+                    fontSize: Converts.c16,
+                    tvColor: Palette.semiTv,
+                    isTextAlignCenter: false,
+                    isBold: false,
                   ),
+                  //),
                   const SizedBox(
                     width: 4,
                   ),

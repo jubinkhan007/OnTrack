@@ -40,11 +40,13 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       final arguments = routeSettings.arguments as Map<String, dynamic>;
       final inquiryResponse = arguments['inquiryResponse'] as InquiryResponse;
       final flag = arguments['flag'] as String;
+      final staffId = arguments['staffId'] as String;
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => InquiryView(
           inquiryResponse: inquiryResponse,
           flag: flag,
+          staffId: staffId
         ),
       );
     case CreateInquiryScreen.routeName:

@@ -19,6 +19,34 @@ extension DateTimeFormatter on DateTime {
   }
 }
 
+/*extension DateCheckExtension on String {
+  bool isOverdue() {
+    final dateFormat = DateFormat("d MMM, yy");
+    final DateTime targetDate = dateFormat.parse(this);
+    final DateTime currentDate = DateTime.now();
+    debugPrint("DATE::$targetDate");
+    debugPrint("CDATE::$currentDate");
+    return currentDate.isAfter(targetDate);
+  }
+}*/
+
+extension DateCheckExtension on String {
+  bool isOverdue() {
+    final dateFormat = DateFormat("d MMM, yy");
+    final DateTime targetDate = dateFormat.parse(this);
+
+    // Get the current date with no time component
+    final DateTime currentDate = DateTime.now().toLocal();
+    final DateTime currentDateOnly =
+        DateTime(currentDate.year, currentDate.month, currentDate.day);
+
+    //debugPrint("TARGET DATE: $targetDate");
+    //debugPrint("CURRENT DATE: $currentDateOnly");
+
+    return currentDateOnly.isAfter(targetDate);
+  }
+}
+
 extension SnackbarExtension on BuildContext {
   void showMessage(String message) {
     final snackBar = SnackBar(
@@ -122,7 +150,6 @@ extension HideKeyboard on BuildContext {
     FocusScope.of(this).requestFocus(FocusNode());
   }
 }
-
 
 extension StatusFlagExtension on StatusFlag {
   String get getFlag {

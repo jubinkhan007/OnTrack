@@ -433,6 +433,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               inquiryViewModel.inquiries![index];
                           return InquiryList(
                             inquiryResponse: inquiryResponse,
+                            selectedFlagIndex: selectedFlagIndex,
+                            staffId: widget.staffId,
 
                             /// detail view
                             onTap: () {
@@ -442,6 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 arguments: {
                                   'inquiryResponse': inquiryResponse,
                                   'flag': selectedFlag,
+                                  'staffId': widget.staffId
                                 },
                               );
                             },
@@ -465,6 +468,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                   'taskId': "0",
                                 },
                               );
+                            },
+
+                            /// delete tap
+                            onDeleteTap: (id) async {
+                              await inquiryViewModel.deleteInq(id);
+                              //if (!context.mounted) return;
+                              if (inquiryViewModel.uiState == UiState.error) {
+                                _showMessage(
+                                    "Error: ${inquiryViewModel.message}");
+                              } else {
+                                if (inquiryViewModel.isSavedInquiry != null) {
+                                  if (inquiryViewModel.isSavedInquiry!) {
+                                    setState(() {
+                                      inquiryViewModel.inquiries!
+                                          .removeAt(index);
+                                    });
+                                  } else {
+                                    _showMessage(
+                                        Strings.failed_to_delete_the_data);
+                                  }
+                                } else {
+                                  _showMessage(Strings.data_is_missing);
+                                }
+                              }
                             },
                           );
                         },
@@ -491,6 +518,24 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  _showMessage(String message) {
+    final snackBar = SnackBar(
+      content: TextViewCustom(
+        text: message,
+        tvColor: Colors.white,
+        fontSize: Converts.c16,
+        isBold: false,
+        isRubik: true,
+        isTextAlignCenter: false,
+      ),
+      action: SnackBarAction(
+        label: 'Ok',
+        onPressed: () {},
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Future<void> _getInquiries(InquiryViewModel inquiryViewModel, String flag,
@@ -694,7 +739,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: Converts.c16,
                       ),
                       TextViewCustom(
-                          text: userResponse.users![0]!.staffName!,
+                          //text: userResponse.users![0]!.staffName!,
+                          text: userResponse.users?.isNotEmpty == true
+                              ? userResponse.users![0].staffName ?? ''
+                              : '',
                           fontSize: Converts.c20,
                           tvColor: Palette.normalTv,
                           isRubik: false,
@@ -703,7 +751,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 4,
                       ),
                       TextViewCustom(
-                          text: userResponse.users![0]!.mailId!,
+                          //text: userResponse.users![0]!.mailId!,
+                          text: userResponse.users?.isNotEmpty == true
+                              ? userResponse.users![0].mailId ?? ''
+                              : '',
                           fontSize: Converts.c12,
                           tvColor: Palette.semiTv,
                           isRubik: false,
@@ -918,7 +969,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               }
                             }
                           }
-                        },//510910
+                        },
                         child: const Text(Strings.add),
                       ),
                 provider.message != null
@@ -937,4 +988,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
+
 }

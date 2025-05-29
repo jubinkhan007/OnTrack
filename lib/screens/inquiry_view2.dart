@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/strings.dart';
-import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/screens/screens.dart';
 
 import '../config/converts.dart';
@@ -12,7 +10,7 @@ import '../viewmodel/add_task_viewmodel.dart';
 import '../viewmodel/inquiry_viewmodel.dart';
 import '../widgets/widgets.dart';
 
-class InquiryView extends StatefulWidget {
+class InquiryView extends StatelessWidget {
   static const String routeName = '/inquiry_screen';
   final InquiryResponse inquiryResponse;
   final String flag;
@@ -24,14 +22,9 @@ class InquiryView extends StatefulWidget {
       required this.flag,
       required this.staffId});
 
-  @override
-  State<InquiryView> createState() => _InquiryViewState();
-}
-
-class _InquiryViewState extends State<InquiryView> {
   int _countPendingTask() {
     int count = 0;
-    for (var value in widget.inquiryResponse.tasks) {
+    for (var value in inquiryResponse.tasks) {
       if (value.isUpdated) {
         count++;
       }
@@ -62,8 +55,8 @@ class _InquiryViewState extends State<InquiryView> {
                 Navigator.pop(context); // Navigate back
               },
             ),
-            /*actions: [
-              widget.staffId == widget.inquiryResponse.postedBy!.staffId
+            actions: [
+              staffId == inquiryResponse.postedBy!.staffId
                   ? Row(
                       children: [
                         Icon(
@@ -88,7 +81,7 @@ class _InquiryViewState extends State<InquiryView> {
                       ],
                     )
                   : const SizedBox.shrink(),
-            ],*/
+            ],
           ),
           SliverPadding(
             padding: EdgeInsets.only(
@@ -102,12 +95,12 @@ class _InquiryViewState extends State<InquiryView> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   _iconView(Icons.folder_open_outlined, "${Strings.project}:",
-                      widget.inquiryResponse.title),
+                      inquiryResponse.title),
                   const SizedBox(
                     height: 4,
                   ),
                   _iconView(Icons.account_circle_outlined, "${Strings.owner}:",
-                      "${widget.inquiryResponse.postedBy.name} [${widget.inquiryResponse.customer.name}]"),
+                      "${inquiryResponse.postedBy.name} [${inquiryResponse.customer.name}]"),
                   const SizedBox(
                     height: 4,
                   ),
@@ -116,7 +109,7 @@ class _InquiryViewState extends State<InquiryView> {
                     height: 4,
                   ),
                   TextViewCustom(
-                    text: widget.inquiryResponse.description,
+                    text: inquiryResponse.description,
                     fontSize: Converts.c16,
                     tvColor: Palette.normalTv,
                     isTextAlignCenter: false,
@@ -126,13 +119,13 @@ class _InquiryViewState extends State<InquiryView> {
                     height: 4,
                   ),
                   _iconView(Icons.timer_outlined, "${Strings.date}:",
-                      widget.inquiryResponse.endDate),
+                      inquiryResponse.endDate),
                   const SizedBox(
                     height: 4,
                   ),
-                  if (widget.inquiryResponse.company != null)
+                  if (inquiryResponse.company != null)
                     _iconView(Icons.label_outline, "${Strings.company}:",
-                        widget.inquiryResponse.company!),
+                        inquiryResponse.company!),
                   SizedBox(
                     height: Converts.c20,
                   ),
@@ -143,11 +136,11 @@ class _InquiryViewState extends State<InquiryView> {
                           width: Converts.c104,
                           radius: 8,
                           //bgColor: flag == HomeFlagItem().homeFlagItems[3].title
-                          bgColor: widget.flag == HomeFlagItem().homeFlagItems[1].title
+                          bgColor: flag == HomeFlagItem().homeFlagItems[1].title
                               ? Colors.green
                               : Palette.iconColor,
                           hasOpacity: false,
-                          text: widget.flag,
+                          text: flag,
                           fontSize: Converts.c16,
                           tvColor: Colors.white,
                           onTap: () {}),
@@ -171,7 +164,7 @@ class _InquiryViewState extends State<InquiryView> {
                               context,
                               AttachmentViewScreen.routeName,
                               arguments: {
-                                'inquiryId': widget.inquiryResponse.id.toString(),
+                                'inquiryId': inquiryResponse.id.toString(),
                                 'taskId': "0",
                               },
                             );
@@ -195,7 +188,7 @@ class _InquiryViewState extends State<InquiryView> {
                             Navigator.pushNamed(
                               context,
                               CommentScreen.routeName,
-                              arguments: widget.inquiryResponse.id.toString(),
+                              arguments: inquiryResponse.id.toString(),
                             );
                           }),
                     ],
@@ -221,7 +214,7 @@ class _InquiryViewState extends State<InquiryView> {
                           bgColor: Palette.tabColor,
                           hasOpacity: false,
                           text:
-                              "${_countPendingTask()}/${widget.inquiryResponse.tasks.length}",
+                              "${_countPendingTask()}/${inquiryResponse.tasks.length}",
                           fontSize: Converts.c12,
                           tvColor: Colors.white,
                           isTvBold: true,
@@ -251,7 +244,7 @@ class _InquiryViewState extends State<InquiryView> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                final task = widget.inquiryResponse.tasks[index];
+                final task = inquiryResponse.tasks[index];
 
                 return /*staffId == inquiryResponse.postedBy.staffId
                     ? Dismissible (
@@ -283,13 +276,13 @@ class _InquiryViewState extends State<InquiryView> {
                     :*/
                     TaskList(
                   task: task,
-                  inquiryId: widget.inquiryResponse.id.toString(),
-                  isOwner: widget.staffId == widget.inquiryResponse.postedBy.staffId,
-                  ownerId: widget.staffId,
-                  endDate: widget.inquiryResponse.endDate,
+                  inquiryId: inquiryResponse.id.toString(),
+                  isOwner: staffId == inquiryResponse.postedBy.staffId,
+                  ownerId: staffId,
+                  endDate: inquiryResponse.endDate,
                 );
               },
-              childCount: widget.inquiryResponse.tasks.length,
+              childCount: inquiryResponse.tasks.length,
             ),
           ),
         ],
@@ -359,15 +352,6 @@ class _InquiryViewState extends State<InquiryView> {
                     onCustomerSelected: (customer) async {
                       if (customer != null) {
                         debugPrint("Name::${customer.name}");
-                        setState(() {
-                          var newTask = widget.inquiryResponse.tasks[0].copyWith(
-                            hasAccess: false,
-                            isUpdated: false,
-                            assignedPerson: customer.name!,
-                            status: "New Entry",
-                          );
-                          widget.inquiryResponse.tasks!.add(newTask);
-                        });
                         //this.customer = customer;
                         //widget.task.assignedPerson = customer.name!;
                       }
@@ -381,9 +365,10 @@ class _InquiryViewState extends State<InquiryView> {
   Future<StaffResponse?> getStaffs(BuildContext context) async {
     await context
         .read<AddTaskViewModel>()
-        .getStaffs(widget.staffId, "0", vm: "SSEARCH");
+        .getStaffs(staffId, "0", vm: "SSEARCH");
     return context.mounted
         ? context.read<AddTaskViewModel>().staffResponse
         : null;
   }
+
 }

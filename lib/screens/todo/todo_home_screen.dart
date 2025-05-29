@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
@@ -51,6 +52,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   List<Customer> filteredNewUsers = [];
   List<Customer> _addedUsers = [];
   List<Discussion> _assignedTaskToUser = [];
+
+  // user info
+  String staffId = "";
 
   void _searchForNewUsers(String query) {
     setState(() {
@@ -117,6 +121,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       ];
       await Future.wait(futures);
       await _fetchStaffsInfo();
+      staffId = await _getUserName(isName: false);
     } catch (e) {
       showMessage(e.toString());
     }
@@ -267,10 +272,15 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     ),
                     confirmDismiss: (direction) async {
                       if (direction == DismissDirection.startToEnd) {
-                        updateTodos(
-                            Provider.of<InquiryCreateViewModel>(context,
-                                listen: false),
-                            inquiryResponse);
+                        //  check if end date is expire
+                        if (!inquiryResponse.endDate.isOverdue()) {
+                          updateTodos(
+                              Provider.of<InquiryCreateViewModel>(context,
+                                  listen: false),
+                              inquiryResponse);
+                        } else {
+                          showMessage(Strings.overdue);
+                        }
                       } else if (direction == DismissDirection.endToStart) {
                         Navigator.pushNamed(
                           context,
@@ -286,10 +296,15 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                       //debugPrint("CHECKED: $value");
                       //});
                       if (value) {
-                        await updateTodos(
-                            Provider.of<InquiryCreateViewModel>(context,
-                                listen: false),
-                            inquiryResponse);
+                        // check if end date is expire
+                        if (!inquiryResponse.endDate.isOverdue()) {
+                          await updateTodos(
+                              Provider.of<InquiryCreateViewModel>(context,
+                                  listen: false),
+                              inquiryResponse);
+                        } else {
+                          showMessage(Strings.overdue);
+                        }
                       }
                     }),
                   );
@@ -432,17 +447,17 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     controller: _taskController,
                     focusNode: _focusNode,
                     maxLines: null,
-                    textInputAction: TextInputAction.done,
+                    //textInputAction: TextInputAction.done,
                     keyboardType: TextInputType.multiline,
                     decoration: const InputDecoration(
                         hintText: Strings.add_a_task,
                         border: InputBorder.none,
                         hintStyle: TextStyle(color: Palette.circleColor)),
-                    style: TextStyle(fontSize: Converts.c16),
+                    style: TextStyle(fontSize: Converts.c20),
                     //onEditingComplete: _addTask, // Add task on done
-                    onEditingComplete: () async {
+                    /*onEditingComplete: () async {
                       await saveTodos(inquiryViewModel);
-                    }, // Add task on done
+                    },*/ // Add task on done
                   ),
                 ),
 
@@ -453,11 +468,16 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                       ? IconButton(
                           icon: Icon(
                             Icons.send,
-                            size: Converts.c16,
+                            size: Converts.c24,
                             color: Palette.mainColor,
                           ),
                           onPressed: () async {
-                            await saveTodos(inquiryViewModel);
+                            if (_addedUsers.isEmpty) {
+                              await _showDialogWithoutMembers(
+                                  context, inquiryViewModel);
+                            } else {
+                              await saveTodos(inquiryViewModel);
+                            }
                           },
                         )
                       : SizedBox(
@@ -518,6 +538,13 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     Provider.of<TodoViewModel>(context, listen: false)
         .getInquiries(statusFlag, widget.staffId, "1");
   }
+
+  /*bool _isDateOverdue(String inputDateString) {
+    final dateFormat = DateFormat("d MMM, yy");
+    final DateTime targetDate = dateFormat.parse(inputDateString);
+    final DateTime currentDate = DateTime.now();
+    return currentDate.isAfter(targetDate);
+  }*/
 
   Future<void> updateTodos(InquiryCreateViewModel inquiryViewModel,
       InquiryResponse inquiryResponse) async {
@@ -607,16 +634,22 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       ),
       child: GestureDetector(
         onTap: () {
+          //debugPrint("Value:: ${inquiryResponse.attachment.count} ${statusFlagName}");
           Navigator.pushNamed(
             context,
             InquiryView.routeName,
             arguments: {
               'inquiryResponse': inquiryResponse,
               'flag': statusFlagName,
+              'staffId': staffId
             },
           );
         },
         child: Material(
+          //color: _isDateOverdue(inquiryResponse.endDate) && statusFlag == StatusFlag.pending.getFlag
+          color: inquiryResponse.endDate.isOverdue() && statusFlag == StatusFlag.pending.getFlag
+              ? Colors.deepOrange.withOpacity(0.3)
+              : Colors.white,
           borderRadius: BorderRadius.circular(8),
           elevation: 2,
           child: Column(
@@ -870,11 +903,14 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     return "";
   }
 
-  Future<String> _getUserName() async {
+  Future<String> _getUserName({bool isName = true}) async {
     try {
       var userResponse = await SPHelper().getUser();
-      String name =
-          userResponse != null ? userResponse.users![0].staffName! : "";
+      String name = userResponse != null
+          ? isName
+              ? userResponse.users![0].staffName!
+              : userResponse.users![0].staffId!
+          : "";
       return name;
     } catch (e) {
       return "";
@@ -950,5 +986,32 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       showMessage("Task description cannot be empty.");
     }
   }
+
+  Future<void> _showDialogWithoutMembers(
+      BuildContext context, InquiryCreateViewModel inquiryViewModel) async {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirm Action'),
+        content: const Text('No team members added—are you sure?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop(); // Close the dialog
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop(); // Close the dialog first
+              await saveTodos(inquiryViewModel); // Call API
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
+
 
 }

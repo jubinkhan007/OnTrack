@@ -71,7 +71,7 @@ class _FileAttachment2State extends State<FileAttachment2> {
                     },
                     child: Icon(
                       Icons.image_outlined,
-                      size: Converts.c16,
+                      size: Converts.c24,
                       //color: _imageFiles.isNotEmpty
                       color: //context.read<InquiryCreateViewModel>()
                           widget.inquiryViewModel!.imageFiles.isNotEmpty
