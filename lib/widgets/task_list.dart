@@ -33,6 +33,8 @@ class TaskList extends StatefulWidget {
 }
 
 class _TaskListState extends State<TaskList> {
+  double _currentDiscreteSliderValue = 60;
+
   _showDialog(BuildContext context) {
     showDialog(
         context: context,
@@ -100,9 +102,9 @@ class _TaskListState extends State<TaskList> {
                                   listen: false),
                             );
                           }
-                        } *//*else if (value == 'edit') {
+                        } */ /*else if (value == 'edit') {
                     print('Edit tapped');
-                  }*//*
+                  }*/ /*
                       });
                     },
                     child: Container(
@@ -116,8 +118,7 @@ class _TaskListState extends State<TaskList> {
                   ),
                 )
               : const SizedBox.shrink(),*/
-
-          /// title & status
+        /// title & status
           Row(
             children: [
               Expanded(
@@ -195,6 +196,27 @@ class _TaskListState extends State<TaskList> {
             height: Converts.c16,
           ),
 
+          /// TEST
+
+          /*Row(
+            children: [
+              Expanded(
+                flex: 30, // 30% green
+                child: Container(
+                  height: 2,
+                  color: Colors.green,
+                ),
+              ),
+              Expanded(
+                flex: 70, // 70% white
+                child: Container(
+                  height: 2,
+                  color: Colors.red,
+                ),
+              ),
+            ],
+          ),
+*/
           /// flag & icon
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -215,11 +237,15 @@ class _TaskListState extends State<TaskList> {
                               : Palette.iconColor,*/
                       bgColor: widget.task.hasAccess
                           ? widget.task.isUpdated
-                          ? Colors.green
-                          : widget.endDate.isOverdue() ? Palette.iconColor : Colors.purple
+                              ? Colors.green
+                              //: widget.endDate.isOverdue() ? Palette.iconColor : Colors.purple
+                              : formatWithCurrentYear(widget.task.date)
+                                      .isOverdue()
+                                  ? Palette.iconColor
+                                  : Colors.purple
                           : widget.task.isUpdated
-                          ? Colors.green
-                          : Palette.iconColor,
+                              ? Colors.green
+                              : Palette.iconColor,
                       hasOpacity: false,
                       tvColor: Colors.white,
                       fontSize: 14,
@@ -232,14 +258,24 @@ class _TaskListState extends State<TaskList> {
                               : "Pending",*/
                       text: widget.task.hasAccess
                           ? widget.task.isUpdated
-                          ? "Complete"
-                          : widget.endDate.isOverdue() ? "Expired" : "Update"
+                              ? "Complete"
+                              //: widget.endDate.isOverdue() ? "Expired" : "Update"
+                              : formatWithCurrentYear(widget.task.date)
+                                      .isOverdue()
+                                  ? "Expired"
+                                  : "Update"
                           : widget.task.isUpdated
-                          ? "Complete"
-                          : widget.endDate.isOverdue() ? "Expired" :"Pending",
+                              ? "Complete"
+                              //: widget.endDate.isOverdue() ? "Expired" :"Pending",
+                              : formatWithCurrentYear(widget.task.date)
+                                      .isOverdue()
+                                  ? "Expired"
+                                  : "Pending",
                       onTap: () {
                         //if (widget.task.hasAccess && !widget.task.isUpdated) {
-                        if (widget.task.hasAccess && !widget.task.isUpdated && !widget.endDate.isOverdue()) {
+                        if (widget.task.hasAccess &&
+                            !widget.task.isUpdated &&
+                            !widget.endDate.isOverdue()) {
                           _showDialog(context);
                         }
                       }),
@@ -394,10 +430,17 @@ class _TaskListState extends State<TaskList> {
     return mounted ? context.read<AddTaskViewModel>().staffResponse : null;
   }
 
-/*bool _isDateOverdue(String inputDateString) {
-    final dateFormat = DateFormat("d MMM, yy");
-    final DateTime targetDate = dateFormat.parse(inputDateString);
-    final DateTime currentDate = DateTime.now();
-    return currentDate.isAfter(targetDate);
-  }*/
+  String formatWithCurrentYear(String dateRange) {
+    final parts = dateRange.split("To");
+    if (parts.length == 2) {
+      final endDate = parts[1].trim(); // e.g., "05 Jun"
+
+      // Get last two digits of the current year
+      final int currentYear = DateTime.now().year;
+      final String yearSuffix = currentYear.toString().substring(2); // "25"
+
+      return "$endDate, $yearSuffix"; // e.g., "05 Jun, 25"
+    }
+    return "";
+  }
 }

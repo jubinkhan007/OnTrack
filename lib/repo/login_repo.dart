@@ -23,6 +23,7 @@ class LoginRepo {
         'vb': userid,
         'vc': password,
         'vd': 'user',
+        've': firebaseDeviceToken
       };
       final response = await dio.get(
         "getall",

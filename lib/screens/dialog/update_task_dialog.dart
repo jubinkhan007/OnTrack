@@ -31,6 +31,9 @@ class UpdateTaskDialog extends StatefulWidget {
 class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
   final TextEditingController descriptionController = TextEditingController();
 
+  double _currentSliderValue = 20;
+  double _currentDiscreteSliderValue = 60;
+
   // files
   final List<ImageFile> imageFiles = [];
 
@@ -165,6 +168,7 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                     tvColor: Palette.normalTv,
                     isRubik: false,
                     isBold: true),
+
                 SizedBox(
                   height: Converts.c8,
                 ),
@@ -182,8 +186,37 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                     }
                   },
                 ),
-                SizedBox(
-                  height: Converts.c16,
+
+                /*SizedBox(
+                  height: Converts.c8,
+                ),*/
+
+                /// percentage
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      "How much done? (${_currentDiscreteSliderValue.round().toString()}/100)",
+                      style: TextStyle(
+                        color: _currentDiscreteSliderValue.round() > 60 ? _currentDiscreteSliderValue.round() == 100 ? Colors.green : Colors.orangeAccent : Colors.deepOrange,
+                        fontSize: Converts.c12,
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                  ],
+                ),
+
+                Slider(
+                  //year2023: year2023,
+                  value: _currentDiscreteSliderValue,
+                  max: 100,
+                  divisions: 10,
+                  label: _currentDiscreteSliderValue.round().toString(),
+                  onChanged: (double value) {
+                    setState(() {
+                      _currentDiscreteSliderValue = value;
+                    });
+                  },
                 ),
 
                 /// update button
@@ -266,4 +299,6 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
       return "";
     }
   }
+
+
 }

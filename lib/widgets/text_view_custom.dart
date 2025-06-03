@@ -6,34 +6,35 @@ class TextViewCustom extends StatelessWidget {
   final double fontSize;
   final Color tvColor;
   final bool isBold;
+  final bool isDecodeNeeded;
   final bool isTextAlignCenter;
   final bool isRubik;
 
-  const TextViewCustom(
-      {super.key,
-      required this.text,
-      required this.fontSize,
-      required this.tvColor,
-      required this.isBold,
-      this.isTextAlignCenter = true,
-      this.isRubik = true});
+  const TextViewCustom({super.key,
+    required this.text,
+    required this.fontSize,
+    required this.tvColor,
+    required this.isBold,
+    this.isDecodeNeeded = true,
+    this.isTextAlignCenter = true,
+    this.isRubik = true});
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      Uri.decodeComponent(text),
+      isDecodeNeeded ? Uri.decodeComponent(text) : text,
       textAlign: isTextAlignCenter ? TextAlign.center : TextAlign.start,
       style: !isRubik
           ? GoogleFonts.roboto(
-              fontSize: fontSize,
-              color: tvColor,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            )
-          : GoogleFonts.rubik(
-              fontSize: fontSize,
-              color: tvColor,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            ),
+        fontSize: fontSize,
+        color: tvColor,
+        fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+      ) : GoogleFonts.rubik(
+        fontSize: fontSize,
+        color: tvColor,
+        fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+      ),
     );
   }
 }
+//411495

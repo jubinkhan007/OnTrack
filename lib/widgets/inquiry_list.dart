@@ -54,7 +54,7 @@ class InquiryList extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// title
+              /// title & menu item
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -86,14 +86,14 @@ class InquiryList extends StatelessWidget {
                                 items: [
                                   const PopupMenuItem(
                                       value: 'delete', child: Text('Delete')),
-                                  //const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                                  const PopupMenuItem(value: 'edit', child: Text('Edit')),
                                 ],
                               ).then((value) {
                                 if (value == 'delete') {
                                   onDeleteTap(inquiryResponse.id.toString());
-                                } /*else if (value == 'edit') {
-                                    print('Edit tapped');
-                                }*/
+                                } else if (value == 'edit') {
+                                    debugPrint('Edit tapped');
+                                }
                               });
                             },
                             child: Container(

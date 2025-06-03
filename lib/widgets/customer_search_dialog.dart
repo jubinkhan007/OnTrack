@@ -86,6 +86,7 @@ class _CustomerSearchDialogState extends State<CustomerSearchDialog> {
                                   //text: "Md. Akash Ahmed (Sub Assistant Manager, Export-Desk)",
                                   fontSize: Converts.c16,
                                   tvColor: Palette.navyBlueColor,
+                                  isDecodeNeeded: false,
                                   isTextAlignCenter: false,
                                   isBold: false),
                             ),
