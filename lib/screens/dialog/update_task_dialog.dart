@@ -16,7 +16,8 @@ class UpdateTaskDialog extends StatefulWidget {
   final Task task;
   final String inquiryId;
 
-  final Function(bool, String) onCall;
+  //final Function(bool, String) onCall;
+  final Function(bool, String, double) onCall;
 
   UpdateTaskDialog(
       {super.key,
@@ -31,8 +32,9 @@ class UpdateTaskDialog extends StatefulWidget {
 class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
   final TextEditingController descriptionController = TextEditingController();
 
-  double _currentSliderValue = 20;
-  double _currentDiscreteSliderValue = 60;
+  //double _currentSliderValue = 20;
+  //double _currentDiscreteSliderValue = 60;
+  double? _currentDiscreteSliderValue = 0.0;
 
   // files
   final List<ImageFile> imageFiles = [];
@@ -51,6 +53,7 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _currentDiscreteSliderValue = widget.task.totalPercentage;
     final taskUpdateViewModel =
         Provider.of<TaskUpdateViewModel>(context, listen: false);
     _reset(taskUpdateViewModel);
@@ -196,22 +199,25 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      "How much done? (${_currentDiscreteSliderValue.round().toString()}/100)",
+                      "How much done? (${_currentDiscreteSliderValue!.round().toString()}/100)",
                       style: TextStyle(
-                        color: _currentDiscreteSliderValue.round() > 60 ? _currentDiscreteSliderValue.round() == 100 ? Colors.green : Colors.orangeAccent : Colors.deepOrange,
-                        fontSize: Converts.c12,
-                        fontWeight: FontWeight.bold
-                      ),
+                          color: _currentDiscreteSliderValue!.round() > 60
+                              ? _currentDiscreteSliderValue!.round() == 100
+                                  ? Colors.green
+                                  : Colors.orangeAccent
+                              : Colors.deepOrange,
+                          fontSize: Converts.c12,
+                          fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
 
                 Slider(
                   //year2023: year2023,
-                  value: _currentDiscreteSliderValue,
+                  value: _currentDiscreteSliderValue!,
                   max: 100,
                   divisions: 10,
-                  label: _currentDiscreteSliderValue.round().toString(),
+                  label: _currentDiscreteSliderValue!.round().toString(),
                   onChanged: (double value) {
                     setState(() {
                       _currentDiscreteSliderValue = value;
@@ -269,7 +275,9 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                                   mStatusId == "7" ? true : false,
                                   inquiryViewModel.statusName != null
                                       ? inquiryViewModel.statusName!
-                                      : "");
+                                      : "",
+                                  _currentDiscreteSliderValue ?? 0
+                              );
                               Navigator.pop(context);
                             } else {
                               showMessage(Strings.failed_to_save_the_data);
@@ -299,6 +307,4 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
       return "";
     }
   }
-
-
 }

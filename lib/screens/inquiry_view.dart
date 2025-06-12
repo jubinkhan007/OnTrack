@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/enum.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/screens/screens.dart';
@@ -11,6 +12,7 @@ import '../models/models.dart';
 import '../viewmodel/add_task_viewmodel.dart';
 import '../viewmodel/inquiry_viewmodel.dart';
 import '../widgets/widgets.dart';
+import 'dialog/edit_task_dialog.dart';
 
 class InquiryView extends StatefulWidget {
   static const String routeName = '/inquiry_screen';
@@ -62,20 +64,21 @@ class _InquiryViewState extends State<InquiryView> {
                 Navigator.pop(context); // Navigate back
               },
             ),
-            /*actions: [
+            actions: [
               widget.staffId == widget.inquiryResponse.postedBy!.staffId
                   ? Row(
                       children: [
-                        Icon(
+                        /*Icon(
                           Icons.add,
                           color: Colors.white,
                           size: Converts.c12,
-                        ),
-                        TextButton(
+                        ),*/
+                        IconButton(
                           onPressed: () {
                             _showCustomerDialog(context, );
                           },
-                          child: Text(
+                          icon: const Icon(Icons.supervisor_account, color: Colors.white,),
+                          /*child: Text(
                             Strings.add_staff,
                             style: TextStyle(
                               fontSize: Converts.c12,
@@ -83,12 +86,28 @@ class _InquiryViewState extends State<InquiryView> {
                               fontWeight:
                                   FontWeight.bold, // Optional, for emphasis
                             ),
-                          ),
+                          ),*/
                         ),
+                        //IconButton(
+                          //onPressed: () {
+                            //_showCustomerDialog(context, );
+                            //_showEditDialog(context);
+                          //},
+                          //icon: const Icon(Icons.edit, color: Colors.white,),
+                          /*child: Text(
+                            Strings.add_staff,
+                            style: TextStyle(
+                              fontSize: Converts.c12,
+                              color: Colors.white, // Customize text color
+                              fontWeight:
+                                  FontWeight.bold, // Optional, for emphasis
+                            ),
+                          ),*/
+                        //),
                       ],
                     )
                   : const SizedBox.shrink(),
-            ],*/
+            ],
           ),
           SliverPadding(
             padding: EdgeInsets.only(
@@ -377,6 +396,30 @@ class _InquiryViewState extends State<InquiryView> {
       }
     });
   }
+
+/*  _showEditDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return EditTaskDialog(
+            //inquiryResponse: widget.inquiryResponse,
+            inquiryResponse: widget.inquiryResponse,
+            onSave: (description, date, data, isUpdateAll) {
+              setState(() {
+                widget.inquiryResponse.description =description;
+                widget.inquiryResponse.title = description;
+                widget.inquiryResponse.endDate = date.toFormattedDate();
+                for (var task in widget.inquiryResponse.tasks) {
+                  task.name = description;
+                  task.date = "${task.date.split("To")[0]} To ${date.toFormattedDate().split(",")[0]}";
+                }
+                //widget.task.status = flag;
+                //widget.task.isUpdated = hasUpdate;
+              });
+            },
+          );
+        });
+  }*/
 
   Future<StaffResponse?> getStaffs(BuildContext context) async {
     await context

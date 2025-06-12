@@ -30,6 +30,8 @@ class Strings {
   static const String pending = 'Pending';
   //static const String attachment = 'Attachment';
   static const String attachment = 'Images';
+  static const String change = 'change';
+  static const String save = 'Save';
   static const String comment = 'Comment';
   static const String notes = 'Notes';
   static const String project = 'Title';
@@ -50,6 +52,7 @@ class Strings {
   static const String add = 'Add';
   static const String add_task = 'Add Task';
   static const String update_task = 'Update Task';
+  static const String edit_task = 'Edit Task';
   static const String update = 'Update';
   static const String description = 'Description';
   static const String enter_brief_description = 'Enter Brief Description';

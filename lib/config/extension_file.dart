@@ -47,6 +47,39 @@ extension DateCheckExtension on String {
   }
 }
 
+/*extension DateFormatExtension on String {
+  /// Converts "yyyy-MM-dd" to "dd MMM, yy"
+  String toFormattedDate() {
+    try {
+      DateTime date = DateTime.parse(this);
+      return DateFormat('dd MMM, yy').format(date);
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+}*/
+
+
+extension DateFormatExtension on String {
+  /// Converts "yyyy-MM-dd" to "dd MMM, yy" safely
+  String toFormattedDate() {
+    try {
+      // Try parsing as ISO (e.g. "2025-06-12")
+      DateTime date = DateTime.parse(this);
+      return DateFormat('dd MMM, yy').format(date);
+    } catch (_) {
+      try {
+        // Check if it's already in "dd MMM, yy" format
+        DateFormat('dd MMM, yy').parseStrict(this);
+        return this;
+      } catch (_) {
+        return 'Invalid date';
+      }
+    }
+  }
+}
+
+
 extension SnackbarExtension on BuildContext {
   void showMessage(String message) {
     final snackBar = SnackBar(

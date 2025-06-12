@@ -10,6 +10,7 @@ import '../config/palette.dart';
 import '../config/strings.dart';
 import '../models/models.dart';
 import '../screens/attachment_view_screen.dart';
+import '../screens/dialog/edit_task_dialog.dart';
 import '../viewmodel/add_task_viewmodel.dart';
 import '../viewmodel/inquiry_viewmodel.dart';
 
@@ -42,10 +43,11 @@ class _TaskListState extends State<TaskList> {
           return UpdateTaskDialog(
             task: widget.task,
             inquiryId: widget.inquiryId,
-            onCall: (hasUpdate, flag) {
+            onCall: (hasUpdate, flag, percentage) {
               setState(() {
                 widget.task.status = flag;
                 widget.task.isUpdated = hasUpdate;
+                widget.task.totalPercentage = percentage;
               });
             },
           );
@@ -72,7 +74,7 @@ class _TaskListState extends State<TaskList> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// menu
-          /*widget.task.hasAccess | widget.isOwner
+          /*widget.task.hasAccess |*/ widget.isOwner && !widget.task.isUpdated
               ? Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
@@ -90,7 +92,10 @@ class _TaskListState extends State<TaskList> {
                         items: [
                           const PopupMenuItem(
                               value: 'forward', child: Text('Forward')),
-                          //const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          const PopupMenuItem(
+                              value: 'edit', child: Text('Edit')),
+                          const PopupMenuItem(
+                              value: 'date_extend', child: Text('Extend Date')),
                         ],
                       ).then((value) {
                         if (value == 'forward') {
@@ -102,9 +107,13 @@ class _TaskListState extends State<TaskList> {
                                   listen: false),
                             );
                           }
-                        } */ /*else if (value == 'edit') {
-                    print('Edit tapped');
-                  }*/ /*
+                        } else if (value == 'edit') {
+                          _showEditDialog(context);
+                          debugPrint('Edit tapped');
+                        } else if (value == 'date_extend') {
+                          _datePickerDialog(context);
+                          debugPrint('Date Extend');
+                        }
                       });
                     },
                     child: Container(
@@ -117,8 +126,9 @@ class _TaskListState extends State<TaskList> {
                     ),
                   ),
                 )
-              : const SizedBox.shrink(),*/
-        /// title & status
+              : const SizedBox.shrink(),
+
+          /// title & status
           Row(
             children: [
               Expanded(
@@ -217,6 +227,7 @@ class _TaskListState extends State<TaskList> {
             ],
           ),
 */
+
           /// flag & icon
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -275,7 +286,9 @@ class _TaskListState extends State<TaskList> {
                         //if (widget.task.hasAccess && !widget.task.isUpdated) {
                         if (widget.task.hasAccess &&
                             !widget.task.isUpdated &&
-                            !widget.endDate.isOverdue()) {
+                            //!widget.endDate.isOverdue()
+                            !formatWithCurrentYear(widget.task.date)
+                                .isOverdue()) {
                           _showDialog(context);
                         }
                       }),
@@ -293,6 +306,42 @@ class _TaskListState extends State<TaskList> {
                       iconData: Icons.flag_outlined,
                       text: widget.task.date.split("To")[1].trim(),
                       onTap: () {}),
+                  SizedBox(
+                    width: Converts.c8,
+                  ),
+                  SizedBox(
+                    height: Converts.c32,
+                    width: Converts.c32,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: CircularProgressIndicator(
+                            //value: 0, // 0.0 to 1.0
+                            value: widget.task.totalPercentage / 100,
+                            // 0.0 to 1.0
+                            strokeWidth: 4,
+                            backgroundColor: Colors.grey.shade500,
+                            valueColor: widget.task.totalPercentage == 100
+                                ? const AlwaysStoppedAnimation<Color>(
+                                    Colors.green)
+                                : const AlwaysStoppedAnimation<Color>(
+                                    Colors.red),
+                          ),
+                        ),
+                        Text(
+                          "${widget.task.totalPercentage.toInt()}%",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: Converts.c12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
               // icon
@@ -423,6 +472,29 @@ class _TaskListState extends State<TaskList> {
     });
   }
 
+  _showEditDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return EditTaskDialog(
+            inquiryResponse: widget.task,
+            onSave: (description, date, data, isUpdateAll) {
+              setState(() {
+                /*widget.inquiryResponse.description =description;
+                widget.inquiryResponse.title = description;
+                widget.inquiryResponse.endDate = date.toFormattedDate();
+                for (var task in widget.inquiryResponse.tasks) {
+                  task.name = description;
+                  task.date = "${task.date.split("To")[0]} To ${date.toFormattedDate().split(",")[0]}";
+                }*/
+                //widget.task.status = flag;
+                //widget.task.isUpdated = hasUpdate;
+              });
+            },
+          );
+        });
+  }
+
   Future<StaffResponse?> getStaffs() async {
     await context
         .read<AddTaskViewModel>()
@@ -442,5 +514,20 @@ class _TaskListState extends State<TaskList> {
       return "$endDate, $yearSuffix"; // e.g., "05 Jun, 25"
     }
     return "";
+  }
+
+  Future<void> _datePickerDialog(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        widget.task.date =
+            "${widget.task.date.split("To")[0]} To ${pickedDate.toFormattedString(format: "dd MMM")}";
+      });
+    }
   }
 }

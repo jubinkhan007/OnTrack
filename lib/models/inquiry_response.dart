@@ -133,16 +133,18 @@ class InquiryResponse {
   //final String id;
   final int id;
   final List<Task> tasks;
-  final String title;
+  //final String title;
+   String title;
 
   //final String status;
   final Comment comment;
   final String? company;
   final Customer customer;
-  final String endDate;
+  //final String endDate;
+   String endDate;
   final User postedBy;
   final Attachment attachment;
-  final String description;
+   String description;
 
   InquiryResponse({
     required this.id,
@@ -190,7 +192,8 @@ class InquiryResponse {
 class Task {
   //final String id;
   final int id;
-  final String date;
+  //final String date;
+  String date;
   //final String name;
   String name;
   /*final*/ bool hasAccess;
@@ -206,6 +209,8 @@ class Task {
   //final String assignedPerson;
   String assignedPerson;
 
+  double totalPercentage;
+
   Task({
     required this.id,
     required this.date,
@@ -215,6 +220,8 @@ class Task {
     required this.totalTime,
     required this.status,
     required this.assignedPerson,
+
+    this.totalPercentage = 0
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
@@ -227,6 +234,10 @@ class Task {
       totalTime: json['TOTAL_TIME'],
       status: json['STATUS'],
       assignedPerson: json['ASSIGNED_PERSON'],
+
+      totalPercentage: json['TOTAL_PERCENTAGE'] != null
+          ? double.tryParse(json['TOTAL_PERCENTAGE'].toString()) ?? 0
+          : 0,
     );
   }
 
@@ -241,6 +252,8 @@ class Task {
     bool? isUpdated,
     String? status,
     String? assignedPerson,
+
+    double? totalPercentage,
   }) {
     return Task(
       id: id ?? this.id,  // Use the current value if null is passed
@@ -251,6 +264,8 @@ class Task {
       isUpdated: isUpdated ?? this.isUpdated,
       status: status ?? this.status,
       assignedPerson: assignedPerson ?? this.assignedPerson,
+
+      totalPercentage: totalPercentage ?? this.totalPercentage,
     );
   }
 }
