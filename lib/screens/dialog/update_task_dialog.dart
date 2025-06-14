@@ -19,7 +19,7 @@ class UpdateTaskDialog extends StatefulWidget {
   //final Function(bool, String) onCall;
   final Function(bool, String, double) onCall;
 
-  UpdateTaskDialog(
+  const UpdateTaskDialog(
       {super.key,
       required this.task,
       required this.inquiryId,
@@ -256,6 +256,7 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                             //descriptionController.text,
                             Uri.encodeComponent(descriptionController.text),
                             userId,
+                            _currentDiscreteSliderValue!.round(),
                             inquiryViewModel.files);
                         if (inquiryViewModel.uiState == UiState.error) {
                           showMessage("Error: ${inquiryViewModel.message}");
@@ -278,7 +279,7 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                                       : "",
                                   _currentDiscreteSliderValue ?? 0
                               );
-                              Navigator.pop(context);
+                              if (context.mounted) Navigator.pop(context);
                             } else {
                               showMessage(Strings.failed_to_save_the_data);
                             }

@@ -280,6 +280,7 @@ class InquiryView extends StatelessWidget {
                   isOwner: staffId == inquiryResponse.postedBy.staffId,
                   ownerId: staffId,
                   endDate: inquiryResponse.endDate,
+                      tasks: [],
                 );
               },
               childCount: inquiryResponse.tasks.length,

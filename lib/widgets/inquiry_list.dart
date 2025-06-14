@@ -32,6 +32,16 @@ class InquiryList extends StatelessWidget {
     return currentDate.isAfter(targetDate);
   }*/
 
+  double _calculateTotalPercentage() {
+    double total = 0.0;
+
+    for (var task in inquiryResponse.tasks) {
+      total += task.totalPercentage;
+    }
+
+    return total;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -260,6 +270,42 @@ class InquiryList extends StatelessWidget {
                       onAttachmentTap(inquiryResponse.id.toString());
                     },
                   ),
+                  SizedBox(
+                    width: Converts.c8,
+                  ),
+                  SizedBox(
+                    height: Converts.c32,
+                    width: Converts.c32,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: CircularProgressIndicator(
+                            //value: 0, // 0.0 to 1.0
+                            value:  _calculateTotalPercentage() / 100,
+                            // 0.0 to 1.0
+                            strokeWidth: 4,
+                            backgroundColor: Colors.grey.shade500,
+                            valueColor: _calculateTotalPercentage() == 100
+                                ? const AlwaysStoppedAnimation<Color>(
+                                Colors.green)
+                                : const AlwaysStoppedAnimation<Color>(
+                                Colors.red),
+                          ),
+                        ),
+                        Text(
+                          "${_calculateTotalPercentage().round()}%",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: Converts.c12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      ],
+                    ),
+                  )
                 ],
               )
             ],

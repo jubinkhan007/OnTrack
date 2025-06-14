@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tmbi/config/enum.dart';
-import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/strings.dart';
-import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/screens/screens.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
 import '../models/models.dart';
 import '../viewmodel/add_task_viewmodel.dart';
-import '../viewmodel/inquiry_viewmodel.dart';
 import '../widgets/widgets.dart';
-import 'dialog/edit_task_dialog.dart';
 
 class InquiryView extends StatefulWidget {
   static const String routeName = '/inquiry_screen';
@@ -75,9 +70,14 @@ class _InquiryViewState extends State<InquiryView> {
                         ),*/
                         IconButton(
                           onPressed: () {
-                            _showCustomerDialog(context, );
+                            _showCustomerDialog(
+                              context,
+                            );
                           },
-                          icon: const Icon(Icons.supervisor_account, color: Colors.white,),
+                          icon: const Icon(
+                            Icons.supervisor_account,
+                            color: Colors.white,
+                          ),
                           /*child: Text(
                             Strings.add_staff,
                             style: TextStyle(
@@ -89,12 +89,12 @@ class _InquiryViewState extends State<InquiryView> {
                           ),*/
                         ),
                         //IconButton(
-                          //onPressed: () {
-                            //_showCustomerDialog(context, );
-                            //_showEditDialog(context);
-                          //},
-                          //icon: const Icon(Icons.edit, color: Colors.white,),
-                          /*child: Text(
+                        //onPressed: () {
+                        //_showCustomerDialog(context, );
+                        //_showEditDialog(context);
+                        //},
+                        //icon: const Icon(Icons.edit, color: Colors.white,),
+                        /*child: Text(
                             Strings.add_staff,
                             style: TextStyle(
                               fontSize: Converts.c12,
@@ -162,7 +162,8 @@ class _InquiryViewState extends State<InquiryView> {
                           width: Converts.c104,
                           radius: 8,
                           //bgColor: flag == HomeFlagItem().homeFlagItems[3].title
-                          bgColor: widget.flag == HomeFlagItem().homeFlagItems[1].title
+                          bgColor: widget.flag ==
+                                  HomeFlagItem().homeFlagItems[1].title
                               ? Colors.green
                               : Palette.iconColor,
                           hasOpacity: false,
@@ -190,7 +191,8 @@ class _InquiryViewState extends State<InquiryView> {
                               context,
                               AttachmentViewScreen.routeName,
                               arguments: {
-                                'inquiryId': widget.inquiryResponse.id.toString(),
+                                'inquiryId':
+                                    widget.inquiryResponse.id.toString(),
                                 'taskId': "0",
                               },
                             );
@@ -303,9 +305,11 @@ class _InquiryViewState extends State<InquiryView> {
                     TaskList(
                   task: task,
                   inquiryId: widget.inquiryResponse.id.toString(),
-                  isOwner: widget.staffId == widget.inquiryResponse.postedBy.staffId,
+                  isOwner:
+                      widget.staffId == widget.inquiryResponse.postedBy.staffId,
                   ownerId: widget.staffId,
                   endDate: widget.inquiryResponse.endDate,
+                  tasks: widget.inquiryResponse.tasks,
                 );
               },
               childCount: widget.inquiryResponse.tasks.length,
@@ -379,7 +383,8 @@ class _InquiryViewState extends State<InquiryView> {
                       if (customer != null) {
                         debugPrint("Name::${customer.name}");
                         setState(() {
-                          var newTask = widget.inquiryResponse.tasks[0].copyWith(
+                          var newTask =
+                              widget.inquiryResponse.tasks[0].copyWith(
                             hasAccess: false,
                             isUpdated: false,
                             assignedPerson: customer.name!,

@@ -106,14 +106,72 @@ class TaskUpdateViewModel extends ChangeNotifier {
   }
 
   Future<void> updateTask(String inquiryId, String taskId, String priorityId,
-      String description, String userId, List<String> fileNames) async {
+      String description, String userId, int percentage, List<String> fileNames) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
     notifyListeners();
     try {
       final response = await inquiryRepo.updateTask(
-          inquiryId, taskId, priorityId, description, userId, fileNames);
+          inquiryId, taskId, priorityId, description, userId, percentage, fileNames);
+      _isSavedInquiry = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+
+  Future<void> editTask(String inquiryId, String taskId, String isUpdateToAll,
+      String newTask, String userId, List<String> fileNames) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.editTask(
+          inquiryId, taskId, isUpdateToAll, newTask, userId, fileNames);
+      _isSavedInquiry = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateExpireDate(String inquiryId, String taskId, String priorityId,
+      String date, String userId, List<String> fileNames) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.updateExpireDate(
+          inquiryId, taskId, priorityId, date, userId, fileNames);
+      _isSavedInquiry = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> forwardTask(String inquiryId, String taskId, String priorityId,
+      String fUserId, String userId, List<String> fileNames) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.forwardTask(
+          inquiryId, taskId, priorityId, fUserId, userId, fileNames);
       _isSavedInquiry = response;
       _uiState = UiState.success;
     } catch (error) {

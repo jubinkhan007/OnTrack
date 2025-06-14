@@ -238,14 +238,14 @@ class InquiryCreateViewModel extends ChangeNotifier {
   }
 
   Future<void> updateTask(String inquiryId, String taskId, String priorityId,
-      String description, String userId, List<String> fileNames) async {
+      String description, String userId, int percentage, List<String> fileNames) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
     notifyListeners();
     try {
       final response = await inquiryRepo.updateTask(
-          inquiryId, taskId, priorityId, description, userId, fileNames);
+          inquiryId, taskId, priorityId, description, userId, percentage, fileNames);
       _isSavedInquiry = response;
       _uiState = UiState.success;
     } catch (error) {

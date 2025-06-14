@@ -83,7 +83,7 @@ class InquiryRepo {
   }
 
   Future<bool> updateTask(String inquiryId, String taskId, String priorityId,
-      String description, String userId, List<String> fileNames) async {
+      String description, String userId, int percentage, List<String> fileNames) async {
     try {
       final headers = {
         "dtype": "TASK",
@@ -92,6 +92,7 @@ class InquiryRepo {
         "inqrdesc": description,
         "userid": userId,
         "priorityid": priorityId,
+        "percentage_value": percentage,
         "files": fileNames.length,
       };
 
@@ -110,6 +111,81 @@ class InquiryRepo {
       throw Exception(error);
     }
   }
+
+
+  Future<bool> updateExpireDate(String inquiryId, String taskId, String priorityId,
+      String date, String userId, List<String> fileNames) async {
+    try {
+      final headers = {
+        "dtype": "UPDATE_DATE",
+        "inqrid": inquiryId,
+        "taskid": taskId,
+        "inqrdesc": date,
+        "userid": userId,
+        "priorityid": priorityId,
+        "files": fileNames.length,
+      };
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
+  Future<bool> editTask(String inquiryId, String taskId, String isUpdateToAll,
+      String newTask, String userId, List<String> fileNames) async {
+    try {
+      final headers = {
+        "dtype": "TASK_EDIT",
+        "inqrid": inquiryId,
+        "taskid": taskId,
+        "inqrdesc": newTask,
+        "userid": userId,
+        "priorityid": isUpdateToAll,
+        "files": fileNames.length,
+      };
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
+
+  Future<bool> forwardTask(String inquiryId, String taskId, String priorityId,
+      String fUserId, String userId, List<String> fileNames) async {
+    try {
+      final headers = {
+        "dtype": "TASK_FORWARD",
+        "inqrid": inquiryId,
+        "taskid": taskId,
+        "inqrdesc": fUserId,
+        "userid": userId,
+        "priorityid": priorityId,
+        "files": fileNames.length,
+      };
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
 
   Future<List<Map<String, dynamic>>> saveImages(List<ImageFile> files,
       {String id = "XXXX", String dbId = "XXX"}) async {

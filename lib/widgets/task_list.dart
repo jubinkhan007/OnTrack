@@ -3,12 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/screens/dialog/update_task_dialog.dart';
 import 'package:tmbi/screens/note_screen.dart';
+import 'package:tmbi/viewmodel/task_update_viewmodel.dart';
 import 'package:tmbi/widgets/widgets.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
 import '../config/strings.dart';
 import '../models/models.dart';
+import '../network/ui_state.dart';
 import '../screens/attachment_view_screen.dart';
 import '../screens/dialog/edit_task_dialog.dart';
 import '../viewmodel/add_task_viewmodel.dart';
@@ -16,6 +18,7 @@ import '../viewmodel/inquiry_viewmodel.dart';
 
 class TaskList extends StatefulWidget {
   final Task task;
+  final List<Task> tasks;
   final String inquiryId;
   final String endDate;
   final bool isOwner;
@@ -27,14 +30,30 @@ class TaskList extends StatefulWidget {
       required this.inquiryId,
       this.isOwner = false,
       this.ownerId,
-      required this.endDate});
+      required this.endDate, required this.tasks});
 
   @override
   State<TaskList> createState() => _TaskListState();
 }
 
 class _TaskListState extends State<TaskList> {
-  double _currentDiscreteSliderValue = 60;
+  _showMessage(String message) {
+    final snackBar = SnackBar(
+      content: TextViewCustom(
+        text: message,
+        tvColor: Colors.white,
+        fontSize: Converts.c16,
+        isBold: false,
+        isRubik: true,
+        isTextAlignCenter: false,
+      ),
+      action: SnackBarAction(
+        label: 'Ok',
+        onPressed: () {},
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   _showDialog(BuildContext context) {
     showDialog(
@@ -102,17 +121,23 @@ class _TaskListState extends State<TaskList> {
                           if (context.mounted) {
                             debugPrint('Forward tapped');
                             _showCustomerDialog(
-                              context,
-                              Provider.of<InquiryViewModel>(context,
-                                  listen: false),
-                            );
+                                context,
+                                Provider.of<InquiryViewModel>(context,
+                                    listen: false),
+                                Provider.of<TaskUpdateViewModel>(context,
+                                    listen: false));
                           }
                         } else if (value == 'edit') {
-                          _showEditDialog(context);
+                          if (context.mounted) _showEditDialog(context);
                           debugPrint('Edit tapped');
                         } else if (value == 'date_extend') {
-                          _datePickerDialog(context);
-                          debugPrint('Date Extend');
+                          if (context.mounted) {
+                            _datePickerDialog(
+                                context,
+                                Provider.of<TaskUpdateViewModel>(context,
+                                    listen: false));
+                            debugPrint('Date Extend');
+                          }
                         }
                       });
                     },
@@ -205,28 +230,6 @@ class _TaskListState extends State<TaskList> {
           SizedBox(
             height: Converts.c16,
           ),
-
-          /// TEST
-
-          /*Row(
-            children: [
-              Expanded(
-                flex: 30, // 30% green
-                child: Container(
-                  height: 2,
-                  color: Colors.green,
-                ),
-              ),
-              Expanded(
-                flex: 70, // 70% white
-                child: Container(
-                  height: 2,
-                  color: Colors.red,
-                ),
-              ),
-            ],
-          ),
-*/
 
           /// flag & icon
           Row(
@@ -428,14 +431,13 @@ class _TaskListState extends State<TaskList> {
   }
 
   void _showCustomerDialog(
-    BuildContext context,
-    InquiryViewModel inquiryViewModel,
-    /*String selectedFlagValue*/
-  ) {
+      BuildContext context,
+      InquiryViewModel inquiryViewModel,
+      TaskUpdateViewModel viewmodel /*String selectedFlagValue*/) {
     getStaffs().then((staffResponse) {
       if (staffResponse != null && context.mounted) {
         List<Customer> customers = [];
-        for (var staff in staffResponse!.staffs!) {
+        for (var staff in staffResponse.staffs!) {
           customers.add(
               Customer(id: staff.code, name: staff.name, isVerified: false));
         }
@@ -455,10 +457,31 @@ class _TaskListState extends State<TaskList> {
                     hintName: "",
                     onCustomerSelected: (customer) async {
                       if (customer != null) {
-                        setState(() {
-                          //this.customer = customer;
-                          widget.task.assignedPerson = customer.name!;
-                        });
+                        await viewmodel.forwardTask(
+                            widget.inquiryId,
+                            widget.task.id.toString(),
+                            "-1",
+                            customer.id!,
+                            widget.ownerId!, []);
+                        if (viewmodel.uiState == UiState.error) {
+                          _showMessage("Error: ${viewmodel.message}");
+                        }
+                        // check the status of the request
+                        else {
+                          if (viewmodel.isSavedInquiry != null) {
+                            if (viewmodel.isSavedInquiry!) {
+                              setState(() {
+                                widget.task.assignedPerson = customer.name!;
+                              });
+                              if (context.mounted) Navigator.pop(context);
+                            } else {
+                              _showMessage(Strings.failed_to_save_the_data);
+                            }
+                          } else {
+                            _showMessage(Strings.data_is_missing);
+                          }
+                        }
+
                         /*await _getInquiries(inquiryViewModel, selectedFlagValue,
                             isAssigned, customer!.id!);
                         if (context.mounted) {
@@ -477,18 +500,17 @@ class _TaskListState extends State<TaskList> {
         context: context,
         builder: (BuildContext context) {
           return EditTaskDialog(
-            inquiryResponse: widget.task,
+            inquiryId: widget.inquiryId,
+            task: widget.task,
             onSave: (description, date, data, isUpdateAll) {
               setState(() {
-                /*widget.inquiryResponse.description =description;
-                widget.inquiryResponse.title = description;
-                widget.inquiryResponse.endDate = date.toFormattedDate();
-                for (var task in widget.inquiryResponse.tasks) {
-                  task.name = description;
-                  task.date = "${task.date.split("To")[0]} To ${date.toFormattedDate().split(",")[0]}";
-                }*/
-                //widget.task.status = flag;
-                //widget.task.isUpdated = hasUpdate;
+                widget.task.name = description;
+
+                if (isUpdateAll){
+                  for (var task in widget.tasks) {
+                    task.name = description;
+                  }
+                }
               });
             },
           );
@@ -516,7 +538,8 @@ class _TaskListState extends State<TaskList> {
     return "";
   }
 
-  Future<void> _datePickerDialog(BuildContext context) async {
+  Future<void> _datePickerDialog(
+      BuildContext context, TaskUpdateViewModel viewmodel) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -524,10 +547,31 @@ class _TaskListState extends State<TaskList> {
       lastDate: DateTime(2101),
     );
     if (pickedDate != null) {
-      setState(() {
-        widget.task.date =
-            "${widget.task.date.split("To")[0]} To ${pickedDate.toFormattedString(format: "dd MMM")}";
-      });
+      await viewmodel.updateExpireDate(
+          widget.inquiryId,
+          widget.task.id.toString(),
+          "1",
+          pickedDate.toFormattedString(isFullYear: false, format: "dd/MM/yyyy"),
+          widget.ownerId!, []);
+      if (viewmodel.uiState == UiState.error) {
+        _showMessage("Error: ${viewmodel.message}");
+      }
+      // check the status of the request
+      else {
+        if (viewmodel.isSavedInquiry != null) {
+          if (viewmodel.isSavedInquiry!) {
+            setState(() {
+              widget.task.date =
+                  "${widget.task.date.split("To")[0]} To ${pickedDate.toFormattedString(format: "dd MMM")}";
+            });
+            //Navigator.pop(context);
+          } else {
+            _showMessage(Strings.failed_to_save_the_data);
+          }
+        } else {
+          _showMessage(Strings.data_is_missing);
+        }
+      }
     }
   }
 }

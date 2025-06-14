@@ -562,7 +562,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             pair.first!.id.toString(),
             HomeFlagItem().priorities[3].id.toString(),
             "Successfully completed the task",
-            widget.staffId, []);
+            widget.staffId, 100, []);
 
         // check the status of the request
         if (inquiryViewModel.uiState == UiState.error) {
