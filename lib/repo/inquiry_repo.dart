@@ -445,6 +445,31 @@ class InquiryRepo {
   }
 
 
+  Future<bool> addMember(
+      String inquiryId, String taskId, String memberId, String priorityId, String userId) async {
+    try {
+      final headers = {
+        "dtype": "TASK_NEW_USER",
+        "inqrid": inquiryId,
+        "inqrdesc": memberId,
+        "taskid": taskId,
+        "userid": userId,
+        "priorityid": "0",
+        "files": "0",
+      };
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
+
   Future<bool> deleteInq(
       String inquiryId) async {
     try {

@@ -211,6 +211,8 @@ class Task {
 
   double totalPercentage;
 
+  bool isCopy;
+
   Task({
     required this.id,
     required this.date,
@@ -221,7 +223,9 @@ class Task {
     required this.status,
     required this.assignedPerson,
 
-    this.totalPercentage = 0
+    this.totalPercentage = 0,
+
+    this.isCopy = false
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
@@ -254,6 +258,8 @@ class Task {
     String? assignedPerson,
 
     double? totalPercentage,
+
+    bool? isCopy
   }) {
     return Task(
       id: id ?? this.id,  // Use the current value if null is passed
@@ -266,6 +272,8 @@ class Task {
       assignedPerson: assignedPerson ?? this.assignedPerson,
 
       totalPercentage: totalPercentage ?? this.totalPercentage,
+
+      isCopy: true,
     );
   }
 }

@@ -30,7 +30,8 @@ class TaskList extends StatefulWidget {
       required this.inquiryId,
       this.isOwner = false,
       this.ownerId,
-      required this.endDate, required this.tasks});
+      required this.endDate,
+      required this.tasks});
 
   @override
   State<TaskList> createState() => _TaskListState();
@@ -93,7 +94,7 @@ class _TaskListState extends State<TaskList> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// menu
-          /*widget.task.hasAccess |*/ widget.isOwner && !widget.task.isUpdated
+          /*widget.task.hasAccess |*/ widget.isOwner && !widget.task.isUpdated && !widget.task.isCopy
               ? Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
@@ -115,6 +116,8 @@ class _TaskListState extends State<TaskList> {
                               value: 'edit', child: Text('Edit')),
                           const PopupMenuItem(
                               value: 'date_extend', child: Text('Extend Date')),
+                          const PopupMenuItem(
+                              value: 'add_member', child: Text('Add Member')),
                         ],
                       ).then((value) {
                         if (value == 'forward') {
@@ -137,6 +140,16 @@ class _TaskListState extends State<TaskList> {
                                 Provider.of<TaskUpdateViewModel>(context,
                                     listen: false));
                             debugPrint('Date Extend');
+                          }
+                        } else if (value == 'add_member') {
+                          if (context.mounted) {
+                            _showCustomerDialog(
+                                context,
+                                Provider.of<InquiryViewModel>(context,
+                                    listen: false),
+                                Provider.of<TaskUpdateViewModel>(context,
+                                    listen: false),
+                                isAddMember: true);
                           }
                         }
                       });
@@ -430,10 +443,10 @@ class _TaskListState extends State<TaskList> {
     );
   }
 
-  void _showCustomerDialog(
-      BuildContext context,
-      InquiryViewModel inquiryViewModel,
-      TaskUpdateViewModel viewmodel /*String selectedFlagValue*/) {
+  void _showCustomerDialog(BuildContext context,
+      InquiryViewModel inquiryViewModel, TaskUpdateViewModel viewmodel,
+      /*String selectedFlagValue*/
+      {bool isAddMember = false}) {
     getStaffs().then((staffResponse) {
       if (staffResponse != null && context.mounted) {
         List<Customer> customers = [];
@@ -457,36 +470,68 @@ class _TaskListState extends State<TaskList> {
                     hintName: "",
                     onCustomerSelected: (customer) async {
                       if (customer != null) {
-                        await viewmodel.forwardTask(
-                            widget.inquiryId,
-                            widget.task.id.toString(),
-                            "-1",
-                            customer.id!,
-                            widget.ownerId!, []);
-                        if (viewmodel.uiState == UiState.error) {
-                          _showMessage("Error: ${viewmodel.message}");
-                        }
-                        // check the status of the request
-                        else {
-                          if (viewmodel.isSavedInquiry != null) {
-                            if (viewmodel.isSavedInquiry!) {
-                              setState(() {
-                                widget.task.assignedPerson = customer.name!;
-                              });
-                              if (context.mounted) Navigator.pop(context);
-                            } else {
-                              _showMessage(Strings.failed_to_save_the_data);
-                            }
-                          } else {
-                            _showMessage(Strings.data_is_missing);
+                        if (!isAddMember) {
+                          await viewmodel.forwardTask(
+                              widget.inquiryId,
+                              widget.task.id.toString(),
+                              "-1",
+                              customer.id!,
+                              widget.ownerId!, []);
+                          if (viewmodel.uiState == UiState.error) {
+                            _showMessage("Error: ${viewmodel.message}");
                           }
-                        }
+                          // check the status of the request
+                          else {
+                            if (viewmodel.isSavedInquiry != null) {
+                              if (viewmodel.isSavedInquiry!) {
+                                setState(() {
+                                  widget.task.assignedPerson = customer.name!;
+                                });
+                                if (context.mounted) Navigator.pop(context);
+                              } else {
+                                _showMessage(Strings.failed_to_save_the_data);
+                              }
+                            } else {
+                              _showMessage(Strings.data_is_missing);
+                            }
+                          }
 
-                        /*await _getInquiries(inquiryViewModel, selectedFlagValue,
+                          /*await _getInquiries(inquiryViewModel, selectedFlagValue,
                             isAssigned, customer!.id!);
                         if (context.mounted) {
                           Navigator.of(context).pop();
                         }*/
+                        } else {
+                          await inquiryViewModel.addMember(
+                              widget.inquiryId,
+                              widget.task.id.toString(),
+                              customer.id!,
+                              "-1",
+                              widget.ownerId!);
+                          //if (!context.mounted) return;
+                          if (inquiryViewModel.uiState == UiState.error) {
+                            _showMessage("Error: ${inquiryViewModel.message}");
+                          } else {
+                            if (inquiryViewModel.isSavedInquiry != null) {
+                              if (inquiryViewModel.isSavedInquiry!) {
+                                if (context.mounted) Navigator.pop(context);
+                                setState(() {
+                                  var newTask = widget.task.copyWith(
+                                    hasAccess: false,
+                                    isUpdated: false,
+                                    assignedPerson: customer.name!,
+                                    status: "New Entry",
+                                  );
+                                  widget.tasks.add(newTask);
+                                });
+                              } else {
+                                _showMessage(Strings.failed_to_delete_the_data);
+                              }
+                            } else {
+                              _showMessage(Strings.data_is_missing);
+                            }
+                          }
+                        }
                       }
                     }),
               );
@@ -506,7 +551,7 @@ class _TaskListState extends State<TaskList> {
               setState(() {
                 widget.task.name = description;
 
-                if (isUpdateAll){
+                if (isUpdateAll) {
                   for (var task in widget.tasks) {
                     task.name = description;
                   }

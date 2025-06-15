@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
@@ -562,7 +561,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             pair.first!.id.toString(),
             HomeFlagItem().priorities[3].id.toString(),
             "Successfully completed the task",
-            widget.staffId, 100, []);
+            widget.staffId,
+            100, []);
 
         // check the status of the request
         if (inquiryViewModel.uiState == UiState.error) {
@@ -647,7 +647,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         },
         child: Material(
           //color: _isDateOverdue(inquiryResponse.endDate) && statusFlag == StatusFlag.pending.getFlag
-          color: inquiryResponse.endDate.isOverdue() && statusFlag == StatusFlag.pending.getFlag
+          color: inquiryResponse.endDate.isOverdue() &&
+                  statusFlag == StatusFlag.pending.getFlag
               ? Colors.deepOrange.withOpacity(0.3)
               : Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -656,12 +657,53 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             children: [
               Row(
                 children: [
-                  Checkbox(
+                  /*Checkbox(
                     value: areAllTasksCompleted(tasks),
                     onChanged: (bool? value) {
                       onChanged(value!);
                     },
                     shape: const CircleBorder(),
+                  ),*/
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 4.0),
+                    child: SizedBox(
+                      height: Converts.c32,
+                      width: Converts.c32,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            height: 100,
+                            width: 100,
+                            child: CircularProgressIndicator(
+                              //value: 0, // 0.0 to 1.0
+                              //value: _calculateTotalPercentage(inquiryResponse) /
+                              value: inquiryResponse.totalTaskPercentage / 100,
+                              // 0.0 to 1.0
+                              strokeWidth: 4,
+                              backgroundColor: Colors.grey.shade500,
+                              valueColor:
+                                  //_calculateTotalPercentage(inquiryResponse) == 100
+                                  inquiryResponse.totalTaskPercentage == 100
+                                      ? const AlwaysStoppedAnimation<Color>(
+                                          Colors.green)
+                                      : const AlwaysStoppedAnimation<Color>(
+                                          Colors.red),
+                            ),
+                          ),
+                          Text(
+                            //"${_calculateTotalPercentage(inquiryResponse).round()}%",
+                            "${inquiryResponse.totalTaskPercentage.round()}%",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: Converts.c12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                   Expanded(
                     child: Column(
@@ -917,6 +959,20 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     }
   }
 
+/*  double _calculateTotalPercentage(InquiryResponse inquiryResponse) {
+    double total = 0.0;
+
+    if (inquiryResponse.tasks != null && inquiryResponse.tasks.isNotEmpty) {
+      for (var task in inquiryResponse.tasks) {
+        total += task.totalPercentage;
+      }
+
+      return total / inquiryResponse.tasks.length;
+    }
+
+    return 0.0; // Avoid NaN when task list is empty
+  }*/
+
   /// BOTTOM VIEW \\\
 
   /// NETWORK CALL FOR SAVE TASK \\\
@@ -1012,6 +1068,4 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       ),
     );
   }
-
-
 }

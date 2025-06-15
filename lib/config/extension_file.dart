@@ -6,6 +6,7 @@ import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
 
 import '../data/data.dart';
+import '../models/inquiry_response.dart';
 import '../models/user_response.dart';
 import '../widgets/widgets.dart';
 import 'converts.dart';
@@ -16,6 +17,27 @@ extension DateTimeFormatter on DateTime {
     DateFormat dateFormat =
         isFullYear ? DateFormat(fullYearFormat) : DateFormat(format);
     return dateFormat.format(this);
+  }
+}
+
+extension InquiryResponseExtensions on InquiryResponse {
+  double get totalTaskPercentage {
+    if (tasks != null && tasks!.isNotEmpty) {
+      final total = tasks!
+          .map((task) => task.totalPercentage)
+          .fold(0.0, (prev, curr) => prev + curr);
+
+      double percentage = total / tasks!.length;
+
+      // Safeguard against NaN or Infinity
+      if (percentage.isNaN || percentage.isInfinite) {
+        return 0.0;
+      }
+
+      return percentage;
+    }
+
+    return 0.0;
   }
 }
 

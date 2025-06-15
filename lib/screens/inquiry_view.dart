@@ -23,6 +23,7 @@ class InquiryView extends StatefulWidget {
 
   @override
   State<InquiryView> createState() => _InquiryViewState();
+
 }
 
 class _InquiryViewState extends State<InquiryView> {
@@ -59,15 +60,15 @@ class _InquiryViewState extends State<InquiryView> {
                 Navigator.pop(context); // Navigate back
               },
             ),
-            actions: [
+            /*actions: [
               widget.staffId == widget.inquiryResponse.postedBy!.staffId
                   ? Row(
                       children: [
-                        /*Icon(
+                        *//*Icon(
                           Icons.add,
                           color: Colors.white,
                           size: Converts.c12,
-                        ),*/
+                        ),*//*
                         IconButton(
                           onPressed: () {
                             _showCustomerDialog(
@@ -78,7 +79,7 @@ class _InquiryViewState extends State<InquiryView> {
                             Icons.supervisor_account,
                             color: Colors.white,
                           ),
-                          /*child: Text(
+                          *//*child: Text(
                             Strings.add_staff,
                             style: TextStyle(
                               fontSize: Converts.c12,
@@ -86,7 +87,7 @@ class _InquiryViewState extends State<InquiryView> {
                               fontWeight:
                                   FontWeight.bold, // Optional, for emphasis
                             ),
-                          ),*/
+                          ),*//*
                         ),
                         //IconButton(
                         //onPressed: () {
@@ -94,7 +95,7 @@ class _InquiryViewState extends State<InquiryView> {
                         //_showEditDialog(context);
                         //},
                         //icon: const Icon(Icons.edit, color: Colors.white,),
-                        /*child: Text(
+                        *//*child: Text(
                             Strings.add_staff,
                             style: TextStyle(
                               fontSize: Converts.c12,
@@ -102,12 +103,12 @@ class _InquiryViewState extends State<InquiryView> {
                               fontWeight:
                                   FontWeight.bold, // Optional, for emphasis
                             ),
-                          ),*/
+                          ),*//*
                         //),
                       ],
                     )
                   : const SizedBox.shrink(),
-            ],
+            ],*/
           ),
           SliverPadding(
             padding: EdgeInsets.only(
@@ -353,15 +354,15 @@ class _InquiryViewState extends State<InquiryView> {
     );
   }
 
-  void _showCustomerDialog(
+  /*void _showCustomerDialog(
     BuildContext context,
     //InquiryViewModel inquiryViewModel,
-    /*String selectedFlagValue*/
+    *//*String selectedFlagValue*//*
   ) {
     getStaffs(context).then((staffResponse) {
       if (staffResponse != null && context.mounted) {
         List<Customer> customers = [];
-        for (var staff in staffResponse!.staffs!) {
+        for (var staff in staffResponse.staffs!) {
           customers.add(
               Customer(id: staff.code, name: staff.name, isVerified: false));
         }
@@ -390,7 +391,7 @@ class _InquiryViewState extends State<InquiryView> {
                             assignedPerson: customer.name!,
                             status: "New Entry",
                           );
-                          widget.inquiryResponse.tasks!.add(newTask);
+                          widget.inquiryResponse.tasks.add(newTask);
                         });
                         //this.customer = customer;
                         //widget.task.assignedPerson = customer.name!;
@@ -400,7 +401,7 @@ class _InquiryViewState extends State<InquiryView> {
             });
       }
     });
-  }
+  }*/
 
 /*  _showEditDialog(BuildContext context) {
     showDialog(
@@ -434,4 +435,6 @@ class _InquiryViewState extends State<InquiryView> {
         ? context.read<AddTaskViewModel>().staffResponse
         : null;
   }
+
+
 }

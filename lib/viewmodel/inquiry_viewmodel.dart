@@ -174,4 +174,23 @@ class InquiryViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> addMember(
+      String inquiryId, String taskId, String memberId, String priorityId, String userId) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response =
+      await inquiryRepo.addMember(inquiryId, taskId, memberId, priorityId, userId);
+      _isSavedInquiry = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
 }

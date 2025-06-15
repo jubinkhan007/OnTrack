@@ -256,7 +256,10 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                             //descriptionController.text,
                             Uri.encodeComponent(descriptionController.text),
                             userId,
-                            _currentDiscreteSliderValue!.round(),
+                            //_currentDiscreteSliderValue!.round(),
+                            mStatusId == "7"
+                                ? 100
+                                : _currentDiscreteSliderValue!.round(),
                             inquiryViewModel.files);
                         if (inquiryViewModel.uiState == UiState.error) {
                           showMessage("Error: ${inquiryViewModel.message}");
@@ -277,8 +280,7 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                                   inquiryViewModel.statusName != null
                                       ? inquiryViewModel.statusName!
                                       : "",
-                                  _currentDiscreteSliderValue ?? 0
-                              );
+                                  _currentDiscreteSliderValue ?? 0);
                               if (context.mounted) Navigator.pop(context);
                             } else {
                               showMessage(Strings.failed_to_save_the_data);

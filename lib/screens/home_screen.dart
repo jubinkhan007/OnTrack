@@ -493,6 +493,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                 }
                               }
                             },
+
+                            /// add new member
+                            /*onAddMemberTap: (id) async {
+                              _showCustomerDialog(
+                                  context,
+                                  Provider.of<InquiryViewModel>(context,
+                                      listen: false),
+                                  selectedFlagValue,
+                                  isAddMember: true,
+                                  data: inquiryResponse);
+                            },*/
                           );
                         },
                         childCount: inquiryViewModel.inquiries!
@@ -586,7 +597,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showCustomerDialog(BuildContext context,
-      InquiryViewModel inquiryViewModel, String selectedFlagValue) {
+      InquiryViewModel inquiryViewModel, String selectedFlagValue,
+      {bool isAddMember = false, InquiryResponse? data}) {
     getStaffs().then((staffResponse) {
       if (staffResponse != null && context.mounted) {
         List<Customer> customers = [];
@@ -610,13 +622,42 @@ class _HomeScreenState extends State<HomeScreen> {
                     hintName: "",
                     onCustomerSelected: (customer) async {
                       if (customer != null) {
-                        setState(() {
-                          this.customer = customer;
-                        });
-                        await _getInquiries(inquiryViewModel, selectedFlagValue,
-                            isAssigned, customer!.id!);
-                        if (context.mounted) {
-                          Navigator.of(context).pop();
+                        if (!isAddMember) {
+                          setState(() {
+                            this.customer = customer;
+                          });
+                          await _getInquiries(inquiryViewModel,
+                              selectedFlagValue, isAssigned, customer!.id!);
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        } else {
+                          if (data != null) {
+                            await inquiryViewModel.addMember(data.id.toString(), "0",
+                                customer.id!, "-1", widget.staffId);
+                            //if (!context.mounted) return;
+                            if (inquiryViewModel.uiState == UiState.error) {
+                              _showMessage(
+                                  "Error: ${inquiryViewModel.message}");
+                            } else {
+                              if (inquiryViewModel.isSavedInquiry != null) {
+                                if (inquiryViewModel.isSavedInquiry!) {
+                                  if (context.mounted) Navigator.pop(context);
+                                  await _getInquiries(
+                                    inquiryViewModel,
+                                    selectedFlagValue,
+                                    isAssigned,
+                                    widget.staffId,
+                                  );
+                                } else {
+                                  _showMessage(
+                                      Strings.failed_to_delete_the_data);
+                                }
+                              } else {
+                                _showMessage(Strings.data_is_missing);
+                              }
+                            }
+                          }
                         }
                       }
                     }),
@@ -988,6 +1029,4 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
-
 }

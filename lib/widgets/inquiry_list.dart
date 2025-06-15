@@ -14,6 +14,7 @@ class InquiryList extends StatelessWidget {
   final Function(String) onCommentTap;
   final Function(String) onAttachmentTap;
   final Function(String) onDeleteTap;
+  //final Function(String) onAddMemberTap;
 
   const InquiryList(
       {super.key,
@@ -23,7 +24,9 @@ class InquiryList extends StatelessWidget {
       required this.onTap,
       required this.onCommentTap,
       required this.onAttachmentTap,
-      required this.onDeleteTap});
+      required this.onDeleteTap,
+      //required this.onAddMemberTap
+      });
 
   /*bool _isDateOverdue(String inputDateString) {
     final dateFormat = DateFormat("d MMM, yy");
@@ -39,7 +42,7 @@ class InquiryList extends StatelessWidget {
       total += task.totalPercentage;
     }
 
-    return total;
+    return total/ inquiryResponse.tasks.length;
   }
 
   @override
@@ -96,14 +99,15 @@ class InquiryList extends StatelessWidget {
                                 items: [
                                   const PopupMenuItem(
                                       value: 'delete', child: Text('Delete')),
-                                  const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                                  //const PopupMenuItem(value: 'add_member', child: Text('Add Member')),
                                 ],
                               ).then((value) {
                                 if (value == 'delete') {
                                   onDeleteTap(inquiryResponse.id.toString());
-                                } else if (value == 'edit') {
-                                    debugPrint('Edit tapped');
-                                }
+                                } /*else if (value == 'add_member') {
+                                  debugPrint('Add Member');
+                                  onAddMemberTap(inquiryResponse.id.toString());
+                                }*/
                               });
                             },
                             child: Container(
@@ -170,7 +174,7 @@ class InquiryList extends StatelessWidget {
                   const SizedBox(
                     width: 4,
                   ),
-                  inquiryResponse.customer!.isVerified!
+                  inquiryResponse.customer.isVerified!
                       ? Icon(
                           Icons.verified_user_rounded,
                           color: Palette.iconColor,
@@ -284,19 +288,19 @@ class InquiryList extends StatelessWidget {
                           width: 100,
                           child: CircularProgressIndicator(
                             //value: 0, // 0.0 to 1.0
-                            value:  _calculateTotalPercentage() / 100,
+                            value: inquiryResponse.totalTaskPercentage / 100,
                             // 0.0 to 1.0
                             strokeWidth: 4,
                             backgroundColor: Colors.grey.shade500,
-                            valueColor: _calculateTotalPercentage() == 100
+                            valueColor: inquiryResponse.totalTaskPercentage == 100
                                 ? const AlwaysStoppedAnimation<Color>(
-                                Colors.green)
+                                    Colors.green)
                                 : const AlwaysStoppedAnimation<Color>(
-                                Colors.red),
+                                    Colors.red),
                           ),
                         ),
                         Text(
-                          "${_calculateTotalPercentage().round()}%",
+                          "${inquiryResponse.totalTaskPercentage.round()}%",
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: Converts.c12,
