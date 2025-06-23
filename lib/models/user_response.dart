@@ -29,11 +29,13 @@ class UserResponse {
 class User {
   String? staffName;
   String? staffId;
-  String password = "";
+  //String password = "";
+  String? password;
   String? designation;
   String? mailId;
+  String? mobileNo;
 
-  User({this.staffName, this.designation, this.mailId, this.password = ""});
+  User({this.staffName, this.designation, this.mailId/*, this.password = ""*/});
 
   User.fromJson(Map<String, dynamic> json) {
     staffName = json['STAFF_NAME'];
@@ -42,6 +44,7 @@ class User {
     mailId = json['MAILID'];
 
     password = json['PASSWORD'] ?? "";
+    mobileNo = json['MOBILE_NO'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -52,6 +55,7 @@ class User {
     data['MAILID'] = mailId;
 
     data['PASSWORD'] = password;
+    data['MOBILE_NO'] = mobileNo;
 
     return data;
   }

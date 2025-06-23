@@ -292,6 +292,7 @@ class _UpdateTaskDialogState extends State<UpdateTaskDialog> {
                       } else {
                         showMessage(Strings.some_values_are_missing);
                       }
+                      //debugPrint(Uri.encodeComponent(descriptionController.text));
                     }),
               ],
             ),

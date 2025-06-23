@@ -1,14 +1,10 @@
-
-
 import 'package:flutter/cupertino.dart';
 
 import '../models/image_file.dart';
 import '../network/ui_state.dart';
 import '../repo/repo.dart';
-import '../widgets/widgets.dart';
 
 class TaskUpdateViewModel extends ChangeNotifier {
-
   final InquiryRepo inquiryRepo;
 
   TaskUpdateViewModel({required this.inquiryRepo});
@@ -81,8 +77,8 @@ class TaskUpdateViewModel extends ChangeNotifier {
   }
 
   Future<void> saveFiles(
-      List<ImageFile> files,
-      ) async {
+    List<ImageFile> files,
+  ) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
@@ -105,15 +101,21 @@ class TaskUpdateViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateTask(String inquiryId, String taskId, String priorityId,
-      String description, String userId, int percentage, List<String> fileNames) async {
+  Future<void> updateTask(
+      String inquiryId,
+      String taskId,
+      String priorityId,
+      String description,
+      String userId,
+      int percentage,
+      List<String> fileNames) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response = await inquiryRepo.updateTask(
-          inquiryId, taskId, priorityId, description, userId, percentage, fileNames);
+      final response = await inquiryRepo.updateTask(inquiryId, taskId,
+          priorityId, description, userId, percentage, fileNames);
       _isSavedInquiry = response;
       _uiState = UiState.success;
     } catch (error) {
@@ -123,7 +125,6 @@ class TaskUpdateViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   Future<void> editTask(String inquiryId, String taskId, String isUpdateToAll,
       String newTask, String userId, List<String> fileNames) async {
@@ -144,8 +145,31 @@ class TaskUpdateViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateExpireDate(String inquiryId, String taskId, String priorityId,
-      String date, String userId, List<String> fileNames) async {
+  Future<void> updateEmailMob(
+      String email, String mobileNo, String userId) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response = await inquiryRepo.editEmailMob(mobileNo, email, userId);
+      _isSavedInquiry = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateExpireDate(
+      String inquiryId,
+      String taskId,
+      String priorityId,
+      String date,
+      String userId,
+      List<String> fileNames) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
@@ -181,6 +205,4 @@ class TaskUpdateViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-
 }

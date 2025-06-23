@@ -52,6 +52,9 @@ class Strings {
   static const String add = 'Add';
   static const String add_task = 'Add Task';
   static const String update_task = 'Update Task';
+  static const String update_info = 'Update Info';
+  static const String email = 'Email';
+  static const String mobile_no = 'Mobile no';
   static const String edit_task = 'Edit Task';
   static const String update = 'Update';
   static const String description = 'Description';

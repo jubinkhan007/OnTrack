@@ -161,6 +161,29 @@ class InquiryRepo {
     }
   }
 
+  Future<bool> editEmailMob(String mobileNo, String email, String userId) async {
+    try {
+      final headers = {
+        "dtype": "UPDATE_EMAIL_MOB",
+        "inqrid": "0",
+        "taskid": mobileNo,
+        "inqrdesc": email,
+        "userid": userId,
+        "priorityid": "0",
+        "files": "0",
+      };
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      throw Exception(error);
+    }
+  }
+
 
   Future<bool> forwardTask(String inquiryId, String taskId, String priorityId,
       String fUserId, String userId, List<String> fileNames) async {

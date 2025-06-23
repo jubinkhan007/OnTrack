@@ -5,6 +5,7 @@ import 'package:tmbi/screens/dialog/update_task_dialog.dart';
 import 'package:tmbi/screens/note_screen.dart';
 import 'package:tmbi/viewmodel/task_update_viewmodel.dart';
 import 'package:tmbi/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../config/converts.dart';
 import '../config/palette.dart';
@@ -619,4 +620,20 @@ class _TaskListState extends State<TaskList> {
       }
     }
   }
+
+
+  Future<void> openWhatsApp(String phone, String message) async {
+    final url =
+    Uri.parse('https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
+
+    var whatsappUrl = Uri.parse(
+        "whatsapp://send?phone=$phone&text=${Uri.encodeComponent("Your Message Here")}");
+    try {
+      launchUrl(whatsappUrl);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+
 }

@@ -474,9 +474,12 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                             if (_addedUsers.isEmpty) {
                               await _showDialogWithoutMembers(
                                   context, inquiryViewModel);
-                            } else {
+                            }
+                            else {
                               await saveTodos(inquiryViewModel);
                             }
+                            //String encodedTask = Uri.encodeComponent(_taskController.text);
+                            //debugPrint(encodedTask);
                           },
                         )
                       : SizedBox(

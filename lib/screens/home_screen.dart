@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
@@ -6,6 +8,7 @@ import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/models/user_response.dart';
+import 'package:tmbi/screens/dialog/update_user_info_dialog.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
 import 'package:tmbi/widgets/feature_status.dart';
@@ -38,12 +41,18 @@ class _HomeScreenState extends State<HomeScreen> {
   // Track which flag is selected in the FeatureStatus widget
   int selectedFlagIndex = 0;
 
+  UserResponse? _userResponse;
+
+  bool _showWarningMessage = false;
+
   @override
   void initState() {
     super.initState();
     selectedFlagValue = StatusFlag.pending.getFlag;
     status = HomeFlagItem().homeFlagItems[0].status;
     selectedFlag = HomeFlagItem().homeFlagItems[0].title;
+
+    _loadUserData();
 
     final inquiryViewModel =
         Provider.of<InquiryViewModel>(context, listen: false);
@@ -55,6 +64,28 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedFlagValue, widget.staffId, isAssigned);
     });
     debugPrint("Called");
+  }
+
+  Future<void> _loadUserData() async {
+    final data = await _getUserInfo();
+    setState(() {
+      _userResponse = data;
+      if (_userResponse != null) {
+        if (_userResponse!.users![0].mailId == "" || _userResponse!.users![0].mailId == null ||
+            _userResponse!.users![0].mailId == "hrismail@notavailable.com") {
+          _showWarningMessage = true;
+          // timer for warning message
+          Timer(const Duration(seconds: 20), () {
+            if (mounted) {
+              setState(() {
+                _showWarningMessage = false;
+              });
+            }
+          });
+        }
+      }
+    });
+
   }
 
   @override
@@ -203,6 +234,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
+            ),
+
+            /// warning message
+            SliverToBoxAdapter(
+              child: warningMessage(),
             ),
 
             /// flag(pending, update), searched user, flag(created, assigned)
@@ -633,8 +669,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         } else {
                           if (data != null) {
-                            await inquiryViewModel.addMember(data.id.toString(), "0",
-                                customer.id!, "-1", widget.staffId);
+                            await inquiryViewModel.addMember(data.id.toString(),
+                                "0", customer.id!, "-1", widget.staffId);
                             //if (!context.mounted) return;
                             if (inquiryViewModel.uiState == UiState.error) {
                               _showMessage(
@@ -745,7 +781,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// DRAWER
-  Widget drawerMenu() {
+  /*Widget drawerMenu() {
     return FutureBuilder<UserResponse?>(
       future: _getUserInfo(), // The Future that gets the user data
       builder: (context, snapshot) {
@@ -768,39 +804,101 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 /// Header
                 DrawerHeader(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LoadImage(
-                        id: userResponse.users![0]!.staffId!,
-                        height: Converts.c56,
-                        width: Converts.c56,
+                  margin: EdgeInsets.zero,
+                  padding: EdgeInsets.zero,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: Converts.c16, right: Converts.c16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          LoadImage(
+                            id: userResponse.users![0]!.staffId!,
+                            height: Converts.c56,
+                            width: Converts.c56,
+                          ),
+                          TextViewCustom(
+                              //text: userResponse.users![0]!.staffName!,
+                              text: userResponse.users?.isNotEmpty == true
+                                  ? userResponse.users![0].staffName ?? ''
+                                  : '',
+                              fontSize: Converts.c16,
+                              tvColor: Palette.normalTv,
+                              isRubik: false,
+                              isBold: true),
+                          userResponse.users?.isNotEmpty == true
+                              ? userResponse.users![0].mobileNo != null
+                                  ? TextViewCustom(
+                                      text:
+                                          userResponse.users![0].mobileNo ?? '',
+                                      //'01675147741',
+                                      fontSize: Converts.c12,
+                                      tvColor: Palette.semiTv,
+                                      isRubik: false,
+                                      isBold: false)
+                                  : const SizedBox.shrink()
+                              : const SizedBox.shrink(),
+                          TextViewCustom(
+                              //text: userResponse.users![0]!.mailId!,
+                              text: userResponse.users?.isNotEmpty == true
+                                  ? userResponse.users![0].mailId ?? ''
+                                  : '',
+                              fontSize: Converts.c12,
+                              tvColor: Palette.semiTv,
+                              isRubik: false,
+                              isBold: false),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton.icon(
+                                icon: Icon(Icons.edit,
+                                    size: Converts.c16,
+                                    color: Colors.redAccent),
+                                label: Text(
+                                  "Edit",
+                                  style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: Converts.c16,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  */ /*await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return UpdateUserInfoDialog(
+                                          user: userResponse.users![0],
+                                          onUpdate: (flag, email, mobileNo) {
+                                            */ /**/ /*setState(() {
+                                              userResponse.users![0].mailId = email;
+                                              userResponse.users![0].mobileNo = mobileNo;
+                                            });*/ /**/ /*
+                                          },
+                                        );
+                                      });*/ /*
+                                  final result = await showDialog<Map<String, String>>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return UpdateUserInfoDialog(user: userResponse.users![0], onUpdate: (flag, email, mobilNo) {},);
+                                    },
+                                  );
+
+                                  if (result != null) {
+                                    setState(() {
+                                      debugPrint(
+                                        "Done: ${ result['email']!}"
+                                      );
+                                      userResponse.users![0].mailId = result['email']!;
+                                      userResponse.users![0].mobileNo = result['mobileNo']!;
+                                    });
+                                  }
+                                },
+                              ),
+                            ],
+                          )
+                        ],
                       ),
-                      SizedBox(
-                        height: Converts.c16,
-                      ),
-                      TextViewCustom(
-                          //text: userResponse.users![0]!.staffName!,
-                          text: userResponse.users?.isNotEmpty == true
-                              ? userResponse.users![0].staffName ?? ''
-                              : '',
-                          fontSize: Converts.c20,
-                          tvColor: Palette.normalTv,
-                          isRubik: false,
-                          isBold: true),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      TextViewCustom(
-                          //text: userResponse.users![0]!.mailId!,
-                          text: userResponse.users?.isNotEmpty == true
-                              ? userResponse.users![0].mailId ?? ''
-                              : '',
-                          fontSize: Converts.c12,
-                          tvColor: Palette.semiTv,
-                          isRubik: false,
-                          isBold: false),
-                    ],
+                    ),
                   ),
                 ),
 
@@ -814,19 +912,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 /// add staff
                 drawerItem(Icons.add_task, Strings.add_staff, () {
-                  /*Navigator.pushNamed(
+                  */ /*Navigator.pushNamed(
                     context,
                     SettingScreen.routeName,
-                  );*/
+                  );*/ /*
                   _showAddStaffDialog(context);
                 }),
 
                 /// Report
                 drawerItem(Icons.dashboard, Strings.reportDashboard, () {
-                  /*Navigator.pushNamed(
+                  */ /*Navigator.pushNamed(
                     context,
                     ReportScreen.routeName,
-                  );*/
+                  );*/ /*
                   Navigator.pop(context);
                   context.showMessage(Strings.available_soon);
                 }),
@@ -835,6 +933,115 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
       },
+    );
+  }*/
+
+  Widget drawerMenu() {
+    if (_userResponse == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final user = _userResponse!.users![0];
+
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          /// Header
+          DrawerHeader(
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: Converts.c16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    LoadImage(
+                      id: user.staffId ?? '',
+                      height: Converts.c56,
+                      width: Converts.c56,
+                    ),
+                    TextViewCustom(
+                      text: user.staffName ?? '',
+                      fontSize: Converts.c16,
+                      tvColor: Palette.normalTv,
+                      isRubik: false,
+                      isBold: true,
+                    ),
+                    if ((user.mobileNo ?? '').isNotEmpty)
+                      TextViewCustom(
+                        text: user.mobileNo!,
+                        fontSize: Converts.c12,
+                        tvColor: Palette.semiTv,
+                        isRubik: false,
+                        isBold: false,
+                      ),
+                    TextViewCustom(
+                      text: user.mailId ?? '',
+                      fontSize: Converts.c12,
+                      tvColor: Palette.semiTv,
+                      isRubik: false,
+                      isBold: false,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton.icon(
+                          icon: Icon(Icons.edit,
+                              size: Converts.c16, color: Colors.redAccent),
+                          label: Text(
+                            "Edit",
+                            style: TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: Converts.c16,
+                            ),
+                          ),
+                          onPressed: () async {
+                            final result =
+                                await showDialog<Map<String, String>>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return UpdateUserInfoDialog(
+                                  user: user,
+                                  onUpdate: (_, __, ___) {},
+                                );
+                              },
+                            );
+
+                            if (result != null) {
+                              setState(() {
+                                user.mailId = result['email']!;
+                                user.mobileNo = result['mobileNo']!;
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          /// Settings
+          drawerItem(Icons.settings, Strings.setting, () {
+            Navigator.pushNamed(context, SettingScreen.routeName);
+          }),
+
+          /// Add staff
+          drawerItem(Icons.add_task, Strings.add_staff, () {
+            _showAddStaffDialog(context);
+          }),
+
+          /// Report
+          drawerItem(Icons.dashboard, Strings.reportDashboard, () {
+            Navigator.pop(context);
+            context.showMessage(Strings.available_soon);
+          }),
+        ],
+      ),
     );
   }
 
@@ -1028,5 +1235,25 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
+  }
+
+  Widget warningMessage() {
+    return _showWarningMessage
+        ? Padding(
+            padding: EdgeInsets.all(Converts.c8),
+            child: Container(
+              padding: EdgeInsets.all(Converts.c8),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.2), // Semi-transparent red
+                border: Border.all(color: Colors.red),
+                borderRadius: BorderRadius.circular(Converts.c8),
+              ),
+              child: Text(
+                "Your email ID is invalid or empty. Please update your email. Just go to the side menu and click \'Edit\'",
+                style: TextStyle(color: Colors.red, fontSize: Converts.c12),
+              ),
+            ),
+          )
+        : const SizedBox.shrink();
   }
 }
