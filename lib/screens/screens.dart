@@ -13,3 +13,4 @@ export 'todo/todo_home_screen.dart';
 export 'setting_screen.dart';
 export 'notification_screen.dart';
 export 'report_screen.dart';
+export 'new_task/new_task_dashboard_screen.dart';

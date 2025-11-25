@@ -107,6 +107,16 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
           taskId: taskId,
         ),
       );
+
+     /// NEW TASK \\\
+    case NewTaskDashboardScreen.routeName:
+      //final arguments = routeSettings.arguments as Map<String, dynamic>;
+      //final inquiryId = arguments['inquiryId'] as String;
+      //final taskId = arguments['taskId'] as String;
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => NewTaskDashboardScreen.create(),
+      );
     default:
       return MaterialPageRoute(
           settings: routeSettings,

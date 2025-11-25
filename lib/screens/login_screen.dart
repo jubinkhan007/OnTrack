@@ -208,9 +208,10 @@ class _LoginOperationState extends State<LoginOperation> {
                             await SPHelper().saveCredentialFlag(_rememberMe);
                             await SPHelper()
                                 .saveUser(loginViewModel.userResponse!);
-                            Navigator.pushNamed(context, HomeScreen.routeName,
+                            /*Navigator.pushNamed(context, HomeScreen.routeName,
                                 arguments: loginViewModel
-                                    .userResponse!.users![0].staffId);
+                                    .userResponse!.users![0].staffId);*/
+                            Navigator.pushNamed(context, NewTaskDashboardScreen.routeName);
                           } else {
                             _showMessage(
                                 loginViewModel.userResponse!.status!.message!,

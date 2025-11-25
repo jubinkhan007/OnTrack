@@ -21,3 +21,8 @@ export 'individual_task_list.dart';
 export 'load_image.dart';
 export 'file_attachment2.dart';
 export 'report_pie_chart.dart';
+export 'new_task/app_header.dart';
+export 'new_task/status_cards.dart';
+export 'new_task/tab_selector.dart';
+export 'new_task/task_item.dart';
+export 'new_task/filter_section.dart';

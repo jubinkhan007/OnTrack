@@ -17,6 +17,7 @@ class Strings {
   static const String next = 'Next';
   static const String home = 'Home';
   static const String staff_id = 'Staff Id';
+  static const String staff_name = 'Staff Name';
   static const String password = 'Password';
   static const String login_using_your_hris =
       'Login using your HRIS staff ID and password.';
@@ -107,6 +108,8 @@ class Strings {
   static const String cancel = 'Cancel';
   static const String add_a_task = "Add a Task";
   static const String overdue = "You can't update your task as the date is over.";
+  static const String overdue1 = "Over due";
+  static const String completed = "Completed";
 
   /// Notification
   static const String notification = "Notification";
@@ -122,5 +125,10 @@ class Strings {
   static const String errorCaptureImage = "Error capturing image. Please try again.";
   static const String errorSelectingImage = "Error selecting image. Please try again.";
   static const String failedToDecodeImage = "Failed to decode image";
+
+
+  /// NEW TASK \\\
+ static const String createdByMe = "Created By Me";
+ static const String assignedToMe = "Assigned To Me";
 
 }
