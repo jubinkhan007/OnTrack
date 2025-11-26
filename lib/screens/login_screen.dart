@@ -9,7 +9,9 @@ import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/network/ui_state.dart';
+import 'package:tmbi/screens/new_task/signup_screen.dart';
 import 'package:tmbi/screens/screens.dart';
+import 'package:tmbi/viewmodel/new_task/signup_viewmodel.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
 import 'package:tmbi/widgets/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -234,6 +236,11 @@ class _LoginOperationState extends State<LoginOperation> {
               SizedBox(
                 height: Converts.c32,
               ),
+              GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, SignupScreen.routeName,);
+                  },
+                  child: Text("Don't have an account? Sign Up")),
             ],
           ),
         ),

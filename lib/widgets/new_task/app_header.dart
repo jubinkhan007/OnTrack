@@ -7,26 +7,29 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(DateTime.now().getGreeting(),
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold)),
-              Text(DateTime.now().toFormattedString(),
-                  style: TextStyle(
-                    fontSize: Converts.c12,
-                  )),
-            ],
+    return Container(
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(DateTime.now().getGreeting(),
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold)),
+                Text(DateTime.now().toFormattedString(),
+                    style: TextStyle(
+                      fontSize: Converts.c16 - 2,
+                    )),
+              ],
+            ),
           ),
-        ),
-        IconButton(onPressed: () {}, icon: const Icon(Icons.notifications))
-      ],
+          IconButton(onPressed: () {}, icon: const Icon(Icons.notifications))
+        ],
+      ),
     );
   }
 }

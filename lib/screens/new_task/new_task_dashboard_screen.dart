@@ -9,6 +9,7 @@ import '../../widgets/new_task/filter_section.dart';
 import '../../widgets/new_task/status_cards.dart';
 import '../../widgets/new_task/tab_selector.dart';
 import '../../widgets/new_task/task_item.dart';
+import '../todo/todo_home_screen.dart';
 
 class NewTaskDashboardScreen extends StatelessWidget {
   static const String routeName = '/new_task_dashboard_screen';
@@ -30,7 +31,10 @@ class NewTaskDashboardScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, TodoHomeScreen.routeName,
+              arguments: "340553");
+        },
       ),
       body: SafeArea(
         child: CustomScrollView(

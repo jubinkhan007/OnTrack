@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../models/new_task/sub_task.dart';
 
 class NewTaskDetailTaskViewmodel extends ChangeNotifier {
-
   late Task task;
   bool isLoading = true;
 
@@ -30,6 +29,48 @@ class NewTaskDetailTaskViewmodel extends ChangeNotifier {
           dateRange: "Sep 14 - Sep 20",
           progress: 100,
           completed: true,
+        ),
+        SubTask(
+          title: "UI Layout Design",
+          assignee: "Ben Carter",
+          dateRange: "Sep 14 - Oct 25",
+          progress: 100,
+          completed: true,
+        ),
+        SubTask(
+          title: "API Integration",
+          assignee: "Alice Johnson",
+          dateRange: "Sep 14 - Sep 30",
+          progress: 100,
+          completed: true,
+        ),
+        SubTask(
+          title: "User Authentication Setup",
+          assignee: "John Doe",
+          dateRange: "Sep 14 - Sep 30",
+          progress: 0,
+          completed: false,
+        ),
+        SubTask(
+          title: "Database Schema Design",
+          assignee: "Sara Lee",
+          dateRange: "Sep 14 - Sep 30",
+          progress: 0,
+          completed: false,
+        ),
+        SubTask(
+          title: "Mobile App Mockups",
+          assignee: "Ben Carter",
+          dateRange: "Sep 14 - Sep 30",
+          progress: 0,
+          completed: false,
+        ),
+        SubTask(
+          title: "Testing & Debugging",
+          assignee: "Emily Clark",
+          dateRange: "Sep 14 - Sep 30",
+          progress: 0,
+          completed: false,
         ),
       ],
     ),
@@ -96,6 +137,4 @@ class NewTaskDetailTaskViewmodel extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
-
 }
-

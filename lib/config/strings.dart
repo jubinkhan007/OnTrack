@@ -45,6 +45,7 @@ class Strings {
   static const String select_priority = 'Select priority';
   static const String select = 'Select';
   static const String tasks = 'Tasks';
+  static const String task_details = 'Task Details';
   static const String setting = 'Setting';
   static const String add_staff = 'Add Staff';
   static const String first_task_entry = 'First Task Entry';
@@ -130,5 +131,9 @@ class Strings {
   /// NEW TASK \\\
  static const String createdByMe = "Created By Me";
  static const String assignedToMe = "Assigned To Me";
+ static const String assignedTo = "Assigned to";
+ static const String overAllProgress = "Overall Progress";
+ static const String complete = "Complete";
+ static const String dot = " • ";
 
 }

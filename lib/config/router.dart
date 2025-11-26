@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/models.dart';
 
+import '../screens/new_task/signup_screen.dart';
 import '../screens/screens.dart';
 
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
   switch (routeSettings.name) {
+
+
     case IntroScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const LoginScreen());
@@ -44,10 +47,7 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => InquiryView(
-          inquiryResponse: inquiryResponse,
-          flag: flag,
-          staffId: staffId
-        ),
+            inquiryResponse: inquiryResponse, flag: flag, staffId: staffId),
       );
     case CreateInquiryScreen.routeName:
       final args = routeSettings.arguments as String;
@@ -108,7 +108,7 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
         ),
       );
 
-     /// NEW TASK \\\
+    /// NEW TASK \\\
     case NewTaskDashboardScreen.routeName:
       //final arguments = routeSettings.arguments as Map<String, dynamic>;
       //final inquiryId = arguments['inquiryId'] as String;
@@ -116,6 +116,14 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => NewTaskDashboardScreen.create(),
+      );
+    case SignupScreen.routeName:
+      //final arguments = routeSettings.arguments as Map<String, dynamic>;
+      //final inquiryId = arguments['inquiryId'] as String;
+      //final taskId = arguments['taskId'] as String;
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => SignupScreen.create(),
       );
     default:
       return MaterialPageRoute(
