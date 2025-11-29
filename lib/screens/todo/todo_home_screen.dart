@@ -115,7 +115,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   Future<void> _fetchDataAndStore() async {
     try {
       List<Future> futures = [
-        _fetchAndStoreStaffs(),
+        //_fetchAndStoreStaffs(),
         _fetchTodos(),
       ];
       await Future.wait(futures);
@@ -166,6 +166,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Palette.mainColor,
         centerTitle: false,
@@ -317,10 +318,12 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     );
   }
 
+
   Widget bottomTextField() {
     return Consumer<InquiryCreateViewModel>(
         builder: (context, inquiryViewModel, child) {
       return Container(
+        width: double.infinity,
         padding: EdgeInsets.all(Converts.c16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -339,97 +342,121 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// filtered user list only
-            /// if there are matches
-            if (filteredNewUsers.isNotEmpty)
-              Column(
-                children: [
-                  SizedBox(
-                    //color: Colors.deepOrange,
-                    height: Converts.c104,
-                    // Set a fixed height for the user list
-                    child: ListView.builder(
-                      itemCount: filteredNewUsers.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.account_circle_outlined,
-                                    size: 14,
-                                    color: Palette.semiTv,
-                                  ),
-                                  const SizedBox(
-                                    width: 4,
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      filteredNewUsers[index].name.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Palette.semiTv,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 4,
-                              ),
-                            ],
-                          ),
-                          onTap: () {
-                            bool userAlreadyAdded = _addedUsers.any((user) =>
-                                user.id == filteredNewUsers[index].id);
-                            if (!userAlreadyAdded) {
-                              setState(() {
-                                _addedUsers.add(filteredNewUsers[index]);
-                              });
-                            }
-
-                            // Get the current text from the TextField
-                            String currentText = _taskController.text.trim();
-
-                            // Check if the string contains "@" and find the position of the last "@"
-                            if (currentText.contains('@')) {
-                              int lastAtIndex = currentText.lastIndexOf('@');
-
-                              // Get the text before the last "@" (everything before it)
-                              String textBeforeLastAt =
-                                  currentText.substring(0, lastAtIndex).trim();
-
-                              // Update the text in the TextField to remove the last "@sala"
-                              setState(() {
-                                _taskController.text = textBeforeLastAt;
-                                filteredNewUsers.clear();
-                              });
-
-                              // Move the cursor to the end of the updated text
-                              _taskController.selection =
-                                  TextSelection.collapsed(
-                                offset: _taskController.text.length,
-                              );
-
-                              debugPrint("Updated Text: $textBeforeLastAt");
-                            } else {
-                              debugPrint("Updated Text: No '@' found");
-                            }
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  const Divider(),
-                ],
+            GestureDetector(
+              onTap: () {
+                inquiryViewModel.setIsShowed();
+              },
+              child: Center(
+                child: Text(
+                  Strings.add_task,
+                  style: TextStyle(
+                      fontSize: Converts.c16 , color: Colors.black, fontWeight: FontWeight.w600),
+                ),
               ),
+            ),
+            inquiryViewModel.isShowed
+                ? Column(children: [
+                    /// filtered user list only
+                    /// if there are matches
+                    if (filteredNewUsers.isNotEmpty)
+                      Column(
+                        children: [
+                          SizedBox(
+                            //color: Colors.deepOrange,
+                            height: Converts.c104,
+                            // Set a fixed height for the user list
+                            child: ListView.builder(
+                              itemCount: filteredNewUsers.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.account_circle_outlined,
+                                            size: 14,
+                                            color: Palette.semiTv,
+                                          ),
+                                          const SizedBox(
+                                            width: 4,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              filteredNewUsers[index]
+                                                  .name
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Palette.semiTv,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 4,
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    bool userAlreadyAdded = _addedUsers.any(
+                                        (user) =>
+                                            user.id ==
+                                            filteredNewUsers[index].id);
+                                    if (!userAlreadyAdded) {
+                                      setState(() {
+                                        _addedUsers
+                                            .add(filteredNewUsers[index]);
+                                      });
+                                    }
 
-            /// check box & task input
-            Row(
-              children: [
-                Checkbox(
+                                    // Get the current text from the TextField
+                                    String currentText =
+                                        _taskController.text.trim();
+
+                                    // Check if the string contains "@" and find the position of the last "@"
+                                    if (currentText.contains('@')) {
+                                      int lastAtIndex =
+                                          currentText.lastIndexOf('@');
+
+                                      // Get the text before the last "@" (everything before it)
+                                      String textBeforeLastAt = currentText
+                                          .substring(0, lastAtIndex)
+                                          .trim();
+
+                                      // Update the text in the TextField to remove the last "@sala"
+                                      setState(() {
+                                        _taskController.text = textBeforeLastAt;
+                                        filteredNewUsers.clear();
+                                      });
+
+                                      // Move the cursor to the end of the updated text
+                                      _taskController.selection =
+                                          TextSelection.collapsed(
+                                        offset: _taskController.text.length,
+                                      );
+
+                                      debugPrint(
+                                          "Updated Text: $textBeforeLastAt");
+                                    } else {
+                                      debugPrint("Updated Text: No '@' found");
+                                    }
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                          const Divider(),
+                        ],
+                      ),
+
+                    /// check box & task input
+                    Row(
+                      children: [
+                        /*Checkbox(
                   value: _isChecked,
                   onChanged: (bool? value) {
                     setState(() {
@@ -440,28 +467,35 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _taskController,
-                    focusNode: _focusNode,
-                    maxLines: null,
-                    //textInputAction: TextInputAction.done,
-                    keyboardType: TextInputType.multiline,
-                    decoration: const InputDecoration(
-                        hintText: Strings.add_a_task,
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Palette.circleColor)),
-                    style: TextStyle(fontSize: Converts.c20),
-                    //onEditingComplete: _addTask, // Add task on done
-                    /*onEditingComplete: () async {
+                ),*/
+                        Expanded(
+                          child: TextField(
+                            controller: _taskController,
+                            focusNode: _focusNode,
+                            maxLines: null,
+                            //minLines: 5,
+                            minLines: 4,
+                            //textInputAction: TextInputAction.done,
+                            keyboardType: TextInputType.multiline,
+                            decoration: InputDecoration(
+                                hintText: Strings.add_a_task,
+                                border: InputBorder.none,
+                                hintStyle: TextStyle(
+                                    color: Palette.circleColor,
+                                    fontSize: Converts.c16 - 2)),
+                            style: TextStyle(
+                              fontSize: Converts.c20,
+                              color: Colors.grey.shade700,
+                            ),
+                            //onEditingComplete: _addTask, // Add task on done
+                            /*onEditingComplete: () async {
                       await saveTodos(inquiryViewModel);
                     },*/ // Add task on done
-                  ),
-                ),
+                          ),
+                        ),
 
-                /// save button
-                Material(
+                        /// save button
+                        Material(
                   color: Colors.transparent,
                   child: !(inquiryViewModel.uiState == UiState.loading)
                       ? IconButton(
@@ -474,8 +508,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                             if (_addedUsers.isEmpty) {
                               await _showDialogWithoutMembers(
                                   context, inquiryViewModel);
-                            }
-                            else {
+                            } else {
                               await saveTodos(inquiryViewModel);
                             }
                             //String encodedTask = Uri.encodeComponent(_taskController.text);
@@ -499,42 +532,80 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                           ),
                         ),
                 )
-              ],
-            ),
-
-            /// assigned person (if any)
-            if (_addedUsers.isNotEmpty) assignedUser(),
-
-            /// date, image selection view
-            Row(
-              children: [
-                DateSelectionView(
-                  onDateSelected: (date) {
-                    if (date != null) {
-                      _selectedDate = date;
-                    }
-                    setState(() {
-                      _isDateSelected = true;
-                    });
-                  },
-                  isFromTodo: true,
-                  isDateSelected: _isDateSelected,
-                ),
-                Expanded(
-                  child: SizedBox(
-                    height: Converts.c48,
-                    child: FileAttachment2(
-                      inquiryViewModel: inquiryViewModel,
+                      ],
                     ),
-                  ),
-                )
-              ],
-            ),
+
+                    /// assigned person (if any)
+                    if (_addedUsers.isNotEmpty) assignedUser(),
+                    Divider(
+                      color: Colors.grey.shade300,
+                    ),
+
+                    /// date, image selection view
+                    Row(
+                      children: [
+                        DateSelectionView(
+                          onDateSelected: (date) {
+                            if (date != null) {
+                              _selectedDate = date;
+                            }
+                            setState(() {
+                              _isDateSelected = true;
+                            });
+                          },
+                          isFromTodo: true,
+                          isDateSelected: _isDateSelected,
+                        ),
+                        Expanded(
+                          child: SizedBox(
+                            height: Converts.c48,
+                            child: FileAttachment2(
+                              inquiryViewModel: inquiryViewModel,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+
+                    /// save button
+                    /*!(inquiryViewModel.uiState == UiState.loading)
+                ? */
+                    /*const SizedBox(
+                      height: 8,
+                    ),
+                    ButtonCustom1(
+                        btnText: Strings.save,
+                        btnHeight: Converts.c48,
+                        bgColor: Palette.mainColor,
+                        btnWidth: double.infinity,
+                        cornerRadius: 4,
+                        isLoading:
+                            (inquiryViewModel.uiState == UiState.loading),
+                        stockColor: Palette.mainColor,
+                        onTap: () async {})*/
+                    /*: SizedBox(
+                    height: Converts.c48,
+                    width: Converts.c48,
+                    child: Center(
+                      child: SizedBox(
+                        height: Converts.c16,
+                        width: Converts.c16,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2, // Smaller stroke for a finer spinner
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Palette.tabColor),
+                        ),
+                      ),
+                    ),
+                  ),*/
+                  ])
+                : const SizedBox.shrink(),
           ],
         ),
       );
     });
   }
+
 
   void _getTodos() {
     Provider.of<TodoViewModel>(context, listen: false)
@@ -652,7 +723,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           //color: _isDateOverdue(inquiryResponse.endDate) && statusFlag == StatusFlag.pending.getFlag
           color: inquiryResponse.endDate.isOverdue() &&
                   statusFlag == StatusFlag.pending.getFlag
-              ? Colors.deepOrange.withOpacity(0.3)
+              ? Colors.red[50]
               : Colors.white,
           borderRadius: BorderRadius.circular(8),
           elevation: 2,
@@ -684,7 +755,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                               //value: _calculateTotalPercentage(inquiryResponse) /
                               value: inquiryResponse.totalTaskPercentage / 100,
                               // 0.0 to 1.0
-                              strokeWidth: 4,
+                              strokeWidth: 2,
                               backgroundColor: Colors.grey.shade500,
                               valueColor:
                                   //_calculateTotalPercentage(inquiryResponse) == 100
@@ -700,7 +771,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                             "${inquiryResponse.totalTaskPercentage.round()}%",
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: Converts.c12,
+                              fontSize: Converts.c8,
                               fontWeight: FontWeight.bold,
                             ),
                           )
@@ -716,8 +787,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                           Uri.decodeComponent(inquiryResponse.title),
                           style: GoogleFonts.roboto(
                               fontSize: Converts.c16,
-                              color: Palette.semiTv,
-                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              //fontWeight: FontWeight.bold,
                               decoration: areAllTasksCompleted(tasks)
                                   ? TextDecoration.lineThrough
                                   : TextDecoration.none),
@@ -728,7 +799,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                             TextViewCustom(
                               text: inquiryResponse.endDate,
                               fontSize: Converts.c12,
-                              tvColor: Palette.semiNormalTv,
+                              tvColor: Colors.black54,
                               isBold: false,
                               isRubik: false,
                             ),
@@ -842,7 +913,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   Widget assignedUser() {
     return Column(
       children: [
-        const Divider(),
+        Divider(
+          color: Colors.grey.shade300,
+        ),
         SizedBox(
           height: 24,
           child: Padding(
@@ -859,7 +932,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 }),
           ),
         ),
-        const Divider(),
+        //const Divider(),
       ],
     );
   }

@@ -53,6 +53,17 @@ class InquiryCreateViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// minimize task form
+  bool _isShowed = true;
+
+  bool get isShowed => _isShowed;
+
+  void setIsShowed() {
+    _isShowed = !_isShowed;
+    notifyListeners();
+  }
+
+
   /// save inquiry
   bool? _isSavedInquiry;
 

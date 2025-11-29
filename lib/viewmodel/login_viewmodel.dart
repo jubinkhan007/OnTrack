@@ -23,6 +23,10 @@ class LoginViewmodel extends ChangeNotifier {
 
   UiState get uiState => _uiState;
 
+  void setUiState(UiState value) {
+    _uiState = value;
+    notifyListeners();
+  }
   // user validation check using ID and password
   Future<void> userAuth(String userId, String password, String? firebaseDeviceToken) async {
     _uiState = UiState.loading;
@@ -38,4 +42,6 @@ class LoginViewmodel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+
 }

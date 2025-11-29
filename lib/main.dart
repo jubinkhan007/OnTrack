@@ -7,6 +7,7 @@ import 'package:tmbi/config/screen_config.dart';
 import 'package:tmbi/network/api_service.dart';
 import 'package:tmbi/repo/inquiry_repo.dart';
 import 'package:tmbi/repo/login_repo.dart';
+import 'package:tmbi/screens/new_task/auth_check.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/task_update_viewmodel.dart';
 
@@ -157,6 +158,7 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
               scaffoldBackgroundColor: Palette.scaffold),
           home: const LoginScreen()),
+          //home: AuthCheck()),
       //home: const TodoHomeScreen()),
     );
   }

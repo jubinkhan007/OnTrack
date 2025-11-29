@@ -17,6 +17,7 @@ import 'package:tmbi/widgets/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config/notification/notification_server_key.dart';
+import '../db/dao/staff_dao.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = '/login_screen';
@@ -38,25 +39,49 @@ class LoginScreen extends StatelessWidget {
                 SizedBox(
                   height: Converts.c48,
                 ),
-                TextViewCustom(
+                /*TextViewCustom(
                     text: Strings.app_name,
                     fontSize: Converts.c24,
                     tvColor: Palette.mainColor,
                     isTextAlignCenter: true,
-                    isBold: true),
-                TextViewCustom(
+                    isBold: true),*/
+                Text(
+                  Strings.app_name,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: Converts.c24,
+                      color: Palette.mainColor,
+                      fontWeight: FontWeight.w500),
+                ),
+                /*TextViewCustom(
                     text: Strings.transforming_inquiries,
                     fontSize: Converts.c12,
                     tvColor: Palette.semiTv,
-                    isBold: true),
+                    isBold: true),*/
+                Text(
+                  Strings.transforming_inquiries,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: Converts.c12,
+                    color: Colors.black,
+                  ),
+                ),
                 SizedBox(
                   height: Converts.c56,
                 ),
-                TextViewCustom(
+                /*TextViewCustom(
                     text: Strings.login_using_your_hris,
                     fontSize: Converts.c16,
                     tvColor: Palette.normalTv,
-                    isBold: false),
+                    isBold: false),*/
+                Text(
+                  Strings.login_using_your_hris,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: Converts.c16,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
                 SizedBox(
                   height: Converts.c32,
                 ),
@@ -213,7 +238,17 @@ class _LoginOperationState extends State<LoginOperation> {
                             /*Navigator.pushNamed(context, HomeScreen.routeName,
                                 arguments: loginViewModel
                                     .userResponse!.users![0].staffId);*/
-                            Navigator.pushNamed(context, NewTaskDashboardScreen.routeName);
+                            // save auto search data
+                            loginViewModel.setUiState(UiState.loading);
+                            await _fetchAndStoreStaffs(loginViewModel.userResponse!.users![0].staffId!);
+
+                            if (context.mounted) {
+                              loginViewModel.setUiState(UiState.success);
+                              Navigator.pushNamed(
+                                  context, NewTaskDashboardScreen.routeName,
+                                  arguments: loginViewModel
+                                      .userResponse!.users![0].staffId);
+                            }
                           } else {
                             _showMessage(
                                 loginViewModel.userResponse!.status!.message!,
@@ -234,18 +269,48 @@ class _LoginOperationState extends State<LoginOperation> {
                 },
               ),
               SizedBox(
-                height: Converts.c32,
+                height: Converts.c20,
               ),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, SignupScreen.routeName,);
-                  },
-                  child: Text("Don't have an account? Sign Up")),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          SignupScreen.routeName,
+                        );
+                      },
+                      child: const Text(
+                        "Don't have an account? Sign Up",
+                        style: TextStyle(color: Colors.black),
+                      )),
+                ],
+              ),
             ],
           ),
         ),
       );
     });
+  }
+
+  Future<void> _fetchAndStoreStaffs(String staffId) async {
+    final addTaskViewModel =
+    Provider.of<AddTaskViewModel>(context, listen: false);
+    await addTaskViewModel.getStaffs(staffId, "0", vm: "STAFF_ALL");
+
+    if (addTaskViewModel.staffResponse != null) {
+      if (addTaskViewModel.staffResponse!.staffs != null) {
+        StaffDao staffDao = StaffDao();
+        bool result = await staffDao
+            .insertStaffsFromJson(addTaskViewModel.staffResponse!.staffs!);
+        if (result) {
+          debugPrint("Staff info inserted successfully");
+        } else {
+          debugPrint("Failed");
+        }
+      }
+    }
   }
 
   _showMessage(String message, {bool isUpdate = false}) {
@@ -316,5 +381,4 @@ class _LoginOperationState extends State<LoginOperation> {
       throw 'Could not launch $url';
     }
   }
-
 }

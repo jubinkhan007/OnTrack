@@ -4,22 +4,27 @@ import 'package:provider/provider.dart';
 import 'package:tmbi/viewmodel/new_task/new_task_dashboard_viewmodel.dart';
 
 import '../../config/converts.dart';
+import '../../config/sp_helper.dart';
+import '../../config/strings.dart';
 import '../../widgets/new_task/app_header.dart';
 import '../../widgets/new_task/filter_section.dart';
 import '../../widgets/new_task/status_cards.dart';
 import '../../widgets/new_task/tab_selector.dart';
 import '../../widgets/new_task/task_item.dart';
+import '../login_screen.dart';
 import '../todo/todo_home_screen.dart';
 
 class NewTaskDashboardScreen extends StatelessWidget {
   static const String routeName = '/new_task_dashboard_screen';
+  final String staffId;
 
-  const NewTaskDashboardScreen({super.key});
+  const NewTaskDashboardScreen({super.key, required this.staffId});
 
-  static Widget create() {
+  static Widget create(String staffId) {
     return ChangeNotifierProvider(
       create: (_) => NewTaskDashboardViewmodel(),
-      child: const NewTaskDashboardScreen(),
+      child: NewTaskDashboardScreen(
+          staffId: staffId), // Pass staffId to the constructor
     );
   }
 
@@ -33,15 +38,20 @@ class NewTaskDashboardScreen extends StatelessWidget {
         child: const Icon(Icons.add),
         onPressed: () {
           Navigator.pushNamed(context, TodoHomeScreen.routeName,
-              arguments: "340553");
+              arguments: staffId);
         },
       ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
             // --- App Bar --- \\
-            const SliverToBoxAdapter(
-              child: AppHeader(),
+            SliverToBoxAdapter(
+              child: AppHeader(
+                onLogoutTap: () {
+                  _showLogoutDialog(context);
+                },
+                onNotificationTap: () {},
+              ),
             ),
             // --- Tab Selector# Created By Me | Assigned To me -- \\
             SliverToBoxAdapter(
@@ -132,4 +142,41 @@ class NewTaskDashboardScreen extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _showLogoutDialog(BuildContext context) async {
+    bool? logoutConfirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(Strings.logout),
+          content: const Text(Strings.are_you_sure_you_want_to_logout),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // return false to indicate cancellation
+              },
+              child: const Text(Strings.cancel),
+            ),
+            TextButton(
+              onPressed: () async {
+                await SPHelper().removeUser();
+                if (context.mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
+                        (Route<dynamic> route) =>
+                    false, // Removes all previous routes
+                  );
+                }
+              },
+              child: const Text(Strings.yes),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }

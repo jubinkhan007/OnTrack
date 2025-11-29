@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class Palette {
   static const Color scaffold = Color(0xFFF0F2F5);
 
-  static const Color mainColor = Color(0xFFE10101);
+  //static const Color mainColor = Color(0xFFE10101);
+  static const Color mainColor = Color(0xFFFF5252);
   static const Color tabColor = Color(0xFF001F3F);
 
   static const Color grayColor = Color(0xFF808080);

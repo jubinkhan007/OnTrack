@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../config/converts.dart';
+
 class CustomEditText extends StatelessWidget {
   final String label;
   final String hint;
@@ -24,7 +26,7 @@ class CustomEditText extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: Converts.c16 - 2)),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),

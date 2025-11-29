@@ -3,7 +3,11 @@ import 'package:tmbi/config/extension_file.dart';
 import '../../config/converts.dart';
 
 class AppHeader extends StatelessWidget {
-  const AppHeader({super.key});
+  final VoidCallback onLogoutTap;
+  final VoidCallback onNotificationTap;
+
+  const AppHeader(
+      {super.key, required this.onLogoutTap, required this.onNotificationTap});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,20 @@ class AppHeader extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.notifications))
+          Row(
+            children: [
+              IconButton(
+                  onPressed: () {
+                    onLogoutTap();
+                  },
+                  icon: const Icon(Icons.login_outlined)),
+              IconButton(
+                  onPressed: () {
+                    onNotificationTap();
+                  },
+                  icon: const Icon(Icons.notifications)),
+            ],
+          ),
         ],
       ),
     );

@@ -108,14 +108,12 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
         ),
       );
 
-    /// NEW TASK \\\
+    /// NEW HOME \\\
     case NewTaskDashboardScreen.routeName:
-      //final arguments = routeSettings.arguments as Map<String, dynamic>;
-      //final inquiryId = arguments['inquiryId'] as String;
-      //final taskId = arguments['taskId'] as String;
+      final args = routeSettings.arguments as String;
       return MaterialPageRoute(
         settings: routeSettings,
-        builder: (_) => NewTaskDashboardScreen.create(),
+        builder: (_) => NewTaskDashboardScreen.create(args),
       );
     case SignupScreen.routeName:
       //final arguments = routeSettings.arguments as Map<String, dynamic>;

@@ -19,8 +19,8 @@ class Strings {
   static const String staff_id = 'Staff Id';
   static const String staff_name = 'Staff Name';
   static const String password = 'Password';
-  static const String login_using_your_hris =
-      'Login using your HRIS staff ID and password.';
+  //static const String login_using_your_hris = 'Login using your HRIS staff ID and password.';
+  static const String login_using_your_hris = 'Log in to continue managing your tasks.';
   static const String login = 'Login';
   static const String summary = 'Summary';
   static const String pending_inquiry = 'Pending';
@@ -107,7 +107,7 @@ class Strings {
   static const String yes = 'Yes';
   static const String no = 'No';
   static const String cancel = 'Cancel';
-  static const String add_a_task = "Add a Task";
+  static const String add_a_task = "Enter task | use '@' + three words to add a member.";
   static const String overdue = "You can't update your task as the date is over.";
   static const String overdue1 = "Over due";
   static const String completed = "Completed";
