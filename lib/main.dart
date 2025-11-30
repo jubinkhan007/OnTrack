@@ -7,7 +7,6 @@ import 'package:tmbi/config/screen_config.dart';
 import 'package:tmbi/network/api_service.dart';
 import 'package:tmbi/repo/inquiry_repo.dart';
 import 'package:tmbi/repo/login_repo.dart';
-import 'package:tmbi/screens/new_task/auth_check.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/task_update_viewmodel.dart';
 
@@ -21,6 +20,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   runApp(const MyApp());
 }
 

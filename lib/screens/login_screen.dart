@@ -7,10 +7,11 @@ import 'package:tmbi/config/notification/notification_service.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
+import 'package:tmbi/db/dao/sync_dao.dart';
 import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/network/ui_state.dart';
-import 'package:tmbi/repo/new_task/data_saving_progress_screen.dart';
 import 'package:tmbi/screens/new_task/signup_screen.dart';
+import 'package:tmbi/screens/new_task/sync_screen.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/new_task/signup_viewmodel.dart';
 import 'package:tmbi/viewmodel/viewmodel.dart';
@@ -19,6 +20,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../config/notification/notification_server_key.dart';
 import '../db/dao/staff_dao.dart';
+import '../db/db_constant.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = '/login_screen';
@@ -239,16 +241,15 @@ class _LoginOperationState extends State<LoginOperation> {
                             /*Navigator.pushNamed(context, HomeScreen.routeName,
                                 arguments: loginViewModel
                                     .userResponse!.users![0].staffId);*/
-                            // save auto search data
-                            //loginViewModel.setUiState(UiState.loading);
-                            //await _fetchAndStoreStaffs(loginViewModel.userResponse!.users![0].staffId!);
-
+                            final syncDao = SyncDao();
+                            bool isExist = await syncDao
+                                .isTableExist(DBConstant.tableStaff);
                             if (context.mounted) {
-                              //loginViewModel.setUiState(UiState.success);
                               Navigator.pushNamed(
                                   context,
-                                  //NewTaskDashboardScreen.routeName,
-                                  DataSavingProgressScreen.routeName,
+                                  isExist
+                                      ? NewTaskDashboardScreen.routeName
+                                      : SyncScreen.routeName,
                                   arguments: loginViewModel
                                       .userResponse!.users![0].staffId);
                             }
@@ -299,7 +300,7 @@ class _LoginOperationState extends State<LoginOperation> {
 
   Future<void> _fetchAndStoreStaffs(String staffId) async {
     final addTaskViewModel =
-    Provider.of<AddTaskViewModel>(context, listen: false);
+        Provider.of<AddTaskViewModel>(context, listen: false);
     await addTaskViewModel.getStaffs(staffId, "0", vm: "STAFF_ALL");
 
     if (addTaskViewModel.staffResponse != null) {

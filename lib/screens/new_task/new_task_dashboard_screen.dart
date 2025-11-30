@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/viewmodel/new_task/new_task_dashboard_viewmodel.dart';
 
@@ -160,7 +159,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                await SPHelper().removeUser();
+                //await SPHelper().removeUser();
                 if (context.mounted) {
                   Navigator.pushAndRemoveUntil(
                     context,

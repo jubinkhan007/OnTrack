@@ -110,4 +110,6 @@ class SignupViewmodel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+
 }

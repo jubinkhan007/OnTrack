@@ -8,13 +8,15 @@ import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/pair.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/db/dao/staff_dao.dart';
+import 'package:tmbi/db/dao/sync_dao.dart';
+import 'package:tmbi/models/new_task/bu_response.dart';
 import 'package:tmbi/screens/todo/custom_dropdown.dart';
 
 import '../../config/converts.dart';
 import '../../config/sp_helper.dart';
 import '../../config/strings.dart';
-import '../../db/dao/staff_dao_new.dart';
 import '../../models/models.dart' hide Staff;
+import '../../models/staff_response.dart';
 import '../../network/ui_state.dart';
 import '../../viewmodel/viewmodel.dart';
 import '../../widgets/date_selection_view.dart';
@@ -59,8 +61,10 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   void _searchForNewUsers(String query) {
     setState(() {
       filteredNewUsers = users
-          .where((user) =>
-              user.searchName.toString().toLowerCase().contains(query.toLowerCase()))
+          .where((user) => user.searchName
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -151,29 +155,26 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     }
   }
 
-  /*Future<void> _fetchStaffsInfo() async {
+  Future<void> _fetchStaffsInfo() async {
     try {
-      final staffDao = StaffDao();
-      List<Staff> staffList = await staffDao.getStaffs();
+      //final staffDao = StaffDao();
+      final syncDao = SyncDao();
+
+      /*List<Staff> staffList = await staffDao.getStaffs();
       for (var staff in staffList) {
         users.add(Customer(
             id: staff.code.toString(), name: staff.name, isVerified: true));
-      }
-    } catch (e) {
-      debugPrint("Error fetching staff data: $e");
-    }
-  }*/
+      }*/
 
-  Future<void> _fetchStaffsInfo() async {
-    try {
-      final staffDao = StaffDaoNew(dio: null);
-      List<Staff> staffList = await staffDao.getAllStaff();
-      debugPrint(" fetching staff data: ${staffList[0].searchName}");
+      List<BusinessUnit> staffList = await syncDao.getAllStaffs();
+      debugPrint("fetching staff data: ${staffList.length}");
       for (var staff in staffList) {
         users.add(Customer(
-            id: staff.userHris.toString(), name: staff.userName, isVerified: true, searchName: staff.searchName));
+            id: staff.userId.toString(),
+            name: staff.displayName,
+            searchName: staff.searchName,
+            isVerified: true));
       }
-      debugPrint(" fetching staff data: ${users[0].searchName}");
     } catch (e) {
       debugPrint("Error fetching staff data: $e");
     }
@@ -334,7 +335,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     );
   }
 
-
   Widget bottomTextField() {
     return Consumer<InquiryCreateViewModel>(
         builder: (context, inquiryViewModel, child) {
@@ -366,7 +366,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 child: Text(
                   Strings.add_task,
                   style: TextStyle(
-                      fontSize: Converts.c16 , color: Colors.black, fontWeight: FontWeight.w600),
+                      fontSize: Converts.c16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -500,7 +502,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                     color: Palette.circleColor,
                                     fontSize: Converts.c16 - 2)),
                             style: TextStyle(
-                              fontSize: Converts.c20,
+                              fontSize: Converts.c16 - 2,
                               color: Colors.grey.shade700,
                             ),
                             //onEditingComplete: _addTask, // Add task on done
@@ -512,42 +514,43 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
                         /// save button
                         Material(
-                  color: Colors.transparent,
-                  child: !(inquiryViewModel.uiState == UiState.loading)
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.send,
-                            size: Converts.c24,
-                            color: Palette.mainColor,
-                          ),
-                          onPressed: () async {
-                            if (_addedUsers.isEmpty) {
-                              await _showDialogWithoutMembers(
-                                  context, inquiryViewModel);
-                            } else {
-                              await saveTodos(inquiryViewModel);
-                            }
-                            //String encodedTask = Uri.encodeComponent(_taskController.text);
-                            //debugPrint(encodedTask);
-                          },
+                          color: Colors.transparent,
+                          child: !(inquiryViewModel.uiState == UiState.loading)
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.send,
+                                    size: Converts.c24,
+                                    color: Palette.mainColor,
+                                  ),
+                                  onPressed: () async {
+                                    if (_addedUsers.isEmpty) {
+                                      await _showDialogWithoutMembers(
+                                          context, inquiryViewModel);
+                                    } else {
+                                      await saveTodos(inquiryViewModel);
+                                    }
+                                    //String encodedTask = Uri.encodeComponent(_taskController.text);
+                                    //debugPrint(encodedTask);
+                                  },
+                                )
+                              : SizedBox(
+                                  height: Converts.c48,
+                                  width: Converts.c48,
+                                  child: Center(
+                                    child: SizedBox(
+                                      height: Converts.c16,
+                                      width: Converts.c16,
+                                      child: const CircularProgressIndicator(
+                                        strokeWidth:
+                                            2, // Smaller stroke for a finer spinner
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Palette.tabColor),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                         )
-                      : SizedBox(
-                          height: Converts.c48,
-                          width: Converts.c48,
-                          child: Center(
-                            child: SizedBox(
-                              height: Converts.c16,
-                              width: Converts.c16,
-                              child: const CircularProgressIndicator(
-                                strokeWidth:
-                                    2, // Smaller stroke for a finer spinner
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Palette.tabColor),
-                              ),
-                            ),
-                          ),
-                        ),
-                )
                       ],
                     ),
 
@@ -621,7 +624,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       );
     });
   }
-
 
   void _getTodos() {
     Provider.of<TodoViewModel>(context, listen: false)

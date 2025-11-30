@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
+import '../models/new_task/bu_response.dart';
 import 'db_constant.dart';
 
 class LocalDB {
@@ -29,13 +30,16 @@ class LocalDB {
   Future<void> _createDB(Database db, int version) async {
     // staff
     await db.execute('''
-      CREATE TABLE ${DBConstant.tableStaff} (
-        ${DBConstant.userId} ${DBConstant.textType}, 
-        ${DBConstant.staffId} ${DBConstant.textType}, 
-        ${DBConstant.userName} ${DBConstant.textType},
-        ${DBConstant.designation} ${DBConstant.textTypeWithNull}
-      )
-    ''');
+        CREATE TABLE ${DBConstant.tableStaff}(
+          ID INTEGER PRIMARY KEY,
+          ${DBConstant.userId} ${DBConstant.textTypeWithNull},
+          ${DBConstant.compId} ${DBConstant.textTypeWithNull},
+          ${DBConstant.userHris} ${DBConstant.textTypeWithNull},
+          ${DBConstant.userName} ${DBConstant.textTypeWithNull},
+          ${DBConstant.searchName} ${DBConstant.textTypeWithNull},
+          ${DBConstant.displayName} ${DBConstant.textTypeWithNull}
+        )
+      ''');
   }
 
   Future<void> close() async {
