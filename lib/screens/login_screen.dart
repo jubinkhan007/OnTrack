@@ -9,6 +9,7 @@ import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/models/user_response.dart';
 import 'package:tmbi/network/ui_state.dart';
+import 'package:tmbi/repo/new_task/data_saving_progress_screen.dart';
 import 'package:tmbi/screens/new_task/signup_screen.dart';
 import 'package:tmbi/screens/screens.dart';
 import 'package:tmbi/viewmodel/new_task/signup_viewmodel.dart';
@@ -239,13 +240,15 @@ class _LoginOperationState extends State<LoginOperation> {
                                 arguments: loginViewModel
                                     .userResponse!.users![0].staffId);*/
                             // save auto search data
-                            loginViewModel.setUiState(UiState.loading);
-                            await _fetchAndStoreStaffs(loginViewModel.userResponse!.users![0].staffId!);
+                            //loginViewModel.setUiState(UiState.loading);
+                            //await _fetchAndStoreStaffs(loginViewModel.userResponse!.users![0].staffId!);
 
                             if (context.mounted) {
-                              loginViewModel.setUiState(UiState.success);
+                              //loginViewModel.setUiState(UiState.success);
                               Navigator.pushNamed(
-                                  context, NewTaskDashboardScreen.routeName,
+                                  context,
+                                  //NewTaskDashboardScreen.routeName,
+                                  DataSavingProgressScreen.routeName,
                                   arguments: loginViewModel
                                       .userResponse!.users![0].staffId);
                             }

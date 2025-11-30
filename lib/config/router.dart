@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/models.dart';
 
+import '../repo/new_task/data_saving_progress_screen.dart';
 import '../screens/new_task/signup_screen.dart';
 import '../screens/screens.dart';
 
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
   switch (routeSettings.name) {
-
-
     case IntroScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const LoginScreen());
@@ -114,6 +113,14 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => NewTaskDashboardScreen.create(args),
+      );
+    case DataSavingProgressScreen.routeName:
+      final args = routeSettings.arguments as String;
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => DataSavingProgressScreen(
+          staffId: args,
+        ),
       );
     case SignupScreen.routeName:
       //final arguments = routeSettings.arguments as Map<String, dynamic>;

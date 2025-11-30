@@ -13,7 +13,8 @@ import 'package:tmbi/screens/todo/custom_dropdown.dart';
 import '../../config/converts.dart';
 import '../../config/sp_helper.dart';
 import '../../config/strings.dart';
-import '../../models/models.dart';
+import '../../db/dao/staff_dao_new.dart';
+import '../../models/models.dart' hide Staff;
 import '../../network/ui_state.dart';
 import '../../viewmodel/viewmodel.dart';
 import '../../widgets/date_selection_view.dart';
@@ -59,7 +60,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     setState(() {
       filteredNewUsers = users
           .where((user) =>
-              user.name.toString().toLowerCase().contains(query.toLowerCase()))
+              user.searchName.toString().toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -150,7 +151,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     }
   }
 
-  Future<void> _fetchStaffsInfo() async {
+  /*Future<void> _fetchStaffsInfo() async {
     try {
       final staffDao = StaffDao();
       List<Staff> staffList = await staffDao.getStaffs();
@@ -158,6 +159,21 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         users.add(Customer(
             id: staff.code.toString(), name: staff.name, isVerified: true));
       }
+    } catch (e) {
+      debugPrint("Error fetching staff data: $e");
+    }
+  }*/
+
+  Future<void> _fetchStaffsInfo() async {
+    try {
+      final staffDao = StaffDaoNew(dio: null);
+      List<Staff> staffList = await staffDao.getAllStaff();
+      debugPrint(" fetching staff data: ${staffList[0].searchName}");
+      for (var staff in staffList) {
+        users.add(Customer(
+            id: staff.userHris.toString(), name: staff.userName, isVerified: true, searchName: staff.searchName));
+      }
+      debugPrint(" fetching staff data: ${users[0].searchName}");
     } catch (e) {
       debugPrint("Error fetching staff data: $e");
     }

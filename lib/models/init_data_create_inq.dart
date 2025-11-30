@@ -339,12 +339,16 @@ class Customer {
   String? name;
   bool? isVerified;
 
-  Customer({this.id, this.name, this.isVerified});
+  String searchName = "";
+
+  Customer({this.id, this.name, this.isVerified, this.searchName = ""});
 
   Customer.fromJson(Map<String, dynamic> json) {
     id = json['ID'].toString(); // Ensure this is an integer in JSON
     name = json['NAME'];
     isVerified = json['IS_VERIFIED'] == 'true';
+
+    searchName = json['SEARCH_NAME'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -352,6 +356,8 @@ class Customer {
     data['ID'] = id;
     data['NAME'] = name;
     data['IS_VERIFIED'] = isVerified;
+
+    data['SEARCH_NAME'] = searchName;
     return data;
   }
 }
