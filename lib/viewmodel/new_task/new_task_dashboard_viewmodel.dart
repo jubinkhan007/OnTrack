@@ -51,14 +51,15 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //List<Map<String, String>> get currentTasks => selectedTab == 0 ? createdTasks : assignedTasks;
-
-  String selectedBU = "All BU";
-  List<String> buOptions = ["All BU", "BU1", "BU2", "BU3"];
+  // bu search
+  CompInfo? selectedBU;
+  final Set<String> buOptions = {};
+  final List<CompInfo> compInfoList = [];
   String buStaffId = "";
 
-  void changeBU(String bu) {
-    selectedBU = bu;
+  void changeBU(CompInfo? ci) {
+    selectedBU = ci;
+    getTasks();
     notifyListeners();
   }
 
@@ -74,10 +75,24 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       _buStaffs.clear();
     }
     _buStaffs = await syncDao.getAllStaffs();
+    await getCompInfoList();
     notifyListeners();
   }
 
-  // TEST START
+  Future<void> getCompInfoList() async {
+    for (var item in _buStaffs) {
+      if (buOptions.add(item.compId)) {
+        compInfoList.add(
+          CompInfo(
+            compId: item.compId,
+            name: item.compId,
+          ),
+        );
+      }
+    }
+    //notifyListeners();
+  }
+
   TextEditingController staffController = TextEditingController();
 
   String get staffName => staffController.text;
@@ -91,8 +106,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     staffController.clear();
     notifyListeners();
   }
-
-  // TEST END
 
   // --- API --- \\
   String? _message;
@@ -132,7 +145,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     try {
       final response = await ntdRepo.getTasks(
           staffId,
-          selectedBU,
+          selectedBU != null ? selectedBU!.compId : "0",
           selectedTab.toString(),
           buStaffId == "" ? "0" : buStaffId,
           statusTab.getData.second);

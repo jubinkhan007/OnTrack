@@ -44,8 +44,9 @@ class NewTaskDashboardScreen extends StatelessWidget {
     final vm = Provider.of<NewTaskDashboardViewmodel>(context);
 
     if (vm.uiState == UiState.loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        //body: Center(child: CircularProgressIndicator()),
+        body: Center(child: context.shimmerLoading()),
       );
     }
 
@@ -87,9 +88,9 @@ class NewTaskDashboardScreen extends StatelessWidget {
             SliverToBoxAdapter(
               child: FilterSection(
                 selectedBU: vm.selectedBU,
-                buOptions: vm.buOptions,
+                buOptions: vm.compInfoList,
                 staffController: vm.staffController,
-                onBUChanged: (value) => vm.changeBU(value!),
+                onBUChanged: (value) => vm.changeBU(value),
                 onClean: () {
                   vm.setStaffName("");
                   vm.clearStaff();

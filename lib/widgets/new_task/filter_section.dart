@@ -1,11 +1,14 @@
 
 import 'package:flutter/material.dart';
 
+import '../../models/new_task/bu_response.dart';
+
 class FilterSection extends StatelessWidget {
-  final String selectedBU;
-  final List<String> buOptions;
+  //final String selectedBU;
+  final CompInfo? selectedBU;
+  final List<CompInfo> buOptions;
   final TextEditingController staffController;
-  final Function(String?) onBUChanged;
+  final Function(CompInfo?) onBUChanged;
   final Function() onClean;
   final VoidCallback onStaffTap;
 
@@ -31,7 +34,7 @@ class FilterSection extends StatelessWidget {
         ),
         child: Row(
           children: [
-            IntrinsicWidth(
+            /*IntrinsicWidth(
               child: DropdownButtonFormField<String>(
                 value: selectedBU,
                 decoration: const InputDecoration(
@@ -45,6 +48,28 @@ class FilterSection extends StatelessWidget {
                           child: Text(bu, style: const TextStyle(fontSize: 14)),
                         ))
                     .toList(),
+                onChanged: onBUChanged,
+              ),
+            ),*/
+            IntrinsicWidth(
+              child: DropdownButtonFormField<CompInfo>(
+                value: selectedBU,
+
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                ),
+
+                items: buOptions.map((bu) {
+                  return DropdownMenuItem<CompInfo>(
+                    value: bu,
+                    child: Text(
+                      bu.name,   // show the display name
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  );
+                }).toList(),
+
                 onChanged: onBUChanged,
               ),
             ),

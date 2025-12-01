@@ -51,3 +51,12 @@ class BusinessUnit {
     };
   }
 }
+
+
+class CompInfo {
+  final String compId;
+  final String name;
+
+  CompInfo({required this.compId, required this.name});
+}
+

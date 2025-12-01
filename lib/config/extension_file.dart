@@ -151,17 +151,31 @@ extension ShimmerLoadingExtension on BuildContext {
       baseColor: Colors.red[100]!,
       highlightColor: Colors.red[50]!,
       child: Padding(
-        padding: EdgeInsets.all(Converts.c8),
+        padding: EdgeInsets.only(top: Converts.c24, left:Converts.c8, right: Converts.c8),
         child: ListView.builder(
           itemCount: 5, // Number of shimmering items
           itemBuilder: (context, index) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: Converts.c208,
-                  height: Converts.c16,
-                  color: Colors.white,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        //width: Converts.c208,
+                        height: Converts.c80,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Container(
+                        //width: Converts.c208,
+                        height: Converts.c80,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Container(
