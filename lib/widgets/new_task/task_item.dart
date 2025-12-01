@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/screens/new_task/task_deatil_screen.dart';
 
+import '../../models/new_task/task_response.dart';
+
 class TaskItem extends StatelessWidget {
-  final String title;
-  final String staff;
+  //final String title;
+  //final String staff;
   final String completionText;
   final Color completionColor;
+  final Task task;
 
-  const TaskItem({
-    super.key,
-    required this.title,
-    required this.staff,
-    required this.completionText,
-    required this.completionColor,
-  });
+  const TaskItem(
+      {super.key,
+      //required this.title,
+      //required this.staff,
+      required this.completionText,
+      required this.completionColor,
+      required this.task});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,7 @@ class TaskItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => TaskDetailsScreen.create(0), // show demoTasks[0]
+            builder: (_) => TaskDetailsScreen.create(0, task), // show demoTasks[0]
           ),
         );
       },
@@ -37,18 +40,21 @@ class TaskItem extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontSize: 14)),
-                Text(staff, style: const TextStyle(color: Colors.grey)),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(task.name, style: const TextStyle(fontSize: 14)),
+                  Text(task.assignToName, style: const TextStyle(color: Colors.grey)),
+                ],
+              ),
             ),
             Text(
               completionText,
               style: TextStyle(
-                fontSize: 12,
-                  color: completionColor, fontWeight: FontWeight.bold),
+                  fontSize: 12,
+                  color: completionColor,
+                  fontWeight: FontWeight.bold),
             ),
           ],
         ),

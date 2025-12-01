@@ -8,10 +8,20 @@ import '../../network/ui_state.dart';
 
 class SyncViewmodel extends ChangeNotifier {
   final SyncRepo syncRepo;
+  final String staffId;
   final SyncDao syncDao = SyncDao();
 
-  SyncViewmodel({required this.syncRepo}) {
-    getStaffs("340553");
+  bool _disposed = false;
+
+  SyncViewmodel({required this.staffId,  required this.syncRepo}) {
+    getStaffs(staffId);
+  }
+
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
   }
 
   // --- API --- \\
@@ -44,6 +54,10 @@ class SyncViewmodel extends ChangeNotifier {
   //int get savedItems => _savedItems;
 
   Future<void> getStaffs(String staffId) async {
+    if (_disposed) {
+      return; // Do nothing if the ViewModel is disposed.
+    }
+
     if (_uiState == UiState.loading) return;
     _uiState = UiState.loading;
     notifyListeners();

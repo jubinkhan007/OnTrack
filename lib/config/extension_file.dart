@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tmbi/config/enum.dart';
+import 'package:tmbi/config/pair.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
 
@@ -81,7 +82,6 @@ extension DateCheckExtension on String {
   }
 }*/
 
-
 extension DateFormatExtension on String {
   /// Converts "yyyy-MM-dd" to "dd MMM, yy" safely
   String toFormattedDate() {
@@ -100,7 +100,6 @@ extension DateFormatExtension on String {
     }
   }
 }
-
 
 extension SnackbarExtension on BuildContext {
   void showMessage(String message) {
@@ -218,6 +217,21 @@ extension StatusFlagExtension on StatusFlag {
       case StatusFlag.completed:
       default:
         return "4"; // Default flag value for unknown or unhandled statuses
+    }
+  }
+}
+
+extension TaskStatusFlagExtension on TaskStatusFlag {
+  Pair<String, String> get getData {
+    switch (this) {
+      case TaskStatusFlag.pending:
+        return Pair("Pending", "2");
+      case TaskStatusFlag.overdue:
+        return Pair("Overdue", "4");
+      case TaskStatusFlag.completed:
+        return Pair("Completed", "6");
+      default:
+        return Pair("All", "8");
     }
   }
 }

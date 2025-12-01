@@ -17,6 +17,7 @@ class SyncScreen extends StatelessWidget {
   static Widget create(String staffId) {
     return ChangeNotifierProvider(
       create: (_) => SyncViewmodel(
+        staffId: staffId,
         syncRepo: SyncRepo(
             dio:
                 ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
@@ -40,13 +41,13 @@ class SyncScreen extends StatelessWidget {
     // Navigate to Home when sync is complete
     if (vm.uiState == UiState.success) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        /*Navigator.pushNamed(context, NewTaskDashboardScreen.routeName,
-            arguments: staffId);*/
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          NewTaskDashboardScreen.routeName, // Your home route
-              (Route<dynamic> route) => false, // Remove all previous routes
-          arguments: staffId, // Pass the staffId
-        );
+        if (context.mounted) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            NewTaskDashboardScreen.routeName, // Your home route
+                (Route<dynamic> route) => false, // Remove all previous routes
+            arguments: staffId, // Pass the staffId
+          );
+        }
       });
     }
 

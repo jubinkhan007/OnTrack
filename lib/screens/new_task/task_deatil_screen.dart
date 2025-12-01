@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
+import 'package:tmbi/config/enum.dart';
+import 'package:tmbi/config/extension_file.dart';
+import 'package:tmbi/models/new_task/task_response.dart';
 import 'package:tmbi/viewmodel/new_task/new_task_detail_task_viewmodel.dart';
 
 import '../../config/strings.dart';
@@ -10,13 +13,18 @@ import '../../widgets/new_task/sub_task_item.dart';
 
 class TaskDetailsScreen extends StatelessWidget {
   final int taskIndex;
+  final Task task2;
 
-  const TaskDetailsScreen({super.key, required this.taskIndex});
+  const TaskDetailsScreen(
+      {super.key, required this.taskIndex, required this.task2});
 
-  static Widget create(int index) {
+  static Widget create(int index, Task task) {
     return ChangeNotifierProvider(
       create: (_) => NewTaskDetailTaskViewmodel(index: index),
-      child: TaskDetailsScreen(taskIndex: index),
+      child: TaskDetailsScreen(
+        taskIndex: index,
+        task2: task,
+      ),
     );
   }
 
@@ -39,7 +47,10 @@ class TaskDetailsScreen extends StatelessWidget {
           : CustomScrollView(
               slivers: [
                 SliverAppBar(
-                  title: Text(Strings.task_details, style: TextStyle(fontSize: Converts.c16),),
+                  title: Text(
+                    Strings.task_details,
+                    style: TextStyle(fontSize: Converts.c16),
+                  ),
                   centerTitle: true,
                   backgroundColor: Colors.redAccent,
                 ),
@@ -50,7 +61,8 @@ class TaskDetailsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          task.title,
+                          //task.title,
+                          task2.name,
                           style: TextStyle(
                               fontSize: Converts.c16 + 2,
                               color: Colors.blue,
@@ -59,13 +71,17 @@ class TaskDetailsScreen extends StatelessWidget {
                         Row(
                           children: [
                             const Text(Strings.assignedTo),
-                            Text(
-                              " ${task.assignee}",
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
+                            Expanded(
+                              child: Text(
+                                //"${task.assignee}",
+                                " ${task2.assignToName}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                             Text(
-                              " • ${task.dateRange}",
+                              //" • ${task.dateRange}",
+                              " • ${task2.createdDate.split("T")[0]}",
                             ),
                           ],
                         ),
@@ -78,8 +94,7 @@ class TaskDetailsScreen extends StatelessWidget {
                               color: Colors.grey.shade300,
                               width: 1.0,
                             ),
-                            borderRadius: BorderRadius.circular(
-                                8),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: Column(
                             children: [
@@ -92,11 +107,22 @@ class TaskDetailsScreen extends StatelessWidget {
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  Text("${task.progress}% ${Strings.complete}"),
+                                  //Text("${task.progress}% ${Strings.complete}"),
+                                  Text(
+                                    "${task2.completion}% | ${task2.status}",
+                                    style: TextStyle(
+                                        color: TaskStatusFlag
+                                                    .completed.getData.first ==
+                                                task2.status
+                                            ? Colors.green
+                                            : Colors.red,
+                                        fontWeight: FontWeight.w700),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              ProgressBar(progress: task.progress / 100),
+                              //ProgressBar(progress: task.progress / 100),
+                              ProgressBar(progress: double.tryParse(task2.completion) ?? 0),
                             ],
                           ),
                         ),

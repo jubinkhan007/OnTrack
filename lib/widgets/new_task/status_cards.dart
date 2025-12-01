@@ -5,9 +5,9 @@ import '../../config/strings.dart';
 
 
 class StatusCards extends StatelessWidget {
-  final int pending;
-  final int overdue;
-  final int completed;
+  final String pending;
+  final String overdue;
+  final String completed;
 
   const StatusCards({
     super.key,

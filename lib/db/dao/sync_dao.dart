@@ -52,6 +52,12 @@ class SyncDao {
     return result.isNotEmpty;
   }
 
+  Future<bool> isTableEmpty(String tableName) async {
+    final db = await localDB.db;
+    var result = await db.query(tableName, limit: 1);
+    return result.isEmpty;
+  }
+
   Future<List<BusinessUnit>> getAllStaffs() async {
     final db = await localDB.db;
     final List<Map<String, dynamic>> maps =

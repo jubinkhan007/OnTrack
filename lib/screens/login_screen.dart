@@ -242,12 +242,12 @@ class _LoginOperationState extends State<LoginOperation> {
                                 arguments: loginViewModel
                                     .userResponse!.users![0].staffId);*/
                             final syncDao = SyncDao();
-                            bool isExist = await syncDao
-                                .isTableExist(DBConstant.tableStaff);
+                            bool isExist = await syncDao.isTableExist(DBConstant.tableStaff);
+                            bool isEmpty = await syncDao.isTableEmpty(DBConstant.tableStaff);
                             if (context.mounted) {
                               Navigator.pushNamed(
                                   context,
-                                  isExist
+                                  isExist && !isEmpty
                                       ? NewTaskDashboardScreen.routeName
                                       : SyncScreen.routeName,
                                   arguments: loginViewModel

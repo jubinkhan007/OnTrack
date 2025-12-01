@@ -1,22 +1,22 @@
-import 'package:flutter/material.dart';
 
-import '../../config/converts.dart';
-import '../../config/strings.dart';
+import 'package:flutter/material.dart';
 
 class FilterSection extends StatelessWidget {
   final String selectedBU;
   final List<String> buOptions;
-  final String staffName;
+  final TextEditingController staffController;
   final Function(String?) onBUChanged;
-  final Function(String) onStaffChanged;
+  final Function() onClean;
+  final VoidCallback onStaffTap;
 
   const FilterSection({
     super.key,
     required this.selectedBU,
     required this.buOptions,
-    required this.staffName,
+    required this.staffController,
     required this.onBUChanged,
-    required this.onStaffChanged,
+    required this.onClean,
+    required this.onStaffTap,
   });
 
   @override
@@ -26,12 +26,11 @@ class FilterSection extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade200),
-          borderRadius: BorderRadius.circular(Converts.c12),
+          borderRadius: BorderRadius.circular(12),
           color: Colors.white,
         ),
         child: Row(
           children: [
-            // --- BU Wise Dropdown - Wrap Content --- \\
             IntrinsicWidth(
               child: DropdownButtonFormField<String>(
                 value: selectedBU,
@@ -42,39 +41,70 @@ class FilterSection extends StatelessWidget {
                 ),
                 items: buOptions
                     .map((bu) => DropdownMenuItem(
-                        value: bu,
-                        child: Text(
-                          bu,
-                          style: const TextStyle(fontSize: 14),
-                        )))
+                          value: bu,
+                          child: Text(bu, style: const TextStyle(fontSize: 14)),
+                        ))
                     .toList(),
                 onChanged: onBUChanged,
               ),
             ),
-
-            // --- Divider  --- \\
             Container(
-                width: 1,
-                height: 32,
-                color: Colors.grey.shade300,
-                margin: const EdgeInsets.symmetric(horizontal: 8)),
-
-            // --- Staff Name Search Box --- \\
+              width: 1,
+              height: 32,
+              color: Colors.grey.shade300,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+            ),
             Expanded(
-              child: TextFormField(
-                initialValue: staffName,
-                style: const TextStyle(fontSize: 14),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: Strings.staff_name,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  suffixIcon: Icon(
-                    Icons.search,
-                    size: 18,
+              child: Stack(
+                children: [
+                  TextFormField(
+                    controller: staffController,
+                    readOnly: true,
+                    style: const TextStyle(fontSize: 14),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Staff name",
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    ),
                   ),
-                ),
-                onChanged: onStaffChanged,
+
+                  // Overlay for detecting tap ONLY on text area
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: onStaffTap,
+                    ),
+                  ),
+
+                  // Place the suffix icon ABOVE the overlay so it does NOT trigger onStaffTap
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: ValueListenableBuilder(
+                      valueListenable: staffController,
+                      builder: (context, value, _) {
+                        if (staffController.text.isEmpty) {
+                          return GestureDetector(
+                            onTap: onStaffTap,
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(Icons.search, size: 18),
+                            ),
+                          );
+                        } else {
+                          return GestureDetector(
+                            onTap: () => staffController.clear(),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(Icons.close, size: 18),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
