@@ -145,7 +145,7 @@ extension StatusColor on String {
 }
 
 extension ShimmerLoadingExtension on BuildContext {
-  // Shimmer loading extension method
+  // Shimmer loading extension method //
   Shimmer shimmerLoading() {
     return Shimmer.fromColors(
       baseColor: Colors.red[100]!,
