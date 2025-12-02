@@ -22,7 +22,7 @@ class NewTaskDashboardRepo {
         'va': buId, // bu_id
         'vb': staffId,
         'vc': isCreatedByMe, // is_created_by_me
-        'vd': 'Data', // bu_staff_id
+        'vd': 'Data',
         've': status, // status
         'vf': buStaffId
       };

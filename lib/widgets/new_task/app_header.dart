@@ -5,9 +5,13 @@ import '../../config/converts.dart';
 class AppHeader extends StatelessWidget {
   final VoidCallback onLogoutTap;
   final VoidCallback onNotificationTap;
+  final VoidCallback onSyncTap;
 
   const AppHeader(
-      {super.key, required this.onLogoutTap, required this.onNotificationTap});
+      {super.key,
+      required this.onLogoutTap,
+      required this.onNotificationTap,
+      required this.onSyncTap});
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +38,23 @@ class AppHeader extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                  onPressed: () {
-                    onLogoutTap();
-                  },
-                  icon: const Icon(Icons.login_outlined)),
+                onPressed: () {
+                  onSyncTap();
+                },
+                icon: const Icon(Icons.sync),
+              ),
               IconButton(
-                  onPressed: () {
-                    onNotificationTap();
-                  },
-                  icon: const Icon(Icons.notifications)),
+                onPressed: () {
+                  onLogoutTap();
+                },
+                icon: const Icon(Icons.login_outlined),
+              ),
+              IconButton(
+                onPressed: () {
+                  onNotificationTap();
+                },
+                icon: const Icon(Icons.notifications),
+              ),
             ],
           ),
         ],

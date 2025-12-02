@@ -15,8 +15,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   final String staffId;
 
   NewTaskDashboardViewmodel({required this.staffId, required this.ntdRepo}) {
-    getTasks();
     getBUStaffs();
+    //getTasks();
   }
 
   String _pending = "0";
@@ -81,6 +81,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     }
     _buStaffs = await syncDao.getAllStaffs();
     await getCompInfoList();
+    await getTasks();
     notifyListeners();
   }
 
@@ -100,11 +101,11 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   Future<void> getCompInfoList() async {
     // Add the initial "All" option **once**
-    compInfoList.add(
+    /*compInfoList.add(
       CompInfo(
         compId: "0",
         name: "All",
-      ));
+      ));*/
     // Clear the set that tracks duplicates if needed
     buOptions.clear();
     // Add items from _buStaffs without duplicates
@@ -119,6 +120,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       }
     }
     selectedBU = compInfoList.first;
+    debugPrint("BU::${selectedBU!.name} & ${selectedBU!.compId}");
     // notifyListeners();
   }
 
@@ -166,52 +168,54 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   }
 
   Future<void> getTasks() async {
-    //if (_disposed) {
-    //return; // Do nothing if the ViewModel is disposed.
-    //}
-    /*
-    * String staffId,
-        String buId,
-        String isCreatedByMe,
-        String buStaffId,
-        String status,*/
     if (_uiState == UiState.loading) return;
+
     _uiState = UiState.loading;
     notifyListeners();
+
     try {
       final response = await ntdRepo.getTasks(
-          staffId,
-          selectedBU != null ? selectedBU!.compId : "0",
-          selectedTab.toString(),
-          buStaffId == "" ? "0" : buStaffId,
-          statusTab.getData.second);
+        staffId,
+        selectedBU != null ? selectedBU!.compId : "0",
+        selectedTab.toString(),
+        buStaffId.isEmpty ? "0" : buStaffId,
+        statusTab.getData.second,
+      );
+
       _taskResponse = response;
 
-      if (_taskResponse != null) {
-        // get status counts
-        _pending = _taskResponse!.data[0].pending.toString();
-        _overdue = _taskResponse!.data[0].overdue.toString();
-        _completed = _taskResponse!.data[0].completed.toString();
-        // get tasks
-        if (_tasks.isNotEmpty) {
-          _tasks.clear();
-        }
-        if (_taskResponse!.data[0].tasks.isNotEmpty) {
-          _tasks.addAll(_taskResponse!.data[0].tasks);
+      // clear previous data
+      _tasks.clear();
+      _pending = "0";
+      _overdue = "0";
+      _completed = "0";
+
+      if (_taskResponse != null && _taskResponse!.data.isNotEmpty) {
+
+        final data = _taskResponse!.data[0];
+
+        _pending = data.pending.toString();
+        _overdue = data.overdue.toString();
+        _completed = data.completed.toString();
+
+        if (data.tasks.isNotEmpty) {
+          _tasks.addAll(data.tasks);
         } else {
-          _message = "(No Data Found)";
+          _message = "(no data found)";
         }
+
         _uiState = UiState.success;
       } else {
-        _message = "Something went wrong, please try again later.";
-        _uiState = UiState.error;
+        _message = "(no data found)";
+        _uiState = UiState.success; // still success, just empty
       }
-    } catch (error) {
+    } catch (e) {
+      _message = e.toString();
       _uiState = UiState.error;
-      _message = error.toString();
-      debugPrint(_message);
     } finally {
       notifyListeners();
     }
   }
+
+
 }
