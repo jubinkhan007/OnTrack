@@ -34,6 +34,7 @@ class LocalDB {
           ID INTEGER PRIMARY KEY,
           ${DBConstant.userId} ${DBConstant.textTypeWithNull},
           ${DBConstant.compId} ${DBConstant.textTypeWithNull},
+          ${DBConstant.compName} ${DBConstant.textTypeWithNull},
           ${DBConstant.userHris} ${DBConstant.textTypeWithNull},
           ${DBConstant.userName} ${DBConstant.textTypeWithNull},
           ${DBConstant.searchName} ${DBConstant.textTypeWithNull},

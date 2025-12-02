@@ -14,6 +14,7 @@ class BuResponse {
 
 class BusinessUnit {
   final String compId;
+  final String compName;
   final String userId;
   final String userHris;
   final String userName;
@@ -22,6 +23,7 @@ class BusinessUnit {
 
   BusinessUnit({
     required this.compId,
+    required this.compName,
     required this.userId,
     required this.userHris,
     required this.userName,
@@ -32,6 +34,7 @@ class BusinessUnit {
   factory BusinessUnit.fromJson(Map<String, dynamic> json) {
     return BusinessUnit(
       compId: json['COMP_ID'].toString(),
+      compName: json['COMP_NAME'].toString(),
       userId: json['USER_ID'].toString(),
       userHris: json['USER_HRIS'].toString(),
       userName: json['USER_NAME'].toString(),
@@ -43,6 +46,7 @@ class BusinessUnit {
   Map<String, dynamic> toJson() {
     return {
       'COMP_ID': compId,
+      'COMP_NAME': compName,
       'USER_ID': userId,
       'USER_HRIS': userHris,
       'USER_NAME': userName,

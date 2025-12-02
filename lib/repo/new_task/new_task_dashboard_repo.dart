@@ -23,7 +23,8 @@ class NewTaskDashboardRepo {
         'vb': staffId,
         'vc': isCreatedByMe, // is_created_by_me
         'vd': 'Data', // bu_staff_id
-        've': status // status
+        've': status, // status
+        'vf': buStaffId
       };
 
       // Making the GET request

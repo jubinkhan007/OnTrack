@@ -38,10 +38,13 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   String get completed => _completed;
 
   int selectedTab = 0; // 0=Created, 1=Assigned
-  TaskStatusFlag statusTab = TaskStatusFlag.all;
+  //TaskStatusFlag statusTab = TaskStatusFlag.all;
+  TaskStatusFlag statusTab = TaskStatusFlag.pending;
 
   void changeTab(int index) {
     selectedTab = index;
+    resetBuStaff();
+    getTasks();
     notifyListeners();
   }
 
@@ -69,6 +72,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
+
+
   Future<void> getBUStaffs() async {
     final syncDao = SyncDao();
     if (_buStaffs.isNotEmpty) {
@@ -79,18 +84,42 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getCompInfoList() async {
+  /*Future<void> getCompInfoList() async {
     for (var item in _buStaffs) {
       if (buOptions.add(item.compId)) {
         compInfoList.add(
           CompInfo(
             compId: item.compId,
-            name: item.compId,
+            name: item.compName,
           ),
         );
       }
     }
     //notifyListeners();
+  }*/
+
+  Future<void> getCompInfoList() async {
+    // Add the initial "All" option **once**
+    compInfoList.add(
+      CompInfo(
+        compId: "0",
+        name: "All",
+      ));
+    // Clear the set that tracks duplicates if needed
+    buOptions.clear();
+    // Add items from _buStaffs without duplicates
+    for (var item in _buStaffs) {
+      if (buOptions.add(item.compId)) {
+        compInfoList.add(
+          CompInfo(
+            compId: item.compId,
+            name: item.compName,
+          ),
+        );
+      }
+    }
+    selectedBU = compInfoList.first;
+    // notifyListeners();
   }
 
   TextEditingController staffController = TextEditingController();
@@ -105,6 +134,13 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   void clearStaff() {
     staffController.clear();
     notifyListeners();
+  }
+
+  void resetBuStaff() {
+    buStaffId = "";
+    selectedBU = compInfoList.first;
+    setStaffName("");
+    clearStaff();
   }
 
   // --- API --- \\

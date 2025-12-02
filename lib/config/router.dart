@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/models.dart';
 
+import '../screens/new_task/notification_screen.dart';
 import '../screens/new_task/signup_screen.dart';
 import '../screens/new_task/sync_screen.dart';
 import '../screens/screens.dart';
@@ -26,9 +27,10 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
     case ReportScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const ReportScreen());
-    case NotificationScreen.routeName:
+    /*case NotificationScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const NotificationScreen());
+    */
     case TodoHomeScreen.routeName:
       final args = routeSettings.arguments as String;
       return MaterialPageRoute(
@@ -113,6 +115,14 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => SyncScreen.create(args),
+      );
+    case NotificationScreen2.routeName:
+      final args = routeSettings.arguments as String;
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => NotificationScreen2(
+          staffId: args,
+        ),
       );
     case NewTaskDashboardScreen.routeName:
       final args = routeSettings.arguments as String;

@@ -18,6 +18,7 @@ import '../../widgets/new_task/tab_selector.dart';
 import '../../widgets/new_task/task_item.dart';
 import '../login_screen.dart';
 import '../todo/todo_home_screen.dart';
+import 'notification_screen.dart';
 
 class NewTaskDashboardScreen extends StatelessWidget {
   static const String routeName = '/new_task_dashboard_screen';
@@ -68,7 +69,10 @@ class NewTaskDashboardScreen extends StatelessWidget {
                 onLogoutTap: () {
                   _showLogoutDialog(context);
                 },
-                onNotificationTap: () {},
+                onNotificationTap: () {
+                  Navigator.pushNamed(context, NotificationScreen2.routeName,
+                      arguments: staffId);
+                },
               ),
             ),
             // --- Tab Selector# Created By Me | Assigned To me -- \\
@@ -126,7 +130,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
                         return TaskItem(
                             //title: task.name,
                             //staff: task.assignToName,
-                          task: task,
+                            task: task,
                             completionText:
                                 "${task.completion}% | ${task.status}",
                             completionColor: task.status ==
@@ -155,7 +159,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
 
   Widget _tabMenu(NewTaskDashboardViewmodel vm) {
     List<TaskStatusFlag> tabs = [
-      TaskStatusFlag.all,
+      //TaskStatusFlag.all,
       TaskStatusFlag.pending,
       TaskStatusFlag.overdue,
       TaskStatusFlag.completed
