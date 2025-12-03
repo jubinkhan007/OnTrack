@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -114,7 +115,8 @@ class NewTaskDetailTaskViewmodel extends ChangeNotifier {
   ];
 
   /// Constructor receives which index to load
-  /*NewTaskDetailTaskViewmodel({required int index}) {
+  */
+/*NewTaskDetailTaskViewmodel({required int index}) {
     task = demoTasks[index];
     _load();                   // auto load
   }
@@ -123,7 +125,8 @@ class NewTaskDetailTaskViewmodel extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 400)); // simulate API delay
     isLoading = false;
     notifyListeners();
-  }*/
+  }*//*
+
 
   NewTaskDetailTaskViewmodel({required int index}) {
     _load(index);
@@ -138,3 +141,4 @@ class NewTaskDetailTaskViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 }
+*/

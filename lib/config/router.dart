@@ -4,6 +4,7 @@ import 'package:tmbi/models/models.dart';
 import '../screens/new_task/notification_screen.dart';
 import '../screens/new_task/signup_screen.dart';
 import '../screens/new_task/sync_screen.dart';
+import '../screens/new_task/task_deatil_screen.dart';
 import '../screens/screens.dart';
 
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
@@ -129,6 +130,20 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => NewTaskDashboardScreen.create(args),
+      );
+    case TaskDetailsScreen.routeName:
+      final assignName = routeSettings.arguments as String;
+      final index = routeSettings.arguments as int;
+      final taskId = routeSettings.arguments as String;
+      final staffId = routeSettings.arguments as String;
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => TaskDetailsScreen(
+          index: index,
+          assignName: assignName,
+          taskId: taskId,
+          staffId: staffId,
+        ),
       );
     case SignupScreen.routeName:
       return MaterialPageRoute(

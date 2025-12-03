@@ -132,6 +132,7 @@ class Strings {
  static const String createdByMe = "Created By Me";
  static const String assignedToMe = "Assigned To Me";
  static const String assignedTo = "Assigned to";
+ static const String assignedBy = "Assigned by";
  static const String overAllProgress = "Overall Progress";
  static const String complete = "Complete";
  static const String dot = " • ";

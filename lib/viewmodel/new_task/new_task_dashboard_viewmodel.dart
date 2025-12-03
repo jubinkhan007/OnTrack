@@ -101,11 +101,11 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   Future<void> getCompInfoList() async {
     // Add the initial "All" option **once**
-    /*compInfoList.add(
+    compInfoList.add(
       CompInfo(
-        compId: "0",
+        compId: "999",
         name: "All",
-      ));*/
+      ));
     // Clear the set that tracks duplicates if needed
     buOptions.clear();
     // Add items from _buStaffs without duplicates
@@ -141,6 +141,15 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   void resetBuStaff() {
     buStaffId = "";
     selectedBU = compInfoList.first;
+    setStaffName("");
+    clearStaff();
+  }
+
+  void reset() {
+    buStaffId = "";
+    selectedBU = compInfoList.first;
+    selectedTab = 0;
+    statusTab = TaskStatusFlag.pending;
     setStaffName("");
     clearStaff();
   }

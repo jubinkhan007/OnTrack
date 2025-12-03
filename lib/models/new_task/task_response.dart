@@ -20,7 +20,7 @@ class TaskDataModel {
   }
 }
 
-class TaskResponse {
+/*class TaskResponse {
   String pending;
   String overdue;
   String completed;
@@ -35,6 +35,42 @@ class TaskResponse {
 
   factory TaskResponse.fromJson(Map<String, dynamic> json) {
     var list = json['TASKS'] as List;
+    List<Task> taskList = list.map((i) => Task.fromJson(i)).toList();
+
+    return TaskResponse(
+      pending: json['PENNDING'].toString(),
+      overdue: json['OVERDUE'].toString(),
+      completed: json['COMPLETED'].toString(),
+      tasks: taskList,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'PENNDING': pending,
+      'OVERDUE': overdue,
+      'COMPLETED': completed,
+      'TASKS': tasks.map((task) => task.toJson()).toList(),
+    };
+  }
+}*/
+
+class TaskResponse {
+  String pending;
+  String overdue;
+  String completed;
+  List<Task> tasks;
+
+  TaskResponse({
+    required this.pending,
+    required this.overdue,
+    required this.completed,
+    required this.tasks,
+  });
+
+  factory TaskResponse.fromJson(Map<String, dynamic> json) {
+    // Handle null for 'TASKS' and convert to an empty list if null
+    var list = json['TASKS'] as List? ?? []; // if 'TASKS' is null, use an empty list
     List<Task> taskList = list.map((i) => Task.fromJson(i)).toList();
 
     return TaskResponse(

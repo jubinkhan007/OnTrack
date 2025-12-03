@@ -170,7 +170,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       debugPrint("fetching staff data: ${staffList.length}");
       for (var staff in staffList) {
         users.add(Customer(
-            id: staff.userId.toString(),
+            //id: staff.userId.toString(),
+            id: staff.userHris.toString(),
             name: staff.displayName,
             searchName: staff.searchName,
             isVerified: true));
@@ -531,6 +532,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                     }
                                     //String encodedTask = Uri.encodeComponent(_taskController.text);
                                     //debugPrint(encodedTask);
+
                                   },
                                 )
                               : SizedBox(
@@ -1018,6 +1020,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         _assignedTaskToUser.add(Discussion(
             name: user.name,
             staffId: user.id,
+            //staffId: user.searchName,
             dateTime: _selectedDate,
             body: _taskController.text.toString()));
       }

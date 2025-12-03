@@ -9,6 +9,7 @@ class TaskItem extends StatelessWidget {
   final String completionText;
   final Color completionColor;
   final Task task;
+  final String staffId;
 
   const TaskItem(
       {super.key,
@@ -16,7 +17,7 @@ class TaskItem extends StatelessWidget {
       //required this.staff,
       required this.completionText,
       required this.completionColor,
-      required this.task});
+      required this.task, required this.staffId});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,13 @@ class TaskItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => TaskDetailsScreen.create(0, task), // show demoTasks[0]
+            //builder: (_) => TaskDetailsScreen.create(0, task), // show demoTasks[0]
+            builder: (_) => TaskDetailsScreen(
+              index: 0,
+              assignName: task.assignToName,
+              taskId: task.id,
+              staffId: staffId,
+            ), // show demoTasks[0]
           ),
         );
       },
@@ -45,7 +52,8 @@ class TaskItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(task.name, style: const TextStyle(fontSize: 14)),
-                  Text(task.assignToName, style: const TextStyle(color: Colors.grey)),
+                  Text(task.assignToName,
+                      style: const TextStyle(color: Colors.grey)),
                 ],
               ),
             ),
