@@ -6,13 +6,14 @@ import '../screens/new_task/signup_screen.dart';
 import '../screens/new_task/sync_screen.dart';
 import '../screens/new_task/task_deatil_screen.dart';
 import '../screens/screens.dart';
+import '../screens/todo/todo_home_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
   switch (routeSettings.name) {
-    case IntroScreen.routeName:
+    /*case IntroScreen.routeName:
       return MaterialPageRoute(
-          settings: routeSettings, builder: (_) => const LoginScreen());
-    case LoginScreen.routeName:
+          settings: routeSettings, builder: (_) => const LoginScreen());*/
+    /*case LoginScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const LoginScreen());
     case HomeScreen.routeName:
@@ -27,7 +28,7 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
           settings: routeSettings, builder: (_) => const SettingScreen());
     case ReportScreen.routeName:
       return MaterialPageRoute(
-          settings: routeSettings, builder: (_) => const ReportScreen());
+          settings: routeSettings, builder: (_) => const ReportScreen());*/
     /*case NotificationScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const NotificationScreen());
@@ -39,7 +40,7 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
           builder: (_) => TodoHomeScreen(
                 staffId: args,
               ));
-    case InquiryView.routeName:
+    /*case InquiryView.routeName:
       /*final args = routeSettings.arguments as InquiryResponse;
       final args1 = routeSettings.arguments as String;*/
       final arguments = routeSettings.arguments as Map<String, dynamic>;
@@ -108,7 +109,7 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
           inquiryId: inquiryId,
           taskId: taskId,
         ),
-      );
+      );*/
 
     /// NEW HOME \\\
     case SyncScreen.routeName:

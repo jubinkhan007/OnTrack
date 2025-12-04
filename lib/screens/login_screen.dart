@@ -298,24 +298,6 @@ class _LoginOperationState extends State<LoginOperation> {
     });
   }
 
-  Future<void> _fetchAndStoreStaffs(String staffId) async {
-    final addTaskViewModel =
-        Provider.of<AddTaskViewModel>(context, listen: false);
-    await addTaskViewModel.getStaffs(staffId, "0", vm: "STAFF_ALL");
-
-    if (addTaskViewModel.staffResponse != null) {
-      if (addTaskViewModel.staffResponse!.staffs != null) {
-        StaffDao staffDao = StaffDao();
-        bool result = await staffDao
-            .insertStaffsFromJson(addTaskViewModel.staffResponse!.staffs!);
-        if (result) {
-          debugPrint("Staff info inserted successfully");
-        } else {
-          debugPrint("Failed");
-        }
-      }
-    }
-  }
 
   _showMessage(String message, {bool isUpdate = false}) {
     context.hideKeyboard;

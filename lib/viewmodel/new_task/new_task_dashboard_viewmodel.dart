@@ -37,6 +37,10 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   String get completed => _completed;
 
+  bool? _isDeleted;
+
+  bool? get isDeleted => _isDeleted;
+
   int selectedTab = 0; // 0=Created, 1=Assigned
   //TaskStatusFlag statusTab = TaskStatusFlag.all;
   TaskStatusFlag statusTab = TaskStatusFlag.pending;
@@ -72,8 +76,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
   Future<void> getBUStaffs() async {
     final syncDao = SyncDao();
     if (_buStaffs.isNotEmpty) {
@@ -101,11 +103,10 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   Future<void> getCompInfoList() async {
     // Add the initial "All" option **once**
-    compInfoList.add(
-      CompInfo(
-        compId: "999",
-        name: "All",
-      ));
+    compInfoList.add(CompInfo(
+      compId: "999",
+      name: "All",
+    ));
     // Clear the set that tracks duplicates if needed
     buOptions.clear();
     // Add items from _buStaffs without duplicates
@@ -200,7 +201,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       _completed = "0";
 
       if (_taskResponse != null && _taskResponse!.data.isNotEmpty) {
-
         final data = _taskResponse!.data[0];
 
         _pending = data.pending.toString();
@@ -226,5 +226,21 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteAccount(String userId, String password) async {
+    if (_uiState == UiState.loading) return;
 
+    _uiState = UiState.loading;
+    _message = null;
+    notifyListeners();
+    try {
+      final response = await ntdRepo.deleteAccount(userId, password, []);
+      _isDeleted = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
 }

@@ -76,17 +76,17 @@ import 'notification_screen.dart';
             // --- App Bar --- \\
             SliverToBoxAdapter(
               child: AppHeader(
-                *//*onLogoutTap: () {
+                */ /*onLogoutTap: () {
                   _showLogoutDialog(context);
-                },*//*
+                },*/ /*
                 onNotificationTap: () {
                   Navigator.pushNamed(context, NotificationScreen2.routeName,
                       arguments: staffId);
                 },
-                *//*onSyncTap: () {
+                */ /*onSyncTap: () {
                   Navigator.pushNamed(context, SyncScreen.routeName,
                       arguments: staffId);
-                },*//*
+                },*/ /*
               ),
             ),
             // --- Tab Selector# Created By Me | Assigned To me -- \\
@@ -493,8 +493,9 @@ class NewTaskDashboardScreen extends StatelessWidget {
       create: (_) => NewTaskDashboardViewmodel(
         staffId: staffId,
         ntdRepo: NewTaskDashboardRepo(
-            dio: ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                .provideDio()),
+            dio:
+                ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio()),
       ),
       child: NewTaskDashboardScreen(staffId: staffId),
     );
@@ -503,7 +504,8 @@ class NewTaskDashboardScreen extends StatelessWidget {
   // This function will be triggered on pull-to-refresh
   Future<void> _onRefresh(BuildContext context) async {
     final vm = Provider.of<NewTaskDashboardViewmodel>(context, listen: false);
-    await vm.getTasks();  // Assuming you have a method in the ViewModel to refresh the data
+    await vm
+        .getTasks(); // Assuming you have a method in the ViewModel to refresh the data
   }
 
   @override
@@ -512,7 +514,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
 
     if (vm.uiState == UiState.loading) {
       return Scaffold(
-        body: Center(child: context.shimmerLoading()),  // Show loading indicator
+        body: Center(child: context.shimmerLoading()), // Show loading indicator
       );
     }
 
@@ -522,32 +524,36 @@ class NewTaskDashboardScreen extends StatelessWidget {
         child: const Icon(Icons.add),
         onPressed: () {
           vm.reset();
-          Navigator.pushNamed(context, TodoHomeScreen.routeName, arguments: staffId);
+          Navigator.pushNamed(context, TodoHomeScreen.routeName,
+              arguments: staffId);
         },
       ),
       drawer: AppDrawer(
         staffId: staffId,
         staffName: "",
         onSync: () {
-          Navigator.pushNamed(context, SyncScreen.routeName, arguments: staffId);
+          Navigator.pushNamed(context, SyncScreen.routeName,
+              arguments: staffId);
         },
         onLogout: () {
           _showLogoutDialog(context);
         },
         onAccountDeletion: () {
-          showDeleteAccountDialog(context);
+          showDeleteAccountDialog(context, vm);
         },
       ),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () => _onRefresh(context),  // Trigger refresh on pull-to-refresh
+          onRefresh: () => _onRefresh(context),
+          // Trigger refresh on pull-to-refresh
           child: CustomScrollView(
             slivers: [
               // --- App Bar --- \\
               SliverToBoxAdapter(
                 child: AppHeader(
                   onNotificationTap: () {
-                    Navigator.pushNamed(context, NotificationScreen2.routeName, arguments: staffId);
+                    Navigator.pushNamed(context, NotificationScreen2.routeName,
+                        arguments: staffId);
                   },
                 ),
               ),
@@ -597,31 +603,33 @@ class NewTaskDashboardScreen extends StatelessWidget {
               // --- Task List --- \\
               vm.tasks.isNotEmpty
                   ? SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    final task = vm.tasks[index];
-                    return TaskItem(
-                      task: task,
-                      staffId: staffId,
-                      completionText: "${task.completion}% | ${task.status}",
-                      completionColor: task.status == TaskStatusFlag.completed.getData.first
-                          ? Colors.green
-                          : Colors.red,
-                    );
-                  },
-                  childCount: vm.tasks.length,
-                ),
-              )
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final task = vm.tasks[index];
+                          return TaskItem(
+                            task: task,
+                            staffId: staffId,
+                            completionText:
+                                "${task.completion}% | ${task.status}",
+                            completionColor: task.status ==
+                                    TaskStatusFlag.completed.getData.first
+                                ? Colors.green
+                                : Colors.red,
+                          );
+                        },
+                        childCount: vm.tasks.length,
+                      ),
+                    )
                   : SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Center(
-                    child: ErrorContainer(
-                      message: vm.message ?? "Something went wrong!",
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: Center(
+                          child: ErrorContainer(
+                            message: vm.message ?? "Something went wrong!",
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -642,7 +650,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(
           tabs.length,
-              (index) => GestureDetector(
+          (index) => GestureDetector(
             onTap: () => vm.changeStatus(tabs[index]),
             child: AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 250),
@@ -650,7 +658,8 @@ class NewTaskDashboardScreen extends StatelessWidget {
                 fontWeight: vm.statusTab == tabs[index]
                     ? FontWeight.bold
                     : FontWeight.w400,
-                color: vm.statusTab == tabs[index] ? Colors.blue : Colors.black54,
+                color:
+                    vm.statusTab == tabs[index] ? Colors.blue : Colors.black54,
               ),
               child: Text(tabs[index].getData.first),
             ),
@@ -680,8 +689,10 @@ class NewTaskDashboardScreen extends StatelessWidget {
                 if (context.mounted) {
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
-                        (Route<dynamic> route) => false, // Removes all previous routes
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
+                    (Route<dynamic> route) =>
+                        false, // Removes all previous routes
                   );
                 }
               },
@@ -693,7 +704,8 @@ class NewTaskDashboardScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _showStaffSearchDialog(BuildContext context, NewTaskDashboardViewmodel vm) async {
+  Future<void> _showStaffSearchDialog(
+      BuildContext context, NewTaskDashboardViewmodel vm) async {
     final bu = await showDialog<BusinessUnit>(
       context: context,
       builder: (_) => StaffSearchDialog(
@@ -707,92 +719,118 @@ class NewTaskDashboardScreen extends StatelessWidget {
     }
   }
 
-  void showDeleteAccountDialog(BuildContext context) {
+  void showDeleteAccountDialog(
+      BuildContext context, NewTaskDashboardViewmodel vm) {
     final TextEditingController passwordController = TextEditingController();
+    bool isButtonEnabled = false;
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.error_outline, color: Colors.red, size: 40),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Center(
-                child: Text(
-                  "Delete Your Account?",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                "This action is final and cannot be undone. You will permanently lose all your data.",
-                style: TextStyle(fontSize: 14, color: Colors.black87),
-              ),
-              const SizedBox(height: 16),
-              _bulletPoint("You will permanently lose all your tasks and projects."),
-              _bulletPoint("Your profile and personal information will be erased."),
-              _bulletPoint("You will be removed from all shared projects."),
-              const SizedBox(height: 20),
-              const Text(
-                "To confirm, please enter your password.",
-                style: TextStyle(fontSize: 14),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: "Enter your password",
-                  filled: true,
-                  fillColor: Colors.grey.shade100,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+      builder: (context) => StatefulBuilder(builder: (context, setState) {
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.error_outline,
+                          color: Colors.red, size: 40),
                     ),
                   ),
-                  child: const Text("Permanently Delete Account", style: TextStyle(color: Colors.white, fontSize: 16)),
-                ),
+                  const SizedBox(height: 16),
+                  const Center(
+                    child: Text(
+                      "Delete Your Account?",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "This action is final and cannot be undone. You will permanently lose all your data.",
+                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 16),
+                  _bulletPoint(
+                      "You will permanently lose all your tasks and projects."),
+                  _bulletPoint(
+                      "Your profile and personal information will be erased."),
+                  _bulletPoint("You will be removed from all shared projects."),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "To confirm, please enter your password.",
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    onChanged: (value) {
+                      setState(() {
+                        isButtonEnabled = value.isNotEmpty;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Enter your password",
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isButtonEnabled
+                          ? () async {
+                              await vm.deleteAccount("userId", "password");
+                              if (vm.isDeleted == true) {
+                                if (context.mounted) {
+                                  Navigator.pop(context);
+                                }
+                              }
+                              debugPrint("Result: ${vm.isDeleted}");
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text("Permanently Delete Account",
+                          style: TextStyle(color: Colors.white, fontSize: 16)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Cancel",
+                          style: TextStyle(color: Colors.black87)),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              Center(
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel", style: TextStyle(color: Colors.black87)),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -876,8 +914,8 @@ class StaffSearchDialog extends StatelessWidget {
                         title: Text(staff.userName),
                         subtitle: Text(staff.displayName),
                         onTap: () =>
-                        //{Navigator.of(context).pop(staff.userName)},
-                        {Navigator.of(context).pop(staff)},
+                            //{Navigator.of(context).pop(staff.userName)},
+                            {Navigator.of(context).pop(staff)},
                       );
                     },
                   );

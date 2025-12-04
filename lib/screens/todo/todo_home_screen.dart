@@ -18,11 +18,11 @@ import '../../config/strings.dart';
 import '../../models/models.dart' hide Staff;
 import '../../models/staff_response.dart';
 import '../../network/ui_state.dart';
+import '../../viewmodel/inquiry_create_viewmodel.dart';
 import '../../viewmodel/viewmodel.dart';
 import '../../widgets/date_selection_view.dart';
 import '../../widgets/widgets.dart';
-import '../comment_screen.dart';
-import '../inquiry_view.dart';
+
 
 class TodoHomeScreen extends StatefulWidget {
   static const String routeName = '/todo_home_screen';
@@ -136,24 +136,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     await inquiryViewModel.getInquiries(statusFlag, widget.staffId, "1");
   }
 
-  Future<void> _fetchAndStoreStaffs() async {
-    final addTaskViewModel =
-        Provider.of<AddTaskViewModel>(context, listen: false);
-    await addTaskViewModel.getStaffs(widget.staffId, "0", vm: "STAFF_ALL");
-
-    if (addTaskViewModel.staffResponse != null) {
-      if (addTaskViewModel.staffResponse!.staffs != null) {
-        StaffDao staffDao = StaffDao();
-        bool result = await staffDao
-            .insertStaffsFromJson(addTaskViewModel.staffResponse!.staffs!);
-        if (result) {
-          debugPrint("Staff info inserted successfully");
-        } else {
-          debugPrint("Failed");
-        }
-      }
-    }
-  }
 
   Future<void> _fetchStaffsInfo() async {
     try {
@@ -291,20 +273,20 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     confirmDismiss: (direction) async {
                       if (direction == DismissDirection.startToEnd) {
                         //  check if end date is expire
-                        if (!inquiryResponse.endDate.isOverdue()) {
+                        /*if (!inquiryResponse.endDate.isOverdue()) {
                           updateTodos(
                               Provider.of<InquiryCreateViewModel>(context,
                                   listen: false),
                               inquiryResponse);
                         } else {
                           showMessage(Strings.overdue);
-                        }
+                        }*/
                       } else if (direction == DismissDirection.endToStart) {
-                        Navigator.pushNamed(
+                        /*Navigator.pushNamed(
                           context,
                           CommentScreen.routeName,
                           arguments: inquiryResponse.id.toString(),
-                        );
+                        );*/
                       }
                       return false;
                     },
@@ -315,14 +297,14 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                       //});
                       if (value) {
                         // check if end date is expire
-                        if (!inquiryResponse.endDate.isOverdue()) {
+                        /*if (!inquiryResponse.endDate.isOverdue()) {
                           await updateTodos(
                               Provider.of<InquiryCreateViewModel>(context,
                                   listen: false),
                               inquiryResponse);
                         } else {
                           showMessage(Strings.overdue);
-                        }
+                        }*/
                       }
                     }),
                   );
@@ -729,7 +711,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       child: GestureDetector(
         onTap: () {
           //debugPrint("Value:: ${inquiryResponse.attachment.count} ${statusFlagName}");
-          Navigator.pushNamed(
+          /*Navigator.pushNamed(
             context,
             InquiryView.routeName,
             arguments: {
@@ -737,7 +719,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               'flag': statusFlagName,
               'staffId': staffId
             },
-          );
+          );*/
         },
         child: Material(
           //color: _isDateOverdue(inquiryResponse.endDate) && statusFlag == StatusFlag.pending.getFlag

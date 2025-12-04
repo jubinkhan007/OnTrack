@@ -8,12 +8,12 @@ class NewTaskDashboardRepo {
   NewTaskDashboardRepo({required this.dio});
 
   Future<TaskDataModel> getTasks(
-      String staffId,
-      String buId,
-      String isCreatedByMe,
-      String buStaffId,
-      String status,
-      ) async {
+    String staffId,
+    String buId,
+    String isCreatedByMe,
+    String buStaffId,
+    String status,
+  ) async {
     try {
       // Setting up headers
       final headers = {
@@ -41,6 +41,36 @@ class NewTaskDashboardRepo {
     } catch (e) {
       debugPrint('General error: $e');
       throw Exception('Unknown error occurred: $e');
+    }
+  }
+
+  Future<bool> deleteAccount(
+      String userId, String password, List<String> fileNames) async {
+    try {
+      final headers = {
+        "dtype": "DELETE_ACCOUNT",
+        "inqrid": "0",
+        "taskid": "0",
+        "inqrdesc": password,
+        "userid": userId,
+        "priorityid": "0",
+        "percentage_value": "0",
+        "files": fileNames.length,
+      };
+
+      // set file names
+      for (var i = 0; i < fileNames.length; i++) {
+        headers['picture${i + 1}'] = fileNames[i];
+      }
+
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      throw Exception(error);
     }
   }
 

@@ -1,16 +1,1 @@
-export '../widgets/counter_card.dart';
-export 'create_inquiry_screen.dart';
-export 'home_screen.dart';
-export 'inquiry_view.dart';
-export 'intro_screen.dart';
-export 'login_screen.dart';
-export 'comment_screen.dart';
-export 'dialog/update_task_dialog.dart';
-export 'attachment_view_screen.dart';
-export 'note_screen.dart';
-export 'add_task_to_staff_screen.dart';
-export 'todo/todo_home_screen.dart';
-export 'setting_screen.dart';
-export 'notification_screen.dart';
-export 'report_screen.dart';
 export 'new_task/new_task_dashboard_screen.dart';

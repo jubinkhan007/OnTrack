@@ -7,8 +7,8 @@ import 'package:tmbi/config/screen_config.dart';
 import 'package:tmbi/network/api_service.dart';
 import 'package:tmbi/repo/inquiry_repo.dart';
 import 'package:tmbi/repo/login_repo.dart';
-import 'package:tmbi/screens/screens.dart';
-import 'package:tmbi/viewmodel/task_update_viewmodel.dart';
+import 'package:tmbi/screens/login_screen.dart';
+import 'package:tmbi/viewmodel/inquiry_create_viewmodel.dart';
 
 import 'config/router.dart';
 import 'firebase_options.dart';
@@ -54,45 +54,19 @@ class MyApp extends StatelessWidget {
                     .provideDio()),
           ),
         ),
+
         ChangeNotifierProvider(
           create: (_) => InquiryCreateViewModel(
+            //loginRepo: LoginRepo(dio: ApiService().provideDio()),
             inquiryRepo: InquiryRepo(
-                //fileDio: ApiService().fileUploadDio(),
-                fileDio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .fileUploadDio(),
-                //dio: ApiService().provideDio()),
                 dio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .provideDio()),
+                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio(), fileDio: ApiService(
+                "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                .fileUploadDio()),
           ),
         ),
-        ChangeNotifierProvider(
-          create: (_) => AddTaskViewModel(
-            inquiryRepo: InquiryRepo(
-                //fileDio: ApiService().fileUploadDio(),
-                fileDio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .fileUploadDio(),
-                //dio: ApiService().provideDio()),
-                dio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .provideDio()),
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => InquiryViewModel(
-            inquiryRepo: InquiryRepo(
-                //fileDio: ApiService().fileUploadDio(),
-                fileDio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .fileUploadDio(),
-                //dio: ApiService().provideDio()),
-                dio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .provideDio()),
-          ),
-        ),
+
         ChangeNotifierProvider(
           create: (_) => TodoViewModel(
             inquiryRepo: InquiryRepo(
@@ -105,48 +79,6 @@ class MyApp extends StatelessWidget {
                         "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                     .provideDio()),
           ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => CommentViewModel(
-            inquiryRepo: InquiryRepo(
-                //fileDio: ApiService().fileUploadDio(),
-                fileDio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .fileUploadDio(),
-                //dio: ApiService().provideDio()),
-                dio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .provideDio()),
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => TaskUpdateViewModel(
-            inquiryRepo: InquiryRepo(
-                //fileDio: ApiService().fileUploadDio(),
-                fileDio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .fileUploadDio(),
-                //dio: ApiService().provideDio()),
-                dio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .provideDio()),
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => CounterViewModel(
-            inquiryRepo: InquiryRepo(
-                //fileDio: ApiService().fileUploadDio(),
-                fileDio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .fileUploadDio(),
-                //dio: ApiService().provideDio()),
-                dio: ApiService(
-                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .provideDio()),
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => SettingsViewModel(),
         ),
       ],
       child: MaterialApp(
