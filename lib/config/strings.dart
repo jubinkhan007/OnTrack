@@ -108,6 +108,7 @@ class Strings {
   static const String no = 'No';
   static const String cancel = 'Cancel';
   static const String add_a_task = "Enter task | use '@' + three words to add a member.";
+  static const String enterTask = "Enter your task here";
   static const String overdue = "You can't update your task as the date is over.";
   static const String overdue1 = "Over due";
   static const String completed = "Completed";

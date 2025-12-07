@@ -7,7 +7,6 @@ import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/pair.dart';
 import 'package:tmbi/config/palette.dart';
-import 'package:tmbi/db/dao/staff_dao.dart';
 import 'package:tmbi/db/dao/sync_dao.dart';
 import 'package:tmbi/models/new_task/bu_response.dart';
 import 'package:tmbi/screens/todo/custom_dropdown.dart';
@@ -16,19 +15,17 @@ import '../../config/converts.dart';
 import '../../config/sp_helper.dart';
 import '../../config/strings.dart';
 import '../../models/models.dart' hide Staff;
-import '../../models/staff_response.dart';
 import '../../network/ui_state.dart';
 import '../../viewmodel/inquiry_create_viewmodel.dart';
 import '../../viewmodel/viewmodel.dart';
 import '../../widgets/date_selection_view.dart';
 import '../../widgets/widgets.dart';
 
-
 class TodoHomeScreen extends StatefulWidget {
   static const String routeName = '/todo_home_screen';
   final String staffId;
 
-  TodoHomeScreen({super.key, required this.staffId});
+  const TodoHomeScreen({super.key, required this.staffId});
 
   @override
   State<TodoHomeScreen> createState() => _TodoHomeScreenState();
@@ -136,18 +133,15 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     await inquiryViewModel.getInquiries(statusFlag, widget.staffId, "1");
   }
 
-
   Future<void> _fetchStaffsInfo() async {
     try {
       //final staffDao = StaffDao();
       final syncDao = SyncDao();
-
       /*List<Staff> staffList = await staffDao.getStaffs();
       for (var staff in staffList) {
         users.add(Customer(
             id: staff.code.toString(), name: staff.name, isVerified: true));
       }*/
-
       List<BusinessUnit> staffList = await syncDao.getAllStaffs();
       debugPrint("fetching staff data: ${staffList.length}");
       for (var staff in staffList) {
@@ -199,8 +193,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 hintName: "Sorted by",
                 onChanged: (value) {
                   if (value != null) {
-                    statusFlag = value!.status!.getFlag!;
-                    statusFlagName = value!.status!.name;
+                    statusFlag = value.status.getFlag;
+                    statusFlagName = value.status.name;
                     Provider.of<TodoViewModel>(context, listen: false)
                         .getInquiries(statusFlag, widget.staffId, "1");
                     debugPrint("StatusFlag::$statusFlag");
@@ -479,7 +473,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                             //textInputAction: TextInputAction.done,
                             keyboardType: TextInputType.multiline,
                             decoration: InputDecoration(
-                                hintText: Strings.add_a_task,
+                                hintText: staffId.isEmail()
+                                    ? Strings.enterTask
+                                    : Strings.add_task,
                                 border: InputBorder.none,
                                 hintStyle: TextStyle(
                                     color: Palette.circleColor,
@@ -506,7 +502,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                     color: Palette.mainColor,
                                   ),
                                   onPressed: () async {
-                                    if (_addedUsers.isEmpty) {
+                                    if (_addedUsers.isEmpty && !staffId.isEmail()) {
                                       await _showDialogWithoutMembers(
                                           context, inquiryViewModel);
                                     } else {
@@ -514,7 +510,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                     }
                                     //String encodedTask = Uri.encodeComponent(_taskController.text);
                                     //debugPrint(encodedTask);
-
                                   },
                                 )
                               : SizedBox(
@@ -559,14 +554,16 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                           isFromTodo: true,
                           isDateSelected: _isDateSelected,
                         ),
-                        Expanded(
-                          child: SizedBox(
-                            height: Converts.c48,
-                            child: FileAttachment2(
-                              inquiryViewModel: inquiryViewModel,
-                            ),
-                          ),
-                        )
+                        staffId.isEmail()
+                            ? const SizedBox.shrink()
+                            : Expanded(
+                                child: SizedBox(
+                                  height: Converts.c48,
+                                  child: FileAttachment2(
+                                    inquiryViewModel: inquiryViewModel,
+                                  ),
+                                ),
+                              )
                       ],
                     ),
 

@@ -8,6 +8,7 @@ import '../../config/converts.dart';
 class AppDrawer extends StatelessWidget {
   final String staffId;
   final String staffName;
+  final bool isEmailUser;
   final VoidCallback onSync;
   final VoidCallback onLogout;
   final VoidCallback onAccountDeletion;
@@ -18,7 +19,8 @@ class AppDrawer extends StatelessWidget {
       required this.staffName,
       required this.onSync,
       required this.onLogout,
-      required this.onAccountDeletion});
+      required this.onAccountDeletion,
+      required this.isEmailUser});
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +33,11 @@ class AppDrawer extends StatelessWidget {
           UserAccountsDrawerHeader(
             decoration: const BoxDecoration(color: Colors.white),
             accountName: Text(
-              "Md. Salauddin",
+              staffName,
               style: TextStyle(color: Colors.black, fontSize: Converts.c16 - 2),
             ),
             accountEmail: Text(
-              "@$staffId",
+              staffId,
               style: TextStyle(color: Colors.grey, fontSize: Converts.c16 - 4),
             ),
             currentAccountPicture: CircleAvatar(
@@ -43,26 +45,31 @@ class AppDrawer extends StatelessWidget {
               backgroundColor: Colors.blue.shade50,
               child: ClipOval(
                 child: CachedNetworkImage(
-                  imageUrl: "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/$staffId/$staffId-0.jpg",
+                  imageUrl:
+                      "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/$staffId/$staffId-0.jpg",
                   fit: BoxFit.cover,
                   width: Converts.c64,
                   height: Converts.c64,
-                  placeholder: (_, __) => const Icon(Icons.person_outline, color: Colors.blue),
-                  errorWidget: (_, __, ___) => const Icon(Icons.person_outline, color: Colors.blue),
+                  placeholder: (_, __) =>
+                      const Icon(Icons.person_outline, color: Colors.blue),
+                  errorWidget: (_, __, ___) =>
+                      const Icon(Icons.person_outline, color: Colors.blue),
                 ),
               ),
             ),
           ),
 
           // menu items
-          _drawerItem(
-            icon: Icons.sync,
-            text: 'Sync',
-            onTap: () {
-              onSync();
-            },
-            selected: false,
-          ),
+          isEmailUser
+              ? const SizedBox.shrink()
+              : _drawerItem(
+                  icon: Icons.sync,
+                  text: 'Sync',
+                  onTap: () {
+                    onSync();
+                  },
+                  selected: false,
+                ),
           _drawerItem(
             icon: Icons.delete_forever,
             text: 'Account delete',
@@ -89,14 +96,14 @@ class AppDrawer extends StatelessWidget {
     bool selected = false,
   }) {
     return ListTile(
-      leading: Icon(icon, color: selected ? Colors.blue : Colors.black87, size: Converts.c16),
+      leading: Icon(icon,
+          color: selected ? Colors.blue : Colors.black87, size: Converts.c16),
       title: Text(
         text,
         style: TextStyle(
-          color: selected ? Colors.blue : Colors.black87,
-          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-            fontSize: Converts.c16 - 2
-        ),
+            color: selected ? Colors.blue : Colors.black87,
+            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+            fontSize: Converts.c16 - 2),
       ),
       onTap: onTap,
       selected: selected,

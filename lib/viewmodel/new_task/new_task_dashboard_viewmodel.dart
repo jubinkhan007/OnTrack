@@ -15,7 +15,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   final String staffId;
 
   NewTaskDashboardViewmodel({required this.staffId, required this.ntdRepo}) {
-    getBUStaffs();
+      getBUStaffs();
     //getTasks();
   }
 
@@ -77,14 +77,16 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   }
 
   Future<void> getBUStaffs() async {
-    final syncDao = SyncDao();
-    if (_buStaffs.isNotEmpty) {
-      _buStaffs.clear();
+    if (!await isEmailUser()) {
+      final syncDao = SyncDao();
+      if (_buStaffs.isNotEmpty) {
+        _buStaffs.clear();
+      }
+      _buStaffs = await syncDao.getAllStaffs();
+      await getCompInfoList();
+      await getTasks();
+      notifyListeners();
     }
-    _buStaffs = await syncDao.getAllStaffs();
-    await getCompInfoList();
-    await getTasks();
-    notifyListeners();
   }
 
   /*Future<void> getCompInfoList() async {
@@ -153,6 +155,20 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     statusTab = TaskStatusFlag.pending;
     setStaffName("");
     clearStaff();
+  }
+
+  Future<bool> isEmailUser() async {
+    if (staffId.isEmail()) {
+      buStaffId = "";
+      selectedBU = CompInfo(compId: "999", name: "All");
+      selectedTab = 1;
+      statusTab = TaskStatusFlag.pending;
+      setStaffName("");
+      clearStaff();
+      await getTasks();
+      return true;
+    }
+    return false;
   }
 
   // --- API --- \\

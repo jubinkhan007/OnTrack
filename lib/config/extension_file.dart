@@ -151,7 +151,8 @@ extension ShimmerLoadingExtension on BuildContext {
       baseColor: Colors.red[100]!,
       highlightColor: Colors.red[50]!,
       child: Padding(
-        padding: EdgeInsets.only(top: Converts.c24, left:Converts.c8, right: Converts.c8),
+        padding: EdgeInsets.only(
+            top: Converts.c24, left: Converts.c8, right: Converts.c8),
         child: ListView.builder(
           itemCount: 5, // Number of shimmering items
           itemBuilder: (context, index) {
@@ -262,5 +263,12 @@ extension GreetingExtension on DateTime {
     } else {
       return Strings.good_night;
     }
+  }
+}
+
+extension EmailValidation on String {
+  bool isEmail() {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(this);
   }
 }

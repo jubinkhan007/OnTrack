@@ -122,11 +122,25 @@ class _LoginOperationState extends State<LoginOperation> {
     super.initState();
     _loadSavedCredential();
     // init notification
-    notificationService.requestNotificationPermission();
+    /*notificationService.requestNotificationPermission();
     notificationService.firebaseInit();
     notificationService.getDeviceToken().then((value) {
       _firebaseDeviceToken = value;
       debugPrint("TOKEN::$value");
+    });*/
+    // Ensure APNs is ready before getting FCM token
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await notificationService.requestNotificationPermission();
+      await notificationService.initLocalNotification();
+      notificationService.firebaseInit();
+      notificationService.listenTokenRefresh();
+
+      String? token = await notificationService.getDeviceToken();
+      setState(() {
+        _firebaseDeviceToken = token;
+      });
+
+      debugPrint("FCM Token: $_firebaseDeviceToken");
     });
   }
 
@@ -241,17 +255,32 @@ class _LoginOperationState extends State<LoginOperation> {
                             /*Navigator.pushNamed(context, HomeScreen.routeName,
                                 arguments: loginViewModel
                                     .userResponse!.users![0].staffId);*/
-                            final syncDao = SyncDao();
-                            bool isExist = await syncDao.isTableExist(DBConstant.tableStaff);
-                            bool isEmpty = await syncDao.isTableEmpty(DBConstant.tableStaff);
-                            if (context.mounted) {
-                              Navigator.pushNamed(
-                                  context,
-                                  isExist && !isEmpty
-                                      ? NewTaskDashboardScreen.routeName
-                                      : SyncScreen.routeName,
-                                  arguments: loginViewModel
-                                      .userResponse!.users![0].staffId);
+                            bool isEmailUser = loginViewModel
+                                .userResponse!.users![0].staffId!
+                                .isEmail();
+
+                            if (!isEmailUser) {
+                              final syncDao = SyncDao();
+                              bool isExist = await syncDao
+                                  .isTableExist(DBConstant.tableStaff);
+                              bool isEmpty = await syncDao
+                                  .isTableEmpty(DBConstant.tableStaff);
+                              if (context.mounted) {
+                                Navigator.pushNamed(
+                                    context,
+                                    isExist && !isEmpty
+                                        ? NewTaskDashboardScreen.routeName
+                                        : SyncScreen.routeName,
+                                    arguments: loginViewModel
+                                        .userResponse!.users![0].staffId);
+                              }
+                            } else {
+                              if (context.mounted) {
+                                Navigator.pushNamed(
+                                    context, NewTaskDashboardScreen.routeName,
+                                    arguments: loginViewModel
+                                        .userResponse!.users![0].staffId);
+                              }
                             }
                           } else {
                             _showMessage(
@@ -297,7 +326,6 @@ class _LoginOperationState extends State<LoginOperation> {
       );
     });
   }
-
 
   _showMessage(String message, {bool isUpdate = false}) {
     context.hideKeyboard;
