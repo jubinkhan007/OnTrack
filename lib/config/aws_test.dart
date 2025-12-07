@@ -1,10 +1,10 @@
-import 'dart:convert';
+/*import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
+import 'package:path/path.dart';*/
 /*final String accessKey = 'NKHLZGVLLLAIV62USI5G'; // Your access key
 final String secretKey = '+hznHV41sb/5vlStEUczr0FZlS57hYWnNZh4HY6SSgk'; // Your secret key
 final String bucketName = 'spro'; // Your DigitalOcean Space bucket name
@@ -125,7 +125,7 @@ final String endpoint = 'https://sgp1.digitaloceanspaces.com/';*/
 
 
 class AwsTest {
-  final String accessKey = 'NKHLZGVLLLAIV62USI5G'; // Your access key
+  /*final String accessKey = 'NKHLZGVLLLAIV62USI5G'; // Your access key
   final String secretKey = '+hznHV41sb/5vlStEUczr0FZlS57hYWnNZh4HY6SSgk'; // Your secret key
   final String bucketName = 'spro'; // Your DigitalOcean Space bucket name
   final String region = 'sgp1'; // DigitalOcean Space region, for example 'sgp1' (Singapore)
@@ -232,5 +232,5 @@ class AwsTest {
 
     final signature = Hmac(sha256, signingKey).convert(utf8.encode(stringToSign)).toString();
     return signature;
-  }
+  }*/
 }

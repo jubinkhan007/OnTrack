@@ -1,6 +1,6 @@
 package com.prangroup.mis93.tmbi.utils
 
-import android.content.Context
+/*import android.content.Context
 import android.util.Log
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
@@ -9,8 +9,9 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.CannedAccessControlList
-import java.io.File
+import java.io.File*/
 
+/*
 class AWSService(
     private val context: Context,
     private val onSuccess: (Boolean, String) -> Unit,
@@ -57,5 +58,5 @@ class AWSService(
             }
         })
     }
-
 }
+*/

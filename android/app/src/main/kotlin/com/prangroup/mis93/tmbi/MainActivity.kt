@@ -1,16 +1,16 @@
 package com.prangroup.mis93.tmbi
 
-import android.widget.Toast
-import com.prangroup.mis93.tmbi.utils.AWSService
+//import android.widget.Toast
+//import com.prangroup.mis93.tmbi.utils.AWSService
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.Result
-import java.io.File
+//import io.flutter.plugin.common.MethodCall
+//import io.flutter.plugin.common.MethodChannel
+//import io.flutter.plugin.common.MethodChannel.Result
+//import java.io.File
 
 class MainActivity : FlutterActivity() {
-    private val channelName = "aws_service_channel"
+    /*private val channelName = "aws_service_channel"
     private val methodName = "upload_file"
     private lateinit var awsService: AWSService
 
@@ -33,5 +33,5 @@ class MainActivity : FlutterActivity() {
                     result.notImplemented()
                 }
             }
-    }
+    }*/
 }
