@@ -63,7 +63,9 @@ class NewTaskDashboardScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          if (!staffId.isEmail()) { vm.reset(); }
+          if (!staffId.isEmail()) {
+            vm.reset();
+          }
           Navigator.pushNamed(context, TodoHomeScreen.routeName,
               arguments: staffId);
         },
@@ -342,10 +344,19 @@ class NewTaskDashboardScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: isButtonEnabled
                           ? () async {
-                              await vm.deleteAccount("userId", "password");
+                              await vm.deleteAccount(
+                                  staffId, passwordController.text);
                               if (vm.isDeleted == true) {
                                 if (context.mounted) {
-                                  Navigator.pop(context);
+                                  //Navigator.pop(context);
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen()),
+                                    (Route<dynamic> route) =>
+                                        false, // Removes all previous routes
+                                  );
                                 }
                               }
                               debugPrint("Result: ${vm.isDeleted}");
