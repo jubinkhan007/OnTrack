@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -304,22 +306,25 @@ class _LoginOperationState extends State<LoginOperation> {
               SizedBox(
                 height: Converts.c20,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          SignupScreen.routeName,
-                        );
-                      },
-                      child: const Text(
-                        "Don't have an account? Sign Up",
-                        style: TextStyle(color: Colors.black),
-                      )),
-                ],
-              ),
+              // this is not for android
+              Platform.isIOS
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                SignupScreen.routeName,
+                              );
+                            },
+                            child: const Text(
+                              "Don't have an account? Sign Up",
+                              style: TextStyle(color: Colors.black),
+                            )),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
         ),

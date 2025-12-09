@@ -1,3 +1,4 @@
+/*
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -554,3 +555,4 @@ class _FileAttachmentState extends State<FileAttachment> {
     return "$type1${dateTime.year.toString().substring(2, 4)}${dateTime.month.toString().padLeft(2, '0')}_${userId}_${dateTime.millisecondsSinceEpoch}_$type2.jpg";
   }
 }
+*/

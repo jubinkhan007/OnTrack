@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -70,13 +72,16 @@ class AppDrawer extends StatelessWidget {
                   },
                   selected: false,
                 ),
-          _drawerItem(
-            icon: Icons.delete_forever,
-            text: 'Account delete',
-            onTap: () {
-              onAccountDeletion();
-            },
-          ),
+          // this is not for android
+          Platform.isIOS
+              ? _drawerItem(
+                  icon: Icons.delete_forever,
+                  text: 'Account delete',
+                  onTap: () {
+                    onAccountDeletion();
+                  },
+                )
+              : const SizedBox.shrink(),
           _drawerItem(
             icon: Icons.logout,
             text: 'Logout',

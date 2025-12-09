@@ -1,3 +1,4 @@
+/*
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -326,3 +327,4 @@ class _FileAttachment2State extends State<FileAttachment2> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
+*/

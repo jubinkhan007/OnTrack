@@ -554,7 +554,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                           isFromTodo: true,
                           isDateSelected: _isDateSelected,
                         ),
-                        staffId.isEmail()
+                        /*staffId.isEmail()
                             ? const SizedBox.shrink()
                             : Expanded(
                                 child: SizedBox(
@@ -563,7 +563,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                     inquiryViewModel: inquiryViewModel,
                                   ),
                                 ),
-                              )
+                              )*/
                       ],
                     ),
 
