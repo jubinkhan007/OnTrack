@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../../models/new_task/bu_response.dart';
@@ -54,22 +53,20 @@ class FilterSection extends StatelessWidget {
             IntrinsicWidth(
               child: DropdownButtonFormField<CompInfo>(
                 value: selectedBU,
-
                 decoration: const InputDecoration(
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 ),
-
                 items: buOptions.map((bu) {
                   return DropdownMenuItem<CompInfo>(
                     value: bu,
                     child: Text(
-                      bu.name,   // show the display name
+                      bu.name, // show the display name
                       style: const TextStyle(fontSize: 14),
                     ),
                   );
                 }).toList(),
-
                 onChanged: onBUChanged,
               ),
             ),
@@ -89,7 +86,8 @@ class FilterSection extends StatelessWidget {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: "Staff name",
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     ),
                   ),
 
@@ -119,7 +117,11 @@ class FilterSection extends StatelessWidget {
                           );
                         } else {
                           return GestureDetector(
-                            onTap: () => staffController.clear(),
+                            //onTap: () => staffController.clear(),
+                            onTap: () {
+                              staffController.clear();
+                              onClean();
+                            },
                             child: const Padding(
                               padding: EdgeInsets.all(8.0),
                               child: Icon(Icons.close, size: 18),

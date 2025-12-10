@@ -218,6 +218,87 @@ class TaskDetailsScreen extends StatelessWidget {
     );
   }
 
+  void _openStatusDialog(BuildContext context, String id, TaskDetailsViewmodel provider) {
+    int? selectedStatus = 3; // default = Pending
+    TextEditingController noteController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Update Status"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Drop-down
+                  DropdownButtonFormField<int>(
+                    value: selectedStatus,
+                    decoration: const InputDecoration(
+                      labelText: "Status",
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 3, child: Text("In Progress")),
+                      DropdownMenuItem(value: 7, child: Text("Completed")),
+                    ],
+                    onChanged: (value) {
+                      setState(() => selectedStatus = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Note TextField
+                  TextField(
+                    controller: noteController,
+                    decoration: const InputDecoration(
+                      labelText: "Note",
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 2,
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+
+                    // Use the data (status + note)
+                    debugPrint("Status Code: $selectedStatus");
+                    debugPrint("Note: ${noteController.text}");
+
+                    await provider.updateTask(taskId, id, selectedStatus.toString(), noteController.text.toString(), staffId, selectedStatus == 7 ? 100 : 0, []);
+
+                    if (provider.isUpdated != null) {
+                      if (provider.isUpdated!) {
+                        provider.getSubTasks(staffId, taskId);
+                      } else {
+                        if (context.mounted) {
+                          showCustomSnackbar(context, provider.message ?? "Something went wrong");
+                        }
+                      }
+                    } else {
+                      if (context.mounted) {
+                        showCustomSnackbar(context, provider.message ?? "Something went wrong");
+                      }
+                    }
+
+                  },
+                  child: const Text("Save"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -373,7 +454,10 @@ class TaskDetailsScreen extends StatelessWidget {
                       return SubTaskItem(subtask: task.data.first.tasks[index],
                       staffId: staffId,
                         onUpdate: (id) async {
-                          await provider.updateTask(taskId, task.data.first.tasks[index].id, "7", "done", staffId, 100, []);
+
+                          //_openStatusDialog(context, taskId, provider);
+                          _openStatusDialog(context, id, provider);
+                          /*await provider.updateTask(taskId, task.data.first.tasks[index].id, "7", "done", staffId, 100, []);
 
                           if (provider.isUpdated != null) {
                             if (provider.isUpdated!) {
@@ -387,7 +471,7 @@ class TaskDetailsScreen extends StatelessWidget {
                             if (context.mounted) {
                               showCustomSnackbar(context, provider.message ?? "Something went wring");
                             }
-                          }
+                          }*/
                         },
                       );
                     },
@@ -400,6 +484,6 @@ class TaskDetailsScreen extends StatelessWidget {
         },
       ),
     );
-
   }
+
 }

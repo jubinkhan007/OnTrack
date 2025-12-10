@@ -41,6 +41,10 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   bool? get isDeleted => _isDeleted;
 
+  bool? _isTaskDeleted;
+
+  bool? get isTaskDeleted => _isTaskDeleted;
+
   int selectedTab = 0; // 0=Created, 1=Assigned
   //TaskStatusFlag statusTab = TaskStatusFlag.all;
   TaskStatusFlag statusTab = TaskStatusFlag.pending;
@@ -259,4 +263,28 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> deleteTask(
+      String inquiryId) async {
+    if (_uiState == UiState.loading) return;
+
+    _uiState = UiState.loading;
+    notifyListeners();
+    try {
+      final response =
+      await ntdRepo.deleteTask(inquiryId);
+      _isTaskDeleted = response;
+      _uiState = UiState.success;
+      if (response) {
+        getTasks();
+      }
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+
 }

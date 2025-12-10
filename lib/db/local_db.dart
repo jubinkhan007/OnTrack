@@ -22,7 +22,7 @@ class LocalDB {
     final path = '$defaultPath/trackAll.db';
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
     );
   }

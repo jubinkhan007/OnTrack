@@ -11,6 +11,7 @@ import 'package:tmbi/widgets/new_task/app_drawer.dart';
 
 import '../../config/converts.dart';
 import '../../config/strings.dart';
+import '../../models/new_task/task_response.dart';
 import '../../network/api_service.dart';
 import '../../network/ui_state.dart';
 import '../../widgets/new_task/app_header.dart';
@@ -47,6 +48,34 @@ class NewTaskDashboardScreen extends StatelessWidget {
     await vm
         .getTasks(); // Assuming you have a method in the ViewModel to refresh the data
   }
+
+
+  Future<bool?> _showDeleteDialog(BuildContext context, Task task, NewTaskDashboardViewmodel ntdv) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Task?"),
+          content: Text("Are you sure you want to delete '${task.name}'?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // perform delete action here if needed
+                Navigator.pop(context, true); // confirm
+                ntdv.deleteTask(task.id);
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +167,9 @@ class NewTaskDashboardScreen extends StatelessWidget {
                   pending: vm.pending,
                   overdue: vm.overdue,
                   completed: vm.completed,
+                  onFinalTap: (tsf) {
+                    vm.changeStatus(tsf);
+                  },
                 ),
               ),
               // --- Tab Menu --- \\
@@ -149,7 +181,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
               ),
               // --- Task List --- \\
               vm.tasks.isNotEmpty
-                  ? SliverList(
+                  ? /*SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final task = vm.tasks[index];
@@ -166,7 +198,45 @@ class NewTaskDashboardScreen extends StatelessWidget {
                         },
                         childCount: vm.tasks.length,
                       ),
-                    )
+                    )*/
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                    final task = vm.tasks[index];
+
+                    return Dismissible(
+                      key: ValueKey(task.id),
+                      direction: DismissDirection.startToEnd, // right swipe
+                      confirmDismiss: (direction) async {
+                        // Only open the dialog if status == 1
+                        if (vm.selectedTab == 0) {
+                          _showDeleteDialog(context, task, vm);
+                          return false; // Don’t dismiss the item
+                        } else {
+                          return false; // Do nothing
+                        }
+                      },
+                      background: Container(
+                        color: Colors.blue,
+                        padding: const EdgeInsets.only(left: 20),
+                        alignment: Alignment.centerLeft,
+                        child: const Icon(Icons.edit, color: Colors.white),
+                      ),
+                      child: TaskItem(
+                        task: task,
+                        staffId: staffId,
+                        completionText: "${task.completion}% | ${task.status}",
+                        completionColor: task.status ==
+                            TaskStatusFlag.completed.getData.first
+                            ? Colors.green
+                            : Colors.red,
+                      ),
+                    );
+                  },
+                  childCount: vm.tasks.length,
+                ),
+              )
+
                   : SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 20.0),

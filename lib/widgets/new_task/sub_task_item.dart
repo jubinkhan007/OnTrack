@@ -102,6 +102,13 @@ class SubTaskItem extends StatelessWidget {
                 //Text(" | ${subtask.progress}%", style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),),
               ],
             ),
+            Text(
+              "Last Note# ${subtask.lastComment}",
+              style: TextStyle(
+                fontSize: Converts.c16 - 4,
+                color: Colors.purpleAccent
+              ),
+            ),
             subtask.assignToId == staffId && subtask.completion != "100"
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
