@@ -246,8 +246,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                   final inquiryResponse = inquiryViewModel.inquiries![index];
                   return Dismissible(
                     key: Key(inquiryResponse.id.toString()),
-                    direction: DismissDirection.horizontal,
-                    background: Container(
+                    //direction: DismissDirection.horizontal,
+                    /*background: Container(
                       color: Colors.green,
                       // Background color for left swipe
                       alignment: Alignment.centerLeft,
@@ -263,25 +263,26 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                       child: const Icon(Icons.comment,
                           color: Colors
                               .white), // Icon for completion on right swipe
-                    ),
+                    ),*/
                     confirmDismiss: (direction) async {
-                      if (direction == DismissDirection.startToEnd) {
+                      /*if (direction == DismissDirection.startToEnd) {
                         //  check if end date is expire
-                        /*if (!inquiryResponse.endDate.isOverdue()) {
+                        if (!inquiryResponse.endDate.isOverdue()) {
                           updateTodos(
                               Provider.of<InquiryCreateViewModel>(context,
                                   listen: false),
                               inquiryResponse);
                         } else {
                           showMessage(Strings.overdue);
-                        }*/
+                        }
                       } else if (direction == DismissDirection.endToStart) {
-                        /*Navigator.pushNamed(
+                        Navigator.pushNamed(
                           context,
                           CommentScreen.routeName,
                           arguments: inquiryResponse.id.toString(),
-                        );*/
+                        );
                       }
+                      return false;*/
                       return false;
                     },
                     child: itemTodoTask(inquiryResponse, inquiryResponse.tasks,

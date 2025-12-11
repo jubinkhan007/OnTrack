@@ -132,17 +132,30 @@ class _LoginOperationState extends State<LoginOperation> {
     });*/
     // Ensure APNs is ready before getting FCM token
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      /*await notificationService.requestNotificationPermission();
+      await notificationService.initLocalNotification();
+      notificationService.firebaseInit();
+      notificationService.listenTokenRefresh();
+
+      String? token = await notificationService.getDeviceToken();
+
+      if (token == null) {
+        await Future.delayed(const Duration(seconds: 2));
+        token = await notificationService.getDeviceToken();
+      }
+      setState(() {
+        _firebaseDeviceToken = token;
+      });
+      debugPrint("FCM Token: $_firebaseDeviceToken");*/
       await notificationService.requestNotificationPermission();
       await notificationService.initLocalNotification();
       notificationService.firebaseInit();
       notificationService.listenTokenRefresh();
 
       String? token = await notificationService.getDeviceToken();
-      setState(() {
-        _firebaseDeviceToken = token;
-      });
+      setState(() => _firebaseDeviceToken = token);
 
-      debugPrint("FCM Token: $_firebaseDeviceToken");
+      debugPrint("Final Token: $_firebaseDeviceToken");
     });
   }
 
@@ -213,7 +226,7 @@ class _LoginOperationState extends State<LoginOperation> {
 
               /// remember me
               CheckBox(
-                  title: Strings.remember_me,
+                  title: "${Strings.remember_me} (${_firebaseDeviceToken != null && _firebaseDeviceToken!.length >= 4 ? _firebaseDeviceToken!.substring(0, 4) : 'N'})",
                   isTitleBold: false,
                   isChecked: _rememberMe,
                   onChecked: (value) {

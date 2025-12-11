@@ -200,15 +200,17 @@ class TaskDetailsScreen extends StatelessWidget {
       required this.taskId,
       required this.staffId});
 
-
   void showCustomSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),                   // The message to show
-        duration: const Duration(seconds: 3),           // Duration for which the snackbar will be shown
-        backgroundColor: Colors.black,            // Background color of the snackbar
+        content: Text(message),
+        // The message to show
+        duration: const Duration(seconds: 3),
+        // Duration for which the snackbar will be shown
+        backgroundColor: Colors.black,
+        // Background color of the snackbar
         action: SnackBarAction(
-          label: 'UNDO',                          // Action text
+          label: 'UNDO', // Action text
           onPressed: () {
             // Add your action logic here, e.g. undo a change
             print('Undo action triggered!');
@@ -218,7 +220,8 @@ class TaskDetailsScreen extends StatelessWidget {
     );
   }
 
-  void _openStatusDialog(BuildContext context, String id, TaskDetailsViewmodel provider) {
+  void _openStatusDialog(
+      BuildContext context, String id, TaskDetailsViewmodel provider) {
     int? selectedStatus = 3; // default = Pending
     TextEditingController noteController = TextEditingController();
 
@@ -228,7 +231,12 @@ class TaskDetailsScreen extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text("Update Status"),
+              backgroundColor: Colors.white,
+              title: Text(
+                "Update Status",
+                style: TextStyle(
+                    fontSize: Converts.c16, fontWeight: FontWeight.w400),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -239,9 +247,15 @@ class TaskDetailsScreen extends StatelessWidget {
                       labelText: "Status",
                       border: OutlineInputBorder(),
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 3, child: Text("In Progress")),
-                      DropdownMenuItem(value: 7, child: Text("Completed")),
+                    items: [
+                      DropdownMenuItem(
+                          value: 3,
+                          child: Text("In Progress",
+                              style: TextStyle(fontSize: Converts.c16 - 2))),
+                      DropdownMenuItem(
+                          value: 7,
+                          child: Text("Completed",
+                              style: TextStyle(fontSize: Converts.c16 - 2))),
                     ],
                     onChanged: (value) {
                       setState(() => selectedStatus = value);
@@ -267,27 +281,32 @@ class TaskDetailsScreen extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     Navigator.pop(context);
-
-                    // Use the data (status + note)
+                    // use the data (status + note)
                     debugPrint("Status Code: $selectedStatus");
                     debugPrint("Note: ${noteController.text}");
-
-                    await provider.updateTask(taskId, id, selectedStatus.toString(), noteController.text.toString(), staffId, selectedStatus == 7 ? 100 : 0, []);
+                    await provider.updateTask(
+                        taskId,
+                        id,
+                        selectedStatus.toString(),
+                        noteController.text.toString(),
+                        staffId,
+                        selectedStatus == 7 ? 100 : 0, []);
 
                     if (provider.isUpdated != null) {
                       if (provider.isUpdated!) {
                         provider.getSubTasks(staffId, taskId);
                       } else {
                         if (context.mounted) {
-                          showCustomSnackbar(context, provider.message ?? "Something went wrong");
+                          showCustomSnackbar(context,
+                              provider.message ?? "Something went wrong");
                         }
                       }
                     } else {
                       if (context.mounted) {
-                        showCustomSnackbar(context, provider.message ?? "Something went wrong");
+                        showCustomSnackbar(context,
+                            provider.message ?? "Something went wrong");
                       }
                     }
-
                   },
                   child: const Text("Save"),
                 ),
@@ -451,10 +470,10 @@ class TaskDetailsScreen extends StatelessWidget {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      return SubTaskItem(subtask: task.data.first.tasks[index],
-                      staffId: staffId,
+                      return SubTaskItem(
+                        subtask: task.data.first.tasks[index],
+                        staffId: staffId,
                         onUpdate: (id) async {
-
                           //_openStatusDialog(context, taskId, provider);
                           _openStatusDialog(context, id, provider);
                           /*await provider.updateTask(taskId, task.data.first.tasks[index].id, "7", "done", staffId, 100, []);
@@ -485,5 +504,4 @@ class TaskDetailsScreen extends StatelessWidget {
       ),
     );
   }
-
 }

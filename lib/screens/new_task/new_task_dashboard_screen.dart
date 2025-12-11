@@ -49,8 +49,8 @@ class NewTaskDashboardScreen extends StatelessWidget {
         .getTasks(); // Assuming you have a method in the ViewModel to refresh the data
   }
 
-
-  Future<bool?> _showDeleteDialog(BuildContext context, Task task, NewTaskDashboardViewmodel ntdv) {
+  Future<bool?> _showDeleteDialog(
+      BuildContext context, Task task, NewTaskDashboardViewmodel ntdv) {
     return showDialog<bool>(
       context: context,
       builder: (context) {
@@ -64,8 +64,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                // perform delete action here if needed
-                Navigator.pop(context, true); // confirm
+                Navigator.pop(context, true);
                 ntdv.deleteTask(task.id);
               },
               child: const Text("Delete"),
@@ -75,7 +74,6 @@ class NewTaskDashboardScreen extends StatelessWidget {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -199,44 +197,46 @@ class NewTaskDashboardScreen extends StatelessWidget {
                         childCount: vm.tasks.length,
                       ),
                     )*/
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    final task = vm.tasks[index];
+                  SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final task = vm.tasks[index];
 
-                    return Dismissible(
-                      key: ValueKey(task.id),
-                      direction: DismissDirection.startToEnd, // right swipe
-                      confirmDismiss: (direction) async {
-                        // Only open the dialog if status == 1
-                        if (vm.selectedTab == 0) {
-                          _showDeleteDialog(context, task, vm);
-                          return false; // Don’t dismiss the item
-                        } else {
-                          return false; // Do nothing
-                        }
-                      },
-                      background: Container(
-                        color: Colors.blue,
-                        padding: const EdgeInsets.only(left: 20),
-                        alignment: Alignment.centerLeft,
-                        child: const Icon(Icons.edit, color: Colors.white),
+                          return Dismissible(
+                            key: ValueKey(task.id),
+                            direction: DismissDirection.startToEnd,
+                            // right swipe
+                            confirmDismiss: (direction) async {
+                              // only open the dialog if status 'Created By Me'
+                              if (vm.selectedTab == 0) {
+                                _showDeleteDialog(context, task, vm);
+                                return false; // don’t dismiss the item
+                              } else {
+                                return false; // do nothing
+                              }
+                            },
+                            background: Container(
+                              color: Colors.redAccent,
+                              padding: const EdgeInsets.only(left: 20),
+                              alignment: Alignment.centerLeft,
+                              child: const Icon(Icons.delete_forever,
+                                  color: Colors.white),
+                            ),
+                            child: TaskItem(
+                              task: task,
+                              staffId: staffId,
+                              completionText:
+                                  "${task.completion}% | ${task.status}",
+                              completionColor: task.status ==
+                                      TaskStatusFlag.completed.getData.first
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
+                          );
+                        },
+                        childCount: vm.tasks.length,
                       ),
-                      child: TaskItem(
-                        task: task,
-                        staffId: staffId,
-                        completionText: "${task.completion}% | ${task.status}",
-                        completionColor: task.status ==
-                            TaskStatusFlag.completed.getData.first
-                            ? Colors.green
-                            : Colors.red,
-                      ),
-                    );
-                  },
-                  childCount: vm.tasks.length,
-                ),
-              )
-
+                    )
                   : SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 20.0),

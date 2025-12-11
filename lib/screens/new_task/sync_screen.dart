@@ -182,7 +182,7 @@ class AllSetWidget extends StatelessWidget {
           _tipRow(Icons.add_circle,
               "Tap the '+' button to create your first task."),
           const SizedBox(height: 14),
-          _tipRow(Icons.swipe, "Swipe a task to mark it as complete."),
+          _tipRow(Icons.swipe, "Swipe right on a task to delete it (if you created it)."),
           const SizedBox(height: 14),
           _tipRow(Icons.notifications_active,
               "You will notify me when a new task is received."),
