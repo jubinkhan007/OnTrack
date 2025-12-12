@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:228314848211:android:2ca651c01697cdf400ed26",
+        "mobilesdk_app_id": "1:228314848211:android:a20d853e943b846700ed26",
         "android_client_info": {
-          "package_name": "com.prangroup.mis93.tmbi"
+          "package_name": "com.prangroup.mis.q_pod"
         }
       },
       "oauth_client": [],
@@ -26,9 +26,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:228314848211:android:a20d853e943b846700ed26",
+        "mobilesdk_app_id": "1:228314848211:android:2ca651c01697cdf400ed26",
         "android_client_info": {
-          "package_name": "com.prangroup.mis.q_pod"
+          "package_name": "com.prangroup.mis93.tmbi"
         }
       },
       "oauth_client": [],

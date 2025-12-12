@@ -264,6 +264,7 @@ class NotificationService {
   // ------------------------------------------------------------
   Future<void> initLocalNotification() async {
     const androidSettings = AndroidInitializationSettings('@drawable/ic_noti');
+    //const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings();
     const initSettings =
     InitializationSettings(android: androidSettings, iOS: iosSettings);
