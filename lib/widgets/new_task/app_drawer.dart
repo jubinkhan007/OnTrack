@@ -14,6 +14,7 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback onSync;
   final VoidCallback onLogout;
   final VoidCallback onAccountDeletion;
+  final VoidCallback onCardScan;
 
   const AppDrawer(
       {super.key,
@@ -22,7 +23,8 @@ class AppDrawer extends StatelessWidget {
       required this.onSync,
       required this.onLogout,
       required this.onAccountDeletion,
-      required this.isEmailUser});
+      required this.isEmailUser,
+      required this.onCardScan});
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +84,13 @@ class AppDrawer extends StatelessWidget {
                   },
                 )
               : const SizedBox.shrink(),
+          _drawerItem(
+            icon: Icons.document_scanner,
+            text: 'Card Scan',
+            onTap: () {
+              onCardScan();
+            },
+          ),
           _drawerItem(
             icon: Icons.logout,
             text: 'Logout',

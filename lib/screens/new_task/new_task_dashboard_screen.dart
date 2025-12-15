@@ -4,6 +4,7 @@ import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/models/new_task/bu_response.dart';
 import 'package:tmbi/repo/new_task/new_task_dashboard_repo.dart';
+import 'package:tmbi/screens/new_task/card_scan_screen.dart';
 import 'package:tmbi/screens/new_task/sync_screen.dart';
 import 'package:tmbi/viewmodel/new_task/new_task_dashboard_viewmodel.dart';
 import 'package:tmbi/widgets/error_container.dart';
@@ -110,6 +111,10 @@ class NewTaskDashboardScreen extends StatelessWidget {
         },
         onAccountDeletion: () {
           showDeleteAccountDialog(context, vm);
+        },
+        onCardScan: () {
+          Navigator.pushNamed(context, CardScanScreen.routeName,
+              arguments: staffId);
         },
       ),
       body: SafeArea(

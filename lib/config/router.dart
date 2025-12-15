@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/models.dart';
 
+import '../screens/new_task/card_scan_screen.dart';
 import '../screens/new_task/notification_screen.dart';
 import '../screens/new_task/signup_screen.dart';
 import '../screens/new_task/sync_screen.dart';
@@ -117,6 +118,14 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => SyncScreen.create(args),
+      );
+    case CardScanScreen.routeName:
+      final args = routeSettings.arguments as String;
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => CardScanScreen(
+          staffId: args,
+        ),
       );
     case NotificationScreen2.routeName:
       final args = routeSettings.arguments as String;
