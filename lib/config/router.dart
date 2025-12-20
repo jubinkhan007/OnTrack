@@ -119,14 +119,14 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
         settings: routeSettings,
         builder: (_) => SyncScreen.create(args),
       );
-    case CardScanScreen.routeName:
+    /*case CardScanScreen.routeName:
       final args = routeSettings.arguments as String;
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => CardScanScreen(
           staffId: args,
         ),
-      );
+      );*/
     case NotificationScreen2.routeName:
       final args = routeSettings.arguments as String;
       return MaterialPageRoute(

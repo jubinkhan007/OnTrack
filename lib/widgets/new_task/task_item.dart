@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/screens/new_task/task_deatil_screen.dart';
 
+import '../../config/converts.dart';
 import '../../models/new_task/task_response.dart';
+import '../../screens/new_task/comment_screen.dart';
 
 class TaskItem extends StatelessWidget {
   //final String title;
@@ -10,6 +12,7 @@ class TaskItem extends StatelessWidget {
   final Color completionColor;
   final Task task;
   final String staffId;
+  final Function() onCommentTap;
 
   const TaskItem(
       {super.key,
@@ -17,7 +20,9 @@ class TaskItem extends StatelessWidget {
       //required this.staff,
       required this.completionText,
       required this.completionColor,
-      required this.task, required this.staffId});
+      required this.task,
+      required this.staffId,
+      required this.onCommentTap});
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +62,49 @@ class TaskItem extends StatelessWidget {
                 ],
               ),
             ),
-            Text(
-              completionText,
-              style: TextStyle(
-                  fontSize: 12,
-                  color: completionColor,
-                  fontWeight: FontWeight.bold),
+            Column(
+              children: [
+                Text(
+                  completionText,
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: completionColor,
+                      fontWeight: FontWeight.bold),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CommentsScreen(staffId: staffId, inqId: task.id,),
+                      ),
+                    );
+                    debugPrint("Comment click");
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  // optional for rounded ripple
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.comment,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          "0",
+                          style: TextStyle(
+                              fontSize: Converts.c16 - 4,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
             ),
           ],
         ),

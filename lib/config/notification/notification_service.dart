@@ -238,7 +238,7 @@ import 'dart:math';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+/*
 class NotificationService {
   final FirebaseMessaging _firebase = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _local =
@@ -384,6 +384,142 @@ class NotificationService {
       1,
       message.notification?.title ?? "New Notification",
       message.notification?.body ?? "",
+      details,
+    );
+  }
+}
+*/
+
+import 'dart:io';
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+class NotificationService {
+  // Firebase messaging instance
+  final FirebaseMessaging _firebase = FirebaseMessaging.instance;
+
+  // Local notification plugin
+  final FlutterLocalNotificationsPlugin _local =
+      FlutterLocalNotificationsPlugin();
+
+  // ------------------------------------------------------------
+  // 1. Request Notification Permission (iOS)
+  // ------------------------------------------------------------
+  Future<void> requestNotificationPermission() async {
+    if (!Platform.isIOS) return;
+
+    final settings = await _firebase.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    debugPrint("Permission status: ${settings.authorizationStatus}");
+  }
+
+  // ------------------------------------------------------------
+  // 2. Initialize Local Notifications (Android + iOS)
+  // ------------------------------------------------------------
+  Future<void> initLocalNotification() async {
+    const androidSettings = AndroidInitializationSettings('@drawable/ic_noti');
+
+    const iosSettings = DarwinInitializationSettings();
+
+    const initSettings =
+        InitializationSettings(android: androidSettings, iOS: iosSettings);
+
+    await _local.initialize(initSettings);
+  }
+
+  // ------------------------------------------------------------
+  // 3. Firebase Foreground Message Listener
+  // ------------------------------------------------------------
+  void firebaseInit() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      debugPrint("Foreground message received");
+      showNotification(message);
+    });
+  }
+
+  // ------------------------------------------------------------
+  // 4. Get Device Token (FCM)
+  // ------------------------------------------------------------
+  Future<String?> getDeviceToken() async {
+    // ---------------------------
+    // iOS: Skip simulator (APNs not supported)
+    // ---------------------------
+    if (Platform.isIOS) {
+      final apnsToken = await _firebase.getAPNSToken();
+
+      if (apnsToken == null) {
+        debugPrint("iOS Simulator detected – APNs not available");
+        return null;
+      }
+
+      debugPrint("APNs Token: $apnsToken");
+    }
+
+    // ---------------------------
+    // Android + Real iOS Device
+    // ---------------------------
+    String? fcmToken = await _firebase.getToken();
+
+    if (fcmToken == null) {
+      debugPrint("FCM token null, retrying...");
+      await Future.delayed(const Duration(seconds: 2));
+      fcmToken = await _firebase.getToken();
+    }
+
+    debugPrint("FCM Token: $fcmToken");
+    return fcmToken;
+  }
+
+  // ------------------------------------------------------------
+  // 5. Listen for Token Refresh
+  // ------------------------------------------------------------
+  void listenTokenRefresh() {
+    _firebase.onTokenRefresh.listen((token) {
+      debugPrint("FCM Token refreshed: $token");
+    });
+  }
+
+  // ------------------------------------------------------------
+  // 6. Show Notification (Foreground)
+  // ------------------------------------------------------------
+  Future<void> showNotification(RemoteMessage message) async {
+    final channel = AndroidNotificationChannel(
+      Random.secure().nextInt(100000).toString(),
+      'high_importance_channel',
+      importance: Importance.max,
+    );
+
+    final androidDetails = AndroidNotificationDetails(
+      channel.id,
+      channel.name,
+      channelDescription: 'High importance notifications',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@drawable/ic_noti',
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    final details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _local.show(
+      0,
+      message.notification?.title ?? 'New Notification',
+      message.notification?.body ?? '',
       details,
     );
   }

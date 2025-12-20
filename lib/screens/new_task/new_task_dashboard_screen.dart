@@ -112,10 +112,10 @@ class NewTaskDashboardScreen extends StatelessWidget {
         onAccountDeletion: () {
           showDeleteAccountDialog(context, vm);
         },
-        onCardScan: () {
+        /*onCardScan: () {
           Navigator.pushNamed(context, CardScanScreen.routeName,
               arguments: staffId);
-        },
+        },*/
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -236,6 +236,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
                                       TaskStatusFlag.completed.getData.first
                                   ? Colors.green
                                   : Colors.red,
+                              onCommentTap: () {},
                             ),
                           );
                         },
@@ -526,7 +527,8 @@ class StaffSearchDialog extends StatelessWidget {
                 builder: (context, query, _) {
                   final filteredStaff = staffList.where((staff) {
                     final lowerQuery = query.toLowerCase();
-                    return staff.userName.toLowerCase().contains(lowerQuery);
+                    //return staff.userName.toLowerCase().contains(lowerQuery);
+                    return staff.searchName.toLowerCase().contains(lowerQuery);
                   }).toList();
 
                   if (filteredStaff.isEmpty) {
@@ -542,8 +544,9 @@ class StaffSearchDialog extends StatelessWidget {
                           backgroundImage: NetworkImage(
                               "https://avatar.iran.liara.run/public/32"),
                         ),
-                        title: Text(staff.userName),
-                        subtitle: Text(staff.displayName),
+                        //title: Text(staff.userName),
+                        //subtitle: Text(staff.displayName),
+                        title: Text(staff.displayName),
                         onTap: () =>
                             //{Navigator.of(context).pop(staff.userName)},
                             {Navigator.of(context).pop(staff)},

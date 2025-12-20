@@ -1,3 +1,5 @@
+
+/*
 import 'dart:async';
 import 'dart:io';
 
@@ -95,8 +97,7 @@ class CameraProvider extends ChangeNotifier {
       }
     });
 
-    try {
-      // HTTP upload
+    try {      // HTTP upload
       final request = http.MultipartRequest('POST', Uri.parse("http://rfq.prangroup.com//Vendor/vdcv/ExtractTextV2"));
       request.fields['staffId'] = staffId;
       request.fields['uniqueId'] = uniqueId;
@@ -171,3 +172,4 @@ class CameraProvider extends ChangeNotifier {
   }
 
 }
+*/

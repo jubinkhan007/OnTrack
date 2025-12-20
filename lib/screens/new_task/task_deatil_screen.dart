@@ -213,7 +213,7 @@ class TaskDetailsScreen extends StatelessWidget {
           label: 'UNDO', // Action text
           onPressed: () {
             // Add your action logic here, e.g. undo a change
-            print('Undo action triggered!');
+            debugPrint('Undo action triggered!');
           },
         ),
       ),
@@ -269,7 +269,7 @@ class TaskDetailsScreen extends StatelessWidget {
                       labelText: "Note",
                       border: OutlineInputBorder(),
                     ),
-                    maxLines: 2,
+                    maxLines: 5,
                   ),
                 ],
               ),
@@ -465,7 +465,7 @@ class TaskDetailsScreen extends StatelessWidget {
                 ),
                 SectionHeader(
                   title:
-                      "Sub-tasks (${task.data.where((s) => s.totalCompletion == "100").length}/${task.data.first.tasks.length})",
+                      "Sub-tasks (${task.data.first.tasks.where((s) => s.completion == "100").length}/${task.data.first.tasks.length})",
                 ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
@@ -504,4 +504,5 @@ class TaskDetailsScreen extends StatelessWidget {
       ),
     );
   }
+
 }

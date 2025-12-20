@@ -41,6 +41,7 @@ class NotificationScreen2 extends StatelessWidget {
         ),
         body: Consumer<NotificationViewmodel>(
           builder: (context, provider, _) {
+
             if (provider.uiState == UiState.loading) {
               return const Center(child: CircularProgressIndicator());
             }

@@ -123,30 +123,9 @@ class _LoginOperationState extends State<LoginOperation> {
   void initState() {
     super.initState();
     _loadSavedCredential();
-    // init notification
-    /*notificationService.requestNotificationPermission();
-    notificationService.firebaseInit();
-    notificationService.getDeviceToken().then((value) {
-      _firebaseDeviceToken = value;
-      debugPrint("TOKEN::$value");
-    });*/
+
     // Ensure APNs is ready before getting FCM token
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      /*await notificationService.requestNotificationPermission();
-      await notificationService.initLocalNotification();
-      notificationService.firebaseInit();
-      notificationService.listenTokenRefresh();
-
-      String? token = await notificationService.getDeviceToken();
-
-      if (token == null) {
-        await Future.delayed(const Duration(seconds: 2));
-        token = await notificationService.getDeviceToken();
-      }
-      setState(() {
-        _firebaseDeviceToken = token;
-      });
-      debugPrint("FCM Token: $_firebaseDeviceToken");*/
+    /*WidgetsBinding.instance.addPostFrameCallback((_) async {
       await notificationService.requestNotificationPermission();
       await notificationService.initLocalNotification();
       notificationService.firebaseInit();
@@ -156,6 +135,21 @@ class _LoginOperationState extends State<LoginOperation> {
       setState(() => _firebaseDeviceToken = token);
 
       debugPrint("Final Token: $_firebaseDeviceToken");
+    });
+    */
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await notificationService.requestNotificationPermission();
+      await notificationService.initLocalNotification();
+      notificationService.firebaseInit();
+      notificationService.listenTokenRefresh();
+
+      final token = await notificationService.getDeviceToken();
+
+      setState(() {
+        _firebaseDeviceToken = token;
+      });
+
+      debugPrint("FINAL TOKEN: $_firebaseDeviceToken");
     });
   }
 
@@ -226,7 +220,8 @@ class _LoginOperationState extends State<LoginOperation> {
 
               /// remember me
               CheckBox(
-                  title: "${Strings.remember_me} (${_firebaseDeviceToken != null && _firebaseDeviceToken!.length >= 4 ? _firebaseDeviceToken!.substring(0, 4) : 'N'})",
+                  title:
+                      "${Strings.remember_me} (${_firebaseDeviceToken != null && _firebaseDeviceToken!.length >= 4 ? _firebaseDeviceToken!.substring(0, 4) : 'N'})",
                   isTitleBold: false,
                   isChecked: _rememberMe,
                   onChecked: (value) {
