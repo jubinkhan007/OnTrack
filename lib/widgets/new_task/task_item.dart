@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:tmbi/screens/new_task/task_deatil_screen.dart';
 
@@ -71,39 +73,43 @@ class TaskItem extends StatelessWidget {
                       color: completionColor,
                       fontWeight: FontWeight.bold),
                 ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CommentsScreen(staffId: staffId, inqId: task.id,),
-                      ),
-                    );
-                    debugPrint("Comment click");
-                  },
-                  borderRadius: BorderRadius.circular(8),
-                  // optional for rounded ripple
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.comment,
-                          size: 16,
-                          color: Colors.grey,
+                Platform.isAndroid
+                    ? InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CommentsScreen(
+                                staffId: staffId,
+                                inqId: task.id,
+                              ),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        // optional for rounded ripple
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.comment,
+                                size: 16,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                task.commentCount,
+                                style: TextStyle(
+                                    fontSize: Converts.c16 - 4,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(width: 2),
-                        Text(
-                          "0",
-                          style: TextStyle(
-                              fontSize: Converts.c16 - 4,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
+                      )
+                    : const SizedBox.shrink()
               ],
             ),
           ],

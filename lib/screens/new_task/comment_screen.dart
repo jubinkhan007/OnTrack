@@ -181,8 +181,10 @@ class _Avatar extends StatelessWidget {
           fit: BoxFit.cover,
           width: Converts.c40,
           height: Converts.c40,
-          placeholder: (_, __) => const Icon(Icons.person_outline, color: Colors.blue),
-          errorWidget: (_, __, ___) => const Icon(Icons.person_outline, color: Colors.blue),
+          placeholder: (_, __) =>
+              const Icon(Icons.person_outline, color: Colors.blue),
+          errorWidget: (_, __, ___) =>
+              const Icon(Icons.person_outline, color: Colors.blue),
         ),
       ),
     );

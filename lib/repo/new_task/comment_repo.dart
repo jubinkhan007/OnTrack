@@ -9,10 +9,10 @@ class CommentRepo {
   CommentRepo({required this.dio});
 
   Future<List<Comment>> getComments(
-      String staffId,
-      String inqId,
-      String taskId,
-      ) async {
+    String staffId,
+    String inqId,
+    String taskId,
+  ) async {
     try {
       final headers = {
         'vm': 'COMMENTS',
@@ -42,9 +42,7 @@ class CommentRepo {
     }
   }
 
-
-  Future<bool> saveComment(
-      String inquiryId, String body, String userId) async {
+  Future<bool> saveComment(String inquiryId, String body, String userId) async {
     try {
       final headers = {
         "dtype": "TASK",
@@ -66,5 +64,4 @@ class CommentRepo {
       throw Exception(error);
     }
   }
-
 }

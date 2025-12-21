@@ -100,6 +100,7 @@ class Task {
   String completion;
   String createdDate;
   String status;
+  String commentCount;
 
   Task({
     required this.tnstHris,
@@ -110,6 +111,7 @@ class Task {
     required this.completion,
     required this.createdDate,
     required this.status,
+    this.commentCount = "0",
   });
 
   // Factory method to parse JSON into Task
@@ -123,6 +125,7 @@ class Task {
       completion: json['COMPLETION'].toString(),
       createdDate: json['CREATED_DATE'].toString(),
       status: json['STATUS'].toString(),
+      commentCount: json['COMMENT_COUNT'] != null ? json['COMMENT_COUNT'].toString() : '0',
     );
   }
 
@@ -137,6 +140,7 @@ class Task {
       'COMPLETION': completion,
       'CREATED_DATE': createdDate,
       'STATUS': status,
+      'COMMENT_COUNT': commentCount,
     };
   }
 }

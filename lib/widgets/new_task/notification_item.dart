@@ -27,20 +27,23 @@ class NotificationItem extends StatelessWidget {
                   color: Colors.blue,
                 ),
               ),*/
-      CircleAvatar(
-      radius: Converts.c20,
-        backgroundColor: Colors.blue.shade50,
-        child: ClipOval(
-          child: CachedNetworkImage(
-            imageUrl: "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/${model.assignId}/${model.assignId}-0.jpg",
-            fit: BoxFit.cover,
-            width: Converts.c40,
-            height: Converts.c40,
-            placeholder: (_, __) => const Icon(Icons.person_outline, color: Colors.blue),
-            errorWidget: (_, __, ___) => const Icon(Icons.person_outline, color: Colors.blue),
-          ),
-        ),
-      ),
+              CircleAvatar(
+                radius: Converts.c20,
+                backgroundColor: Colors.blue.shade50,
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl:
+                        "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/${model.assignId}/${model.assignId}-0.jpg",
+                    fit: BoxFit.cover,
+                    width: Converts.c40,
+                    height: Converts.c40,
+                    placeholder: (_, __) =>
+                        const Icon(Icons.person_outline, color: Colors.blue),
+                    errorWidget: (_, __, ___) =>
+                        const Icon(Icons.person_outline, color: Colors.blue),
+                  ),
+                ),
+              ),
               Positioned(
                 right: 0,
                 bottom: 0,

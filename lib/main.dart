@@ -54,19 +54,18 @@ class MyApp extends StatelessWidget {
                     .provideDio()),
           ),
         ),
-
         ChangeNotifierProvider(
           create: (_) => InquiryCreateViewModel(
             //loginRepo: LoginRepo(dio: ApiService().provideDio()),
             inquiryRepo: InquiryRepo(
                 dio: ApiService(
-                    "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                    .provideDio(), fileDio: ApiService(
-                "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
-                .fileUploadDio()),
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .provideDio(),
+                fileDio: ApiService(
+                        "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
+                    .fileUploadDio()),
           ),
         ),
-
         ChangeNotifierProvider(
           create: (_) => TodoViewModel(
             inquiryRepo: InquiryRepo(
@@ -90,7 +89,7 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
               scaffoldBackgroundColor: Palette.scaffold),
           home: const LoginScreen()),
-          //home: AuthCheck()),
+      //home: AuthCheck()),
       //home: const TodoHomeScreen()),
     );
   }

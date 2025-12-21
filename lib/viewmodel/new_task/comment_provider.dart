@@ -5,7 +5,6 @@ import '../../network/ui_state.dart';
 import '../../repo/new_task/comment_repo.dart';
 
 class CommentProvider extends ChangeNotifier {
-
   final TextEditingController commentController = TextEditingController();
   final CommentRepo commentRepo;
   final String staffId;
