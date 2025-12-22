@@ -286,5 +286,4 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     }
   }
 
-
 }

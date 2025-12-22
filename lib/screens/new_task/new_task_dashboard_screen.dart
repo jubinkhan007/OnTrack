@@ -82,7 +82,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
 
     if (vm.uiState == UiState.loading) {
       return Scaffold(
-        body: Center(child: context.shimmerLoading()), // Show loading indicator
+        body: Center(child: context.shimmerLoading()),
       );
     }
 

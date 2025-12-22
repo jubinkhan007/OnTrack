@@ -10,6 +10,7 @@ import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/db/dao/sync_dao.dart';
 import 'package:tmbi/models/new_task/bu_response.dart';
 import 'package:tmbi/screens/todo/custom_dropdown.dart';
+import 'package:tmbi/viewmodel/inquiry_viewmodel.dart';
 
 import '../../config/converts.dart';
 import '../../config/sp_helper.dart';
@@ -104,6 +105,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     Provider.of<TodoViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchDataAndStore();
+      _openTaskSheet(context);
     });
   }
 
@@ -307,7 +309,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               ),
             );
           }),
-          bottomTextField(),
+
+          //bottomTextField(),
         ],
       ),
     );
@@ -503,7 +506,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                     color: Palette.mainColor,
                                   ),
                                   onPressed: () async {
-                                    if (_addedUsers.isEmpty && !staffId.isEmail()) {
+                                    if (_addedUsers.isEmpty &&
+                                        !staffId.isEmail()) {
                                       await _showDialogWithoutMembers(
                                           context, inquiryViewModel);
                                     } else {
@@ -1036,20 +1040,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     }
   }
 
-/*  double _calculateTotalPercentage(InquiryResponse inquiryResponse) {
-    double total = 0.0;
-
-    if (inquiryResponse.tasks != null && inquiryResponse.tasks.isNotEmpty) {
-      for (var task in inquiryResponse.tasks) {
-        total += task.totalPercentage;
-      }
-
-      return total / inquiryResponse.tasks.length;
-    }
-
-    return 0.0; // Avoid NaN when task list is empty
-  }*/
-
   /// BOTTOM VIEW \\\
 
   /// NETWORK CALL FOR SAVE TASK \\\
@@ -1088,17 +1078,20 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         inquiryViewModel.files);
   }
 
-  Future<void> saveTodos(InquiryCreateViewModel inquiryViewModel) async {
-    if (_taskController.text.isNotEmpty) {
+  Future<void> saveTodos(InquiryCreateViewModel inquiryViewModel, {String? value}) async {
+    if (_taskController.text.isNotEmpty || value != null) {
       String loggedUserName = await _getUserName();
 
       // save files if necessary
       await _saveFilesIfNeeded(inquiryViewModel);
 
       // save the inquiry
-      await _saveInquiry(
-          inquiryViewModel, _taskController.text, loggedUserName);
-
+      //await _saveInquiry(inquiryViewModel, _taskController.text, loggedUserName);
+      if (_taskController.text.isEmpty && value != null) {
+        await _saveInquiry(inquiryViewModel, value, loggedUserName);
+      } else {
+        await _saveInquiry(inquiryViewModel, _taskController.text, loggedUserName);
+      }
       // check the status of the inquiry save request
       if (inquiryViewModel.isSavedInquiry == null) {
         showMessage(Strings.data_is_missing);
@@ -1121,7 +1114,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   }
 
   Future<void> _showDialogWithoutMembers(
-      BuildContext context, InquiryCreateViewModel inquiryViewModel) async {
+      BuildContext context, InquiryCreateViewModel inquiryViewModel, {String? value}) async {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1137,11 +1130,323 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           TextButton(
             onPressed: () async {
               Navigator.of(ctx).pop(); // Close the dialog first
-              await saveTodos(inquiryViewModel); // Call API
+              await saveTodos(inquiryViewModel, value: value); // Call API
             },
             child: const Text('Yes'),
           ),
         ],
+      ),
+    );
+  }
+
+  /// OPEN TASK ENTRY SHEET \\\
+
+  void _openTaskSheet(BuildContext context) {
+    final tvm = context.read<TodoViewModel>();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return TaskBottomSheet(
+          tvm: tvm,
+          onCreate: (value) async {
+              if (_addedUsers.isEmpty &&
+                  !staffId.isEmail()) {
+                await _showDialogWithoutMembers(
+                context, Provider.of<InquiryCreateViewModel>(context, listen: false), value: value);
+              } else {
+                await saveTodos(Provider.of<InquiryCreateViewModel>(context, listen: false), value: value);
+              }
+          },
+        );
+      },
+    );
+  }
+}
+
+/// NEW TASK ENTRY \\\
+class TaskBottomSheet extends StatelessWidget {
+  final TodoViewModel tvm;
+  final Function(String value) onCreate;
+
+  const TaskBottomSheet({super.key, required this.tvm, required this.onCreate});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.transparent, // To preserve the rounded corners
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        // rounded top corners
+        child: Consumer<TodoViewModel>(builder: (context, vm, _) {
+          return Container(
+            color: Colors.white, // white background
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.38,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _handle(),
+                  // Editable task
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Column(
+                      children: [
+                        TextField(
+                          maxLines: 5,
+                          minLines: 3,
+                          onChanged: (value) {
+                            vm.onTaskTextChanged(value);
+                          },
+                          controller: vm.taskTextEdit,
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            hintText: 'Enter task ',
+                            hintStyle: TextStyle(color: Colors.grey.shade400),
+                            border: InputBorder.none, // no visible border
+                          ),
+                          style: TextStyle(
+                            fontSize: Converts.c16,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 24.0),
+                          child: Container(
+                            height: 1,
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Add assignees
+                  ListTile(
+                    leading: Icon(
+                      Icons.account_circle_outlined,
+                      color: Colors.grey.shade600,
+                      size: Converts.c16,
+                    ),
+                    title: Text(
+                      'Add assignees',
+                      style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: Converts.c16 - 2),
+                    ),
+                    onTap: () => _openAssignSheet(context),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.only(left: 38.0),
+                    child: Container(
+                      height: 1,
+                      color: Colors.grey.shade300,
+                    ),
+                  ),
+
+                  // Set dates
+                  ListTile(
+                    leading: Icon(
+                      Icons.calendar_today_outlined,
+                      color: Colors.grey.shade600,
+                      size: Converts.c16,
+                    ),
+                    title: Text(
+                      'Set dates',
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: Converts.c16 - 2,
+                      ),
+                    ),
+                    onTap: () {},
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: Container(
+                      height: 1,
+                      color: Colors.grey.shade300,
+                    ),
+                  ),
+                  const Spacer(),
+
+                  //Create button view
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0, bottom: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // priority
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.flag_outlined,
+                            color: Colors.black38,
+                          ),
+                        ),
+                        // line
+                        Text(
+                          "|",
+                          style: TextStyle(
+                              fontSize: Converts.c16,
+                              color: Colors.grey.shade300),
+                        ),
+                        // button
+                        const SizedBox(
+                          width: 16,
+                        ),
+                        SizedBox(
+                          height: Converts.c40,
+                          child: ElevatedButton(
+                            //onPressed: () => Navigator.pop(context),
+                            onPressed: vm.canCreate ? () {
+                              onCreate(tvm.taskTextEdit.text);
+                            } : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Create',
+                              style: TextStyle(
+                                  fontSize: Converts.c16 - 2,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _handle() {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        height: 4,
+        width: 40,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+  }
+
+  void _openAssignSheet(BuildContext context) {
+    final vm = context.read<TodoViewModel>();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return ChangeNotifierProvider.value(
+          value: vm,
+          child: AssignBottomSheet(
+            tvm: tvm,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class AssignBottomSheet extends StatelessWidget {
+  final TodoViewModel tvm;
+
+  const AssignBottomSheet({super.key, required this.tvm});
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<TodoViewModel>();
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.75,
+      child: Column(
+        children: [
+          _handle(),
+          const Text(
+            'Assign members',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              onChanged: provider.search,
+              decoration: InputDecoration(
+                hintText: 'Search name',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: provider.members.length,
+              itemBuilder: (_, index) {
+                final name = provider.members[index];
+                final selected = provider.selected.contains(name);
+
+                return ListTile(
+                  title: Text(name),
+                  trailing: Checkbox(
+                    value: selected,
+                    onChanged: (_) => provider.toggle(name),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Done'),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _handle() {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: Colors.grey[400],
+          borderRadius: BorderRadius.circular(10),
+        ),
       ),
     );
   }
