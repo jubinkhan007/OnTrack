@@ -272,3 +272,14 @@ extension EmailValidation on String {
     return emailRegex.hasMatch(this);
   }
 }
+
+
+extension UrlDecodeExtension on String {
+  String get decoded {
+    try {
+      return Uri.decodeComponent(this);
+    } catch (_) {
+      return this; // fallback if not encoded or invalid
+    }
+  }
+}

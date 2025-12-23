@@ -183,7 +183,7 @@ class TodoViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> _allMembers = [
+  /*final List<String> _allMembers = [
     'Mithun',
     'Rahul',
     'Anita',
@@ -214,7 +214,50 @@ class TodoViewModel extends ChangeNotifier {
   void search(String value) {
     _search = value;
     notifyListeners();
+  }*/
+  final List<Customer> _allCustomers = [];
+
+  List<Customer> get members => _allCustomers;
+
+  void addCustomers(List<Customer> values) {
+    if (_allCustomers.isNotEmpty) _allCustomers.clear();
+    _allCustomers.addAll(values);
+    notifyListeners();
   }
 
+  final List<Customer> _selectedCustomers = [];
+  String _search = '';
+
+  /// Available customers (excluding selected)
+  List<Customer> get availableCustomers {
+    final list = _allCustomers
+        .where((c) => !_selectedCustomers.contains(c))
+        .toList();
+
+    if (_search.isEmpty) return list;
+
+    return list
+        .where(
+          (c) => c.name!.toLowerCase().contains(_search.toLowerCase()),
+    )
+        .toList();
+  }
+
+  List<Customer> get selectedCustomers => _selectedCustomers;
+
+  void add(Customer customer) {
+    _selectedCustomers.add(customer);
+    notifyListeners();
+  }
+
+  void remove(Customer customer) {
+    _selectedCustomers.remove(customer);
+    notifyListeners();
+  }
+
+  void search(String value) {
+    _search = value;
+    notifyListeners();
+  }
 
 }

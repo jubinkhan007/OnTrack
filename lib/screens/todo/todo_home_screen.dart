@@ -1078,7 +1078,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         inquiryViewModel.files);
   }
 
-  Future<void> saveTodos(InquiryCreateViewModel inquiryViewModel, {String? value}) async {
+  Future<void> saveTodos(InquiryCreateViewModel inquiryViewModel,
+      {String? value}) async {
     if (_taskController.text.isNotEmpty || value != null) {
       String loggedUserName = await _getUserName();
 
@@ -1090,7 +1091,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       if (_taskController.text.isEmpty && value != null) {
         await _saveInquiry(inquiryViewModel, value, loggedUserName);
       } else {
-        await _saveInquiry(inquiryViewModel, _taskController.text, loggedUserName);
+        await _saveInquiry(
+            inquiryViewModel, _taskController.text, loggedUserName);
       }
       // check the status of the inquiry save request
       if (inquiryViewModel.isSavedInquiry == null) {
@@ -1114,7 +1116,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   }
 
   Future<void> _showDialogWithoutMembers(
-      BuildContext context, InquiryCreateViewModel inquiryViewModel, {String? value}) async {
+      BuildContext context, InquiryCreateViewModel inquiryViewModel,
+      {String? value}) async {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1153,14 +1156,17 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       builder: (_) {
         return TaskBottomSheet(
           tvm: tvm,
+          peoples: users,
           onCreate: (value) async {
-              if (_addedUsers.isEmpty &&
-                  !staffId.isEmail()) {
-                await _showDialogWithoutMembers(
-                context, Provider.of<InquiryCreateViewModel>(context, listen: false), value: value);
-              } else {
-                await saveTodos(Provider.of<InquiryCreateViewModel>(context, listen: false), value: value);
-              }
+            if (_addedUsers.isEmpty && !staffId.isEmail()) {
+              await _showDialogWithoutMembers(context,
+                  Provider.of<InquiryCreateViewModel>(context, listen: false),
+                  value: value);
+            } else {
+              await saveTodos(
+                  Provider.of<InquiryCreateViewModel>(context, listen: false),
+                  value: value);
+            }
           },
         );
       },
@@ -1171,9 +1177,14 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 /// NEW TASK ENTRY \\\
 class TaskBottomSheet extends StatelessWidget {
   final TodoViewModel tvm;
+  final List<Customer> peoples;
   final Function(String value) onCreate;
 
-  const TaskBottomSheet({super.key, required this.tvm, required this.onCreate});
+  const TaskBottomSheet(
+      {super.key,
+      required this.tvm,
+      required this.onCreate,
+      required this.peoples});
 
   @override
   Widget build(BuildContext context) {
@@ -1184,7 +1195,7 @@ class TaskBottomSheet extends StatelessWidget {
         // rounded top corners
         child: Consumer<TodoViewModel>(builder: (context, vm, _) {
           return Container(
-            color: Colors.white, // white background
+            color: Colors.white,
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
@@ -1310,9 +1321,11 @@ class TaskBottomSheet extends StatelessWidget {
                           height: Converts.c40,
                           child: ElevatedButton(
                             //onPressed: () => Navigator.pop(context),
-                            onPressed: vm.canCreate ? () {
-                              onCreate(tvm.taskTextEdit.text);
-                            } : null,
+                            onPressed: vm.canCreate
+                                ? () {
+                                    onCreate(tvm.taskTextEdit.text);
+                                  }
+                                : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.redAccent,
                               shape: RoundedRectangleBorder(
@@ -1355,6 +1368,7 @@ class TaskBottomSheet extends StatelessWidget {
 
   void _openAssignSheet(BuildContext context) {
     final vm = context.read<TodoViewModel>();
+    vm.addCustomers(peoples);
 
     showModalBottomSheet(
       context: context,
@@ -1366,6 +1380,7 @@ class TaskBottomSheet extends StatelessWidget {
         return ChangeNotifierProvider.value(
           value: vm,
           child: AssignBottomSheet(
+            peoples: peoples,
             tvm: tvm,
           ),
         );
@@ -1376,63 +1391,114 @@ class TaskBottomSheet extends StatelessWidget {
 
 class AssignBottomSheet extends StatelessWidget {
   final TodoViewModel tvm;
+  final List<Customer> peoples;
 
-  const AssignBottomSheet({super.key, required this.tvm});
+  const AssignBottomSheet(
+      {super.key, required this.tvm, required this.peoples});
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<TodoViewModel>();
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.75,
-      child: Column(
-        children: [
-          _handle(),
-          const Text(
-            'Assign members',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      height: MediaQuery.of(context).size.height * 0.80,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white, // dialog background
+            borderRadius: BorderRadius.circular(20), // dialog round
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: TextField(
-              onChanged: provider.search,
-              decoration: InputDecoration(
-                hintText: 'Search name',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+          child: Column(
+            children: [
+              _handle(),
+              const SizedBox(height: 8),
+              Text(
+                'Assignees',
+                style: TextStyle(
+                  fontSize: Converts.c16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: provider.members.length,
-              itemBuilder: (_, index) {
-                final name = provider.members[index];
-                final selected = provider.selected.contains(name);
-
-                return ListTile(
-                  title: Text(name),
-                  trailing: Checkbox(
-                    value: selected,
-                    onChanged: (_) => provider.toggle(name),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: TextField(
+                  onChanged: provider.search,
+                  decoration: InputDecoration(
+                    hintText: 'Search name',
+                    hintStyle: const TextStyle(color: Colors.black38),
+                    prefixIcon: const Icon(Icons.search, color: Colors.black38),
+                    filled: true,
+                    fillColor: Colors.grey.shade100,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      // search bar round
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Done'),
+                ),
               ),
-            ),
-          )
-        ],
+
+              /// Selected Customers
+              if (provider.selectedCustomers.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Assignees',
+                      style: TextStyle(
+                        fontSize: Converts.c16 - 2,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold
+                      )
+                    ),
+                  ),
+                ),
+
+              Wrap(
+                spacing: 2,
+                children: provider.selectedCustomers.map((customer) {
+                  return Chip(
+                    label: Text(customer.name!, style: TextStyle(fontSize: Converts.c8, fontWeight: FontWeight.bold),),
+                    deleteIcon: const Icon(Icons.close),
+                    onDeleted: () => provider.remove(customer),
+                  );
+                }).toList(),
+              ),
+
+              if (provider.selectedCustomers.isNotEmpty) const Divider(),
+
+              Expanded(
+                child: ListView.builder(
+                  //itemCount: provider.members.length,
+                  itemCount: provider.availableCustomers.length,
+                  itemBuilder: (_, index) {
+                    //final customer = provider.members[index];
+                    final customer = provider.availableCustomers[index];
+                    return ListTile(
+                      title: Text(
+                        customer.name ?? "",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: Converts.c16 - 2),
+                      ),
+                      onTap: () => provider.add(customer),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/repo/new_task/comment_repo.dart';
 import 'package:tmbi/widgets/error_container.dart';
 
@@ -154,7 +155,7 @@ class _CommentBubble extends StatelessWidget {
                     color: isMe ? Colors.blue.shade100 : Colors.white,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Text(comment.body ?? ""),
+                  child: Text(comment.body?.decoded ?? ""),
                 ),
               ],
             ),
