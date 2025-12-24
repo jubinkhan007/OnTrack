@@ -94,7 +94,7 @@ class TaskDetailsViewmodel extends ChangeNotifier {
             100, []);*/
 
   Future<void> updateTask(String inquiryId, String taskId, String priorityId,
-      String description, String userId, int percentage, List<String> fileNames) async {
+      String description, String userId, String percentage, List<String> fileNames) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;

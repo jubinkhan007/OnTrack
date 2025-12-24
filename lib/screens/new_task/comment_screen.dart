@@ -38,17 +38,19 @@ class CommentsScreen extends StatelessWidget {
             style: TextStyle(fontSize: Converts.c16),
           ),
         ),
-        body: Consumer<CommentProvider>(
-          builder: (context, provider, _) {
-            return Column(
-              children: [
-                const SizedBox(height: 8),
-                //const _TodayLabel(),
-                Expanded(child: _CommentsList(staffId, provider)),
-                _InputBar(provider, staffId, inqId),
-              ],
-            );
-          },
+        body: SafeArea(
+          child: Consumer<CommentProvider>(
+            builder: (context, provider, _) {
+              return Column(
+                children: [
+                  const SizedBox(height: 8),
+                  //const _TodayLabel(),
+                  Expanded(child: _CommentsList(staffId, provider)),
+                  _InputBar(provider, staffId, inqId),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

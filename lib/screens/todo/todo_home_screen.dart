@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/enum.dart';
@@ -105,7 +106,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     Provider.of<TodoViewModel>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchDataAndStore();
-      _openTaskSheet(context);
+      //_openTaskSheet(context);
     });
   }
 
@@ -221,7 +222,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               );
             } else if (inquiryViewModel.uiState == UiState.error) {
               return Expanded(
-                child: ErrorContainer(
+                child: filteredNewUsers.isNotEmpty? const SizedBox.shrink(): ErrorContainer(
                     message: inquiryViewModel.message != null
                         ? inquiryViewModel.message!
                         : Strings.something_went_wrong),
@@ -233,7 +234,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 child: SizedBox(
                   height: double.infinity,
                   width: double.infinity,
-                  child: ErrorContainer(
+                  child: filteredNewUsers.isNotEmpty? const SizedBox.shrink(): ErrorContainer(
                       message: inquiryViewModel.message != null
                           ? inquiryViewModel.message!
                           : Strings.no_data_found),
@@ -310,7 +311,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             );
           }),
 
-          //bottomTextField(),
+          bottomTextField(),
         ],
       ),
     );
@@ -319,293 +320,298 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   Widget bottomTextField() {
     return Consumer<InquiryCreateViewModel>(
         builder: (context, inquiryViewModel, child) {
-      return Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(Converts.c16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Converts.c20),
-            topRight: Radius.circular(Converts.c20),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: Converts.c8,
-              spreadRadius: 2,
+      return SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(Converts.c16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Converts.c20),
+              topRight: Radius.circular(Converts.c20),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                inquiryViewModel.setIsShowed();
-              },
-              child: Center(
-                child: Text(
-                  Strings.add_task,
-                  style: TextStyle(
-                      fontSize: Converts.c16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: Converts.c8,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  inquiryViewModel.setIsShowed();
+                },
+                child: Center(
+                  child: Text(
+                    Strings.add_task,
+                    style: TextStyle(
+                        fontSize: Converts.c16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
-            ),
-            inquiryViewModel.isShowed
-                ? Column(children: [
-                    /// filtered user list only
-                    /// if there are matches
-                    if (filteredNewUsers.isNotEmpty)
-                      Column(
-                        children: [
-                          SizedBox(
-                            //color: Colors.deepOrange,
-                            height: Converts.c104,
-                            // Set a fixed height for the user list
-                            child: ListView.builder(
-                              itemCount: filteredNewUsers.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.account_circle_outlined,
-                                            size: 14,
-                                            color: Palette.semiTv,
-                                          ),
-                                          const SizedBox(
-                                            width: 4,
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              filteredNewUsers[index]
-                                                  .name
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Palette.semiTv,
+              inquiryViewModel.isShowed
+                  ? Column(children: [
+                      /// filtered user list only
+                      /// if there are matches
+                      if (filteredNewUsers.isNotEmpty)
+                        Column(
+                          children: [
+                            SizedBox(
+                              //color: Colors.deepOrange,
+                              height: Converts.c104,
+                              // Set a fixed height for the user list
+                              child: ListView.builder(
+                                itemCount: filteredNewUsers.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.account_circle_outlined,
+                                              size: 14,
+                                              color: Palette.semiTv,
+                                            ),
+                                            const SizedBox(
+                                              width: 4,
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                filteredNewUsers[index]
+                                                    .name
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Palette.semiTv,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 4,
-                                      ),
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    bool userAlreadyAdded = _addedUsers.any(
-                                        (user) =>
-                                            user.id ==
-                                            filteredNewUsers[index].id);
-                                    if (!userAlreadyAdded) {
-                                      setState(() {
-                                        _addedUsers
-                                            .add(filteredNewUsers[index]);
-                                      });
-                                    }
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 4,
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      bool userAlreadyAdded = _addedUsers.any(
+                                          (user) =>
+                                              user.id ==
+                                              filteredNewUsers[index].id);
+                                      if (!userAlreadyAdded) {
+                                        setState(() {
+                                          _addedUsers
+                                              .add(filteredNewUsers[index]);
+                                        });
+                                      }
 
-                                    // Get the current text from the TextField
-                                    String currentText =
-                                        _taskController.text.trim();
+                                      // Get the current text from the TextField
+                                      String currentText =
+                                          _taskController.text.trim();
 
-                                    // Check if the string contains "@" and find the position of the last "@"
-                                    if (currentText.contains('@')) {
-                                      int lastAtIndex =
-                                          currentText.lastIndexOf('@');
+                                      // Check if the string contains "@" and find the position of the last "@"
+                                      if (currentText.contains('@')) {
+                                        int lastAtIndex =
+                                            currentText.lastIndexOf('@');
 
-                                      // Get the text before the last "@" (everything before it)
-                                      String textBeforeLastAt = currentText
-                                          .substring(0, lastAtIndex)
-                                          .trim();
+                                        // Get the text before the last "@" (everything before it)
+                                        String textBeforeLastAt = currentText
+                                            .substring(0, lastAtIndex)
+                                            .trim();
 
-                                      // Update the text in the TextField to remove the last "@sala"
-                                      setState(() {
-                                        _taskController.text = textBeforeLastAt;
-                                        filteredNewUsers.clear();
-                                      });
+                                        // Update the text in the TextField to remove the last "@sala"
+                                        setState(() {
+                                          _taskController.text = textBeforeLastAt;
+                                          filteredNewUsers.clear();
+                                        });
 
-                                      // Move the cursor to the end of the updated text
-                                      _taskController.selection =
-                                          TextSelection.collapsed(
-                                        offset: _taskController.text.length,
-                                      );
+                                        // Move the cursor to the end of the updated text
+                                        _taskController.selection =
+                                            TextSelection.collapsed(
+                                          offset: _taskController.text.length,
+                                        );
 
-                                      debugPrint(
-                                          "Updated Text: $textBeforeLastAt");
-                                    } else {
-                                      debugPrint("Updated Text: No '@' found");
-                                    }
-                                  },
-                                );
-                              },
+                                        debugPrint(
+                                            "Updated Text: $textBeforeLastAt");
+                                      } else {
+                                        debugPrint("Updated Text: No '@' found");
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                          const Divider(),
-                        ],
-                      ),
-
-                    /// check box & task input
-                    Row(
-                      children: [
-                        /*Checkbox(
-                  value: _isChecked,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _isChecked = value ?? false;
-                    });
-                  },
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),*/
-                        Expanded(
-                          child: TextField(
-                            controller: _taskController,
-                            focusNode: _focusNode,
-                            maxLines: null,
-                            //minLines: 5,
-                            minLines: 4,
-                            //textInputAction: TextInputAction.done,
-                            keyboardType: TextInputType.multiline,
-                            decoration: InputDecoration(
-                                hintText: staffId.isEmail()
-                                    ? Strings.enterTask
-                                    : Strings.add_task,
-                                border: InputBorder.none,
-                                hintStyle: TextStyle(
-                                    color: Palette.circleColor,
-                                    fontSize: Converts.c16 - 2)),
-                            style: TextStyle(
-                              fontSize: Converts.c16 - 2,
-                              color: Colors.grey.shade700,
-                            ),
-                            //onEditingComplete: _addTask, // Add task on done
-                            /*onEditingComplete: () async {
-                      await saveTodos(inquiryViewModel);
-                    },*/ // Add task on done
-                          ),
+                            const Divider(),
+                          ],
                         ),
 
-                        /// save button
-                        Material(
-                          color: Colors.transparent,
-                          child: !(inquiryViewModel.uiState == UiState.loading)
-                              ? IconButton(
-                                  icon: Icon(
-                                    Icons.send,
-                                    size: Converts.c24,
-                                    color: Palette.mainColor,
-                                  ),
-                                  onPressed: () async {
-                                    if (_addedUsers.isEmpty &&
-                                        !staffId.isEmail()) {
-                                      await _showDialogWithoutMembers(
-                                          context, inquiryViewModel);
-                                    } else {
-                                      await saveTodos(inquiryViewModel);
-                                    }
-                                    //String encodedTask = Uri.encodeComponent(_taskController.text);
-                                    //debugPrint(encodedTask);
-                                  },
-                                )
-                              : SizedBox(
-                                  height: Converts.c48,
-                                  width: Converts.c48,
-                                  child: Center(
-                                    child: SizedBox(
-                                      height: Converts.c16,
-                                      width: Converts.c16,
-                                      child: const CircularProgressIndicator(
-                                        strokeWidth:
-                                            2, // Smaller stroke for a finer spinner
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Palette.tabColor),
+                      /// check box & task input
+                      Row(
+                        children: [
+                          /*Checkbox(
+                    value: _isChecked,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _isChecked = value ?? false;
+                      });
+                    },
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),*/
+                          Expanded(
+                            child: TextField(
+                              controller: _taskController,
+                              focusNode: _focusNode,
+                              maxLines: null,
+                              //minLines: 5,
+                              minLines: 4,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.done,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(RegExp(r'[\n\r]')),
+                              ],
+                              decoration: InputDecoration(
+                                  hintText: staffId.isEmail()
+                                      ? Strings.enterTask
+                                      : Strings.add_task,
+                                  border: InputBorder.none,
+                                  hintStyle: TextStyle(
+                                      color: Palette.circleColor,
+                                      fontSize: Converts.c16 - 2)),
+                              style: TextStyle(
+                                fontSize: Converts.c16 - 2,
+                                color: Colors.grey.shade700,
+                              ),
+                              //onEditingComplete: _addTask, // Add task on done
+                              /*onEditingComplete: () async {
+                        await saveTodos(inquiryViewModel);
+                      },*/ // Add task on done
+                            ),
+                          ),
+
+                          /// save button
+                          Material(
+                            color: Colors.transparent,
+                            child: !(inquiryViewModel.uiState == UiState.loading)
+                                ? IconButton(
+                                    icon: Icon(
+                                      Icons.send,
+                                      size: Converts.c24,
+                                      color: Palette.mainColor,
+                                    ),
+                                    onPressed: () async {
+                                      if (_addedUsers.isEmpty &&
+                                          !staffId.isEmail()) {
+                                        await _showDialogWithoutMembers(
+                                            context, inquiryViewModel);
+                                      } else {
+                                        await saveTodos(inquiryViewModel);
+                                      }
+                                      //String encodedTask = Uri.encodeComponent(_taskController.text);
+                                      //debugPrint(encodedTask);
+                                    },
+                                  )
+                                : SizedBox(
+                                    height: Converts.c48,
+                                    width: Converts.c48,
+                                    child: Center(
+                                      child: SizedBox(
+                                        height: Converts.c16,
+                                        width: Converts.c16,
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth:
+                                              2, // Smaller stroke for a finer spinner
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Palette.tabColor),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                        )
-                      ],
-                    ),
+                          )
+                        ],
+                      ),
 
-                    /// assigned person (if any)
-                    if (_addedUsers.isNotEmpty) assignedUser(),
-                    Divider(
-                      color: Colors.grey.shade300,
-                    ),
+                      /// assigned person (if any)
+                      if (_addedUsers.isNotEmpty) assignedUser(),
+                      Divider(
+                        color: Colors.grey.shade300,
+                      ),
 
-                    /// date, image selection view
-                    Row(
-                      children: [
-                        DateSelectionView(
-                          onDateSelected: (date) {
-                            if (date != null) {
-                              _selectedDate = date;
-                            }
-                            setState(() {
-                              _isDateSelected = true;
-                            });
-                          },
-                          isFromTodo: true,
-                          isDateSelected: _isDateSelected,
-                        ),
-                        /*staffId.isEmail()
-                            ? const SizedBox.shrink()
-                            : Expanded(
-                                child: SizedBox(
-                                  height: Converts.c48,
-                                  child: FileAttachment2(
-                                    inquiryViewModel: inquiryViewModel,
+                      /// date, image selection view
+                      Row(
+                        children: [
+                          DateSelectionView(
+                            onDateSelected: (date) {
+                              if (date != null) {
+                                _selectedDate = date;
+                              }
+                              setState(() {
+                                _isDateSelected = true;
+                              });
+                            },
+                            isFromTodo: true,
+                            isDateSelected: _isDateSelected,
+                          ),
+                          /*staffId.isEmail()
+                              ? const SizedBox.shrink()
+                              : Expanded(
+                                  child: SizedBox(
+                                    height: Converts.c48,
+                                    child: FileAttachment2(
+                                      inquiryViewModel: inquiryViewModel,
+                                    ),
                                   ),
-                                ),
-                              )*/
-                      ],
-                    ),
+                                )*/
+                        ],
+                      ),
 
-                    /// save button
-                    /*!(inquiryViewModel.uiState == UiState.loading)
-                ? */
-                    /*const SizedBox(
-                      height: 8,
-                    ),
-                    ButtonCustom1(
-                        btnText: Strings.save,
-                        btnHeight: Converts.c48,
-                        bgColor: Palette.mainColor,
-                        btnWidth: double.infinity,
-                        cornerRadius: 4,
-                        isLoading:
-                            (inquiryViewModel.uiState == UiState.loading),
-                        stockColor: Palette.mainColor,
-                        onTap: () async {})*/
-                    /*: SizedBox(
-                    height: Converts.c48,
-                    width: Converts.c48,
-                    child: Center(
-                      child: SizedBox(
-                        height: Converts.c16,
-                        width: Converts.c16,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2, // Smaller stroke for a finer spinner
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Palette.tabColor),
+                      /// save button
+                      /*!(inquiryViewModel.uiState == UiState.loading)
+                  ? */
+                      /*const SizedBox(
+                        height: 8,
+                      ),
+                      ButtonCustom1(
+                          btnText: Strings.save,
+                          btnHeight: Converts.c48,
+                          bgColor: Palette.mainColor,
+                          btnWidth: double.infinity,
+                          cornerRadius: 4,
+                          isLoading:
+                              (inquiryViewModel.uiState == UiState.loading),
+                          stockColor: Palette.mainColor,
+                          onTap: () async {})*/
+                      /*: SizedBox(
+                      height: Converts.c48,
+                      width: Converts.c48,
+                      child: Center(
+                        child: SizedBox(
+                          height: Converts.c16,
+                          width: Converts.c16,
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2, // Smaller stroke for a finer spinner
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Palette.tabColor),
+                          ),
                         ),
                       ),
-                    ),
-                  ),*/
-                  ])
-                : const SizedBox.shrink(),
-          ],
+                    ),*/
+                    ])
+                  : const SizedBox.shrink(),
+            ],
+          ),
         ),
       );
     });
@@ -788,7 +794,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          Uri.decodeComponent(inquiryResponse.title),
+                          inquiryResponse.title.decoded,
                           style: GoogleFonts.roboto(
                               fontSize: Converts.c16,
                               color: Colors.black,
@@ -1055,7 +1061,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
   Future<void> _saveInquiry(InquiryCreateViewModel inquiryViewModel,
       String task, String loggedUserName) async {
-    String encodedTask = Uri.encodeComponent(task);
+    //String encodedTask = Uri.encodeComponent(task);
+    String encodedTask = task.replaceAll("%", " percent");
     String companyId = "0";
     String inquiryId = "0";
     String priorityId = "401";

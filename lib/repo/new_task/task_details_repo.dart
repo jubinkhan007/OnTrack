@@ -31,7 +31,7 @@ class TaskDetailsRepo {
   }
 
   Future<bool> updateTask(String inquiryId, String taskId, String priorityId,
-      String description, String userId, int percentage, List<String> fileNames) async {
+      String description, String userId, String percentage, List<String> fileNames) async {
     try {
       final headers = {
         "dtype": "TASK",

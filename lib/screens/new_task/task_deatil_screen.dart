@@ -170,6 +170,7 @@ class TaskDetailsScreen extends StatelessWidget {
 */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/enum.dart';
@@ -179,6 +180,7 @@ import 'package:tmbi/repo/new_task/task_details_repo.dart';
 import 'package:tmbi/widgets/error_container.dart';
 
 import '../../config/strings.dart';
+import '../../models/new_task/main_task_response.dart';
 import '../../network/api_service.dart';
 import '../../viewmodel/new_task/task_details_viewmodel.dart';
 import '../../widgets/new_task/progressbar.dart';
@@ -220,10 +222,12 @@ class TaskDetailsScreen extends StatelessWidget {
     );
   }
 
-  void _openStatusDialog(
-      BuildContext context, String id, TaskDetailsViewmodel provider) {
+  void _openStatusDialog(BuildContext context, String id,
+      TaskDetailsViewmodel provider, SubTask subtask) {
     int? selectedStatus = 3; // default = Pending
     TextEditingController noteController = TextEditingController();
+    double? currentDiscreteSliderValue =
+        double.tryParse(subtask.completion ?? '');
 
     showDialog(
       context: context,
@@ -265,11 +269,43 @@ class TaskDetailsScreen extends StatelessWidget {
                   // Note TextField
                   TextField(
                     controller: noteController,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(RegExp(r'[\n\r]')),
+                    ],
                     decoration: const InputDecoration(
                       labelText: "Note",
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 5,
+                  ),
+                  // percentage indicator
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "How much done? (${currentDiscreteSliderValue!.round().toString()}/100)",
+                        style: TextStyle(
+                            color: currentDiscreteSliderValue!.round() > 60
+                                ? currentDiscreteSliderValue!.round() == 100
+                                    ? Colors.green
+                                    : Colors.orangeAccent
+                                : Colors.deepOrange,
+                            fontSize: Converts.c12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+
+                  Slider(
+                    value: currentDiscreteSliderValue ?? 0.0,
+                    max: 100,
+                    divisions: 10,
+                    label: currentDiscreteSliderValue!.round().toString(),
+                    onChanged: (double value) {
+                      setState(() {
+                        currentDiscreteSliderValue = value;
+                      });
+                    },
                   ),
                 ],
               ),
@@ -290,7 +326,13 @@ class TaskDetailsScreen extends StatelessWidget {
                         selectedStatus.toString(),
                         noteController.text.toString(),
                         staffId,
-                        selectedStatus == 7 ? 100 : 0, []);
+                        //selectedStatus == 7 ? 100 : 0,
+                        selectedStatus == 7
+                            ? "100"
+                            : currentDiscreteSliderValue != null
+                                ? currentDiscreteSliderValue.toString()
+                                : "0",
+                        []);
 
                     if (provider.isUpdated != null) {
                       if (provider.isUpdated!) {
@@ -475,7 +517,9 @@ class TaskDetailsScreen extends StatelessWidget {
                         staffId: staffId,
                         onUpdate: (id) async {
                           //_openStatusDialog(context, taskId, provider);
-                          _openStatusDialog(context, id, provider);
+                          _openStatusDialog(context, id, provider,
+                              task.data.first.tasks[index]);
+
                           /*await provider.updateTask(taskId, task.data.first.tasks[index].id, "7", "done", staffId, 100, []);
 
                           if (provider.isUpdated != null) {
@@ -504,5 +548,4 @@ class TaskDetailsScreen extends StatelessWidget {
       ),
     );
   }
-
 }

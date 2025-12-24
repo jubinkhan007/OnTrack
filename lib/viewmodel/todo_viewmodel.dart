@@ -12,6 +12,7 @@ class TodoViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    debugPrint("DISPOSE");
     taskTextEdit.dispose();
     super.dispose();
   }
