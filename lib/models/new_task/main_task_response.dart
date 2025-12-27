@@ -71,6 +71,7 @@ class SubTask {
   String date;
   String status;
   String lastComment;
+  String commentCount;
 
   SubTask({
     required this.id,
@@ -80,7 +81,8 @@ class SubTask {
     required this.completion,
     required this.date,
     required this.status,
-    required this.lastComment
+    required this.lastComment,
+    this.commentCount = "0",
   });
 
   factory SubTask.fromJson(Map<String, dynamic> json) {
@@ -93,6 +95,9 @@ class SubTask {
       date: json['TASK_DATE'].toString(),
       status: json['STATUS'].toString(),
       lastComment: json['LAST_COMMENTS'].toString(),
+      commentCount: json['COMMENT_COUNT'] != null
+          ? json['COMMENT_COUNT'].toString()
+          : '0',
     );
   }
 
@@ -105,7 +110,8 @@ class SubTask {
       'COMPLETION': completion,
       'TASK_DATE': date,
       'STATUS': status,
-      'LAST_COMMENTS': lastComment
+      'LAST_COMMENTS': lastComment,
+      'COMMENT_COUNT': commentCount,
     };
   }
 }

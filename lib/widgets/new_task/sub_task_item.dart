@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/size_config.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/models/new_task/main_task_response.dart';
 
 import '../../config/converts.dart';
+import '../../screens/new_task/comment_screen.dart';
 
 class SubTaskItem extends StatelessWidget {
   final SubTask subtask;
+  final String mainTaskId;
   final String staffId;
   final void Function(String subtaskId) onUpdate;
 
@@ -15,6 +20,7 @@ class SubTaskItem extends StatelessWidget {
     required this.subtask,
     required this.staffId,
     required this.onUpdate,
+    required this.mainTaskId,
   });
 
   @override
@@ -83,8 +89,10 @@ class SubTaskItem extends StatelessWidget {
                 )
               ],
             ),
-            //const SizedBox(height: 2),
-            Row(
+            const SizedBox(height: 2),
+            subtask.assignToName.withDate(" ${Strings.dot} ${subtask.date}",
+                fontSize: Converts.c12),
+            /*Row(
               children: [
                 /*Text(
                   Strings.assignedTo,
@@ -101,13 +109,56 @@ class SubTaskItem extends StatelessWidget {
                 ),
                 //Text(" | ${subtask.progress}%", style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),),
               ],
-            ),
-            Text(
-              "Last Note# ${subtask.lastComment}",
-              style: TextStyle(
-                fontSize: Converts.c16 - 4,
-                color: Colors.purpleAccent
-              ),
+            ),*/
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "Last Note# ${subtask.lastComment}",
+                    style: TextStyle(
+                        fontSize: Converts.c16 - 4, color: Colors.purpleAccent),
+                  ),
+                ),
+                Platform.isAndroid
+                    ? InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CommentsScreen(
+                                staffId: staffId,
+                                inqId: mainTaskId,
+                                subTask: subtask,
+                              ),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        // optional for rounded ripple
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.comment,
+                                size: 16,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                subtask.commentCount,
+                                style: TextStyle(
+                                    fontSize: Converts.c16 - 4,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink()
+              ],
             ),
             subtask.assignToId == staffId && subtask.completion != "100"
                 ? Row(

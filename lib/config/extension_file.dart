@@ -273,7 +273,6 @@ extension EmailValidation on String {
   }
 }
 
-
 extension UrlDecodeExtension on String {
   String get decoded {
     try {
@@ -281,5 +280,36 @@ extension UrlDecodeExtension on String {
     } catch (_) {
       return this; // fallback if not encoded or invalid
     }
+  }
+}
+
+extension NameWithDate on String {
+  Widget withDate(
+    String date, {
+    double fontSize = 14,
+    Color nameColor = Colors.black87,
+    Color dateColor = Colors.black87,
+  }) {
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(fontSize: fontSize),
+        children: [
+          TextSpan(
+            text: '$this ',
+            style: TextStyle(
+              color: nameColor,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          TextSpan(
+            text: date,
+            style: TextStyle(
+              color: dateColor,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

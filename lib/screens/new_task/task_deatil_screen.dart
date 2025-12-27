@@ -324,7 +324,9 @@ class TaskDetailsScreen extends StatelessWidget {
                         taskId,
                         id,
                         selectedStatus.toString(),
-                        noteController.text.toString(),
+                        noteController.text
+                            .toString()
+                            .replaceAll("%", " percent"),
                         staffId,
                         //selectedStatus == 7 ? 100 : 0,
                         selectedStatus == 7
@@ -438,11 +440,15 @@ class TaskDetailsScreen extends StatelessWidget {
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                        Row(
+                        assignName.withDate(
+                          " • ${provider.mainTaskResponse!.data.first.date}",
+                          fontSize: Converts.c16 - 2,
+                        ),
+                        /*Row(
                           children: [
-                            /*index == 0 // 0 = assign to, 1 = assign by
-                                ? const Text(Strings.assignedTo)
-                                : const Text(Strings.assignedBy),*/
+                            //index == 0 // 0 = assign to, 1 = assign by
+                                //? const Text(Strings.assignedTo)
+                                //: const Text(Strings.assignedBy),
                             Expanded(
                               child: Text(
                                 " $assignName",
@@ -453,7 +459,7 @@ class TaskDetailsScreen extends StatelessWidget {
                             Text(
                                 " • ${provider.mainTaskResponse!.data.first.date}"),
                           ],
-                        ),
+                        ),*/
                         const SizedBox(height: 12),
                         /*Container(
                           padding: const EdgeInsets.all(8),
@@ -536,6 +542,7 @@ class TaskDetailsScreen extends StatelessWidget {
                             }
                           }*/
                         },
+                        mainTaskId: task.data.last.mainTaskId,
                       );
                     },
                     childCount: task.data.first.tasks.length,

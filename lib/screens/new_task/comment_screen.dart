@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/extension_file.dart';
+import 'package:tmbi/models/new_task/main_task_response.dart';
 import 'package:tmbi/repo/new_task/comment_repo.dart';
 import 'package:tmbi/widgets/error_container.dart';
 
@@ -16,8 +17,10 @@ import '../../viewmodel/new_task/comment_provider.dart';
 class CommentsScreen extends StatelessWidget {
   final String staffId;
   final String inqId;
+  final SubTask? subTask;
 
-  const CommentsScreen({super.key, required this.staffId, required this.inqId});
+  const CommentsScreen(
+      {super.key, required this.staffId, required this.inqId, this.subTask});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,8 @@ class CommentsScreen extends StatelessWidget {
                       "https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                   .provideDio()),
           staffId,
-          inqId),
+          inqId,
+          subTask),
       child: Scaffold(
         backgroundColor: const Color(0xFFF7F8FA),
         appBar: AppBar(
@@ -46,7 +50,7 @@ class CommentsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   //const _TodayLabel(),
                   Expanded(child: _CommentsList(staffId, provider)),
-                  _InputBar(provider, staffId, inqId),
+                  _InputBar(provider, staffId, inqId, subTask),
                 ],
               );
             },
@@ -197,9 +201,10 @@ class _Avatar extends StatelessWidget {
 class _InputBar extends StatelessWidget {
   final CommentProvider provider;
   final String staffId;
+  final SubTask? subTask;
   final String inqId;
 
-  const _InputBar(this.provider, this.staffId, this.inqId);
+  const _InputBar(this.provider, this.staffId, this.inqId, this.subTask);
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +234,7 @@ class _InputBar extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.send, color: Colors.white),
               onPressed: () {
-                provider.saveComment(inqId, staffId);
+                provider.saveComment(inqId, staffId, subTask);
               },
             ),
           ),

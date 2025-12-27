@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/new_task/comment_response.dart';
+import 'package:tmbi/models/new_task/main_task_response.dart';
 
 import '../../network/ui_state.dart';
 import '../../repo/new_task/comment_repo.dart';
@@ -9,11 +10,12 @@ class CommentProvider extends ChangeNotifier {
   final CommentRepo commentRepo;
   final String staffId;
   final String inqId;
+  final SubTask? subTask;
 
   bool _disposed = false;
 
-  CommentProvider(this.staffId, this.inqId, {required this.commentRepo}) {
-    getComments(staffId, inqId, "");
+  CommentProvider(this.staffId, this.inqId, this.subTask, {required this.commentRepo}) {
+    getComments(staffId, inqId, subTask);
   }
 
   @override
@@ -51,13 +53,13 @@ class CommentProvider extends ChangeNotifier {
   Future<void> refresh(
     String staffId,
     String inquiryId,
-    String taskId,
+    SubTask? subTask,
   ) async {
     try {
       final response = await commentRepo.getComments(
         staffId,
         inquiryId,
-        taskId,
+        subTask,
       );
 
       _commentList
@@ -73,7 +75,7 @@ class CommentProvider extends ChangeNotifier {
   Future<void> getComments(
     String staffId,
     String inqId,
-    String taskId,
+    SubTask? subTask,
   ) async {
     if (_uiState == UiState.loading) return;
 
@@ -84,7 +86,7 @@ class CommentProvider extends ChangeNotifier {
       final response = await commentRepo.getComments(
         staffId,
         inqId,
-        taskId,
+        subTask,
       );
 
       _commentList
@@ -102,7 +104,7 @@ class CommentProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> saveComment(String inquiryId, String userId) async {
+  Future<void> saveComment(String inquiryId, String userId, SubTask? subTask) async {
     final text = commentController.text.trim();
     if (text.isEmpty) return;
 
@@ -110,11 +112,11 @@ class CommentProvider extends ChangeNotifier {
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response = await commentRepo.saveComment(inquiryId, text, userId);
+      final response = await commentRepo.saveComment(inquiryId, text, userId, subTask);
       debugPrint("ID: $userId, InqId: $inquiryId");
       if (response) {
         commentController.clear();
-        await refresh(userId, inquiryId, "");
+        await refresh(userId, inquiryId, subTask);
       }
 
       _isSuccess = response;

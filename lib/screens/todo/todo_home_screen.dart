@@ -1012,7 +1012,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             staffId: user.id,
             //staffId: user.searchName,
             dateTime: _selectedDate,
-            body: _taskController.text.toString()));
+            body: _taskController.text.toString().replaceAll("%", " percent")));
       }
     } else {
       _assignedTaskToUser.add(Discussion(
