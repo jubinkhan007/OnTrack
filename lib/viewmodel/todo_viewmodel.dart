@@ -184,38 +184,7 @@ class TodoViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /*final List<String> _allMembers = [
-    'Mithun',
-    'Rahul',
-    'Anita',
-    'Suman',
-    'Amit',
-    'Neha',
-  ];
 
-  final Set<String> _selected = {};
-  String _search = '';
-
-  List<String> get members {
-    if (_search.isEmpty) return _allMembers;
-    return _allMembers
-        .where((e) => e.toLowerCase().contains(_search.toLowerCase()))
-        .toList();
-  }
-
-  Set<String> get selected => _selected;
-
-  void toggle(String name) {
-    _selected.contains(name)
-        ? _selected.remove(name)
-        : _selected.add(name);
-    notifyListeners();
-  }
-
-  void search(String value) {
-    _search = value;
-    notifyListeners();
-  }*/
   final List<Customer> _allCustomers = [];
 
   List<Customer> get members => _allCustomers;

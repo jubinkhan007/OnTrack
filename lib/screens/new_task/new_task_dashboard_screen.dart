@@ -9,6 +9,7 @@ import 'package:tmbi/screens/new_task/sync_screen.dart';
 import 'package:tmbi/viewmodel/new_task/new_task_dashboard_viewmodel.dart';
 import 'package:tmbi/widgets/error_container.dart';
 import 'package:tmbi/widgets/new_task/app_drawer.dart';
+import 'package:tmbi/widgets/new_task/bs_task_entry.dart';
 
 import '../../config/converts.dart';
 import '../../config/strings.dart';
@@ -96,6 +97,28 @@ class NewTaskDashboardScreen extends StatelessWidget {
           }
           Navigator.pushNamed(context, TodoHomeScreen.routeName,
               arguments: staffId);
+          /*showModalBottomSheet(context: context, builder: (_) =>
+              BsTaskEntry(peoples: [], onCreate: (value){})
+          );*/
+
+          /*final vm = context.read<NewTaskDashboardViewmodel>();
+
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            // disable tap outside
+            isDismissible: false,
+            // disable swipe down
+            enableDrag: false,
+            builder: (_) {
+              return ChangeNotifierProvider.value(
+                value: vm,
+                child: BsTaskEntry(
+                  onCreate: (value) {},
+                ),
+              );
+            },
+          );*/
         },
       ),
       drawer: AppDrawer(

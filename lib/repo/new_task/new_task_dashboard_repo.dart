@@ -73,8 +73,8 @@ class NewTaskDashboardRepo {
       throw Exception(error);
     }
   }
-  Future<bool> deleteTask(
-      String inquiryId) async {
+
+  Future<bool> deleteTask(String inquiryId) async {
     try {
       final headers = {
         "dtype": "DELETE",
@@ -92,5 +92,43 @@ class NewTaskDashboardRepo {
     }
   }
 
-
+  Future<bool> saveTask(
+      {String companyId = "0",
+      String inquiryId = "0",
+      String customerId = "0",
+      String customerName = "Other",
+      String isSample = "N",
+      required String title,
+      required String details,
+      required String dueDate,
+      required String priorityId,
+      required String userId,
+      required String assignees}) async {
+    try {
+      final headers = {
+        "dtype": "INQUERY",
+        "compid": companyId,
+        "custid": customerId,
+        "inqrid": inquiryId,
+        "inqrname": title,
+        "inqrdesc": details,
+        "salmpleflag": isSample,
+        "needdate": dueDate,
+        "userid": userId,
+        "custname": customerName,
+        "priorityid": priorityId,
+        "taskdetail": assignees,
+        "files": "0"
+      };
+      final response = await dio.post(
+        "saveall",
+        options: Options(headers: headers),
+      );
+      debugPrint("RESPONSE#${response.data}");
+      return response.data['status'] == "200";
+    } on DioException catch (error) {
+      debugPrint("RESPONSE_ERROR#$error");
+      throw Exception(error);
+    }
+  }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -9,13 +11,14 @@ import 'package:tmbi/models/new_task/task_response.dart';
 import 'package:tmbi/repo/new_task/new_task_dashboard_repo.dart';
 
 import '../../network/ui_state.dart';
+import '../../widgets/new_task/dropdown_type.dart';
 
 class NewTaskDashboardViewmodel extends ChangeNotifier {
   final NewTaskDashboardRepo ntdRepo;
   final String staffId;
 
   NewTaskDashboardViewmodel({required this.staffId, required this.ntdRepo}) {
-      getBUStaffs();
+    getBUStaffs();
     //getTasks();
   }
 
@@ -264,15 +267,13 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteTask(
-      String inquiryId) async {
+  Future<void> deleteTask(String inquiryId) async {
     if (_uiState == UiState.loading) return;
 
     _uiState = UiState.loading;
     notifyListeners();
     try {
-      final response =
-      await ntdRepo.deleteTask(inquiryId);
+      final response = await ntdRepo.deleteTask(inquiryId);
       _isTaskDeleted = response;
       _uiState = UiState.success;
       if (response) {
@@ -284,6 +285,183 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  /// NEW TASK ENTRY \\\
+  TextEditingController taskTextEdit = TextEditingController();
+  TextEditingController searchTextEdit = TextEditingController();
+  String? _selectedDate = DateTime.now().toFormattedString(
+    format: "yyyy-MM-dd",
+  );
+
+  String? get selectedDate => _selectedDate;
+
+  void setDate(DateTime dateTime) {
+    _selectedDate = "${dateTime.toLocal()}".split(' ')[0];
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    taskTextEdit.dispose();
+    searchTextEdit.dispose();
+    super.dispose();
+  }
+
+  bool _canCreate = false;
+
+  bool get canCreate => _canCreate;
+
+  void onTaskTextChanged(String value) {
+    _canCreate = value.trim().isNotEmpty;
+    notifyListeners();
+  }
+
+  final List<BusinessUnit> _selectedStaffs = [];
+
+  List<BusinessUnit> get selectedStaffs => _selectedStaffs;
+
+  String _search = '';
+
+  // available staffs (excluding selected)
+  List<BusinessUnit> get availableStaffs {
+    final list = _buStaffs.where((c) => !_selectedStaffs.contains(c)).toList();
+    if (_search.isEmpty) return list;
+    return list
+        .where(
+          (c) => c.userName.toLowerCase().contains(_search.toLowerCase()),
+        )
+        .toList();
+  }
+
+  void add(BusinessUnit customer) {
+    _selectedStaffs.add(customer);
+    notifyListeners();
+  }
+
+  void remove(BusinessUnit customer) {
+    _selectedStaffs.remove(customer);
+    notifyListeners();
+  }
+
+  void search(String value) {
+    _search = value;
+    notifyListeners();
+  }
+
+  /// DROPDOWN ITEM \\\
+
+  DropdownOption? _selectedDropdownOption;
+
+  DropdownOption? get selectedDropdownOption => _selectedDropdownOption;
+
+  DropdownOption? _selectedPriorityDropdownOption;
+
+  DropdownOption? get selectedPriorityDropdownOption =>
+      _selectedPriorityDropdownOption;
+
+  void setDropDownValue(DropdownOption option) {
+    _selectedDropdownOption = option;
+    notifyListeners();
+  }
+
+  void setPriorityDropDownValue(DropdownOption option) {
+    _selectedPriorityDropdownOption = option;
+    notifyListeners();
+  }
+
+  // UI state
+  UiState _uiStateTask = UiState.init;
+
+  UiState get uiStateTask => _uiStateTask;
+
+  set uiStateTask(UiState newState) {
+    if (_uiState != newState) {
+      _uiStateTask = newState;
+      notifyListeners();
+    }
+  }
+
+  bool _isSuccessTask = false;
+
+  bool get isSuccessTask => _isSuccessTask;
+
+  void resetTaskEntry() {
+    taskTextEdit.text = "";
+    _canCreate = false;
+    _selectedDate = DateTime.now().toFormattedString(
+      format: "yyyy-MM-dd",
+    );
+    _selectedStaffs.clear();
+    _search = '';
+    _selectedDropdownOption = DropdownOption(
+      id: 1,
+      icon: Icons.circle_outlined,
+      label: 'TO DO',
+    );
+    _selectedPriorityDropdownOption = null;
+    _isSuccessTask = false;
+    notifyListeners();
+  }
+
+  Future<void> saveTask(String userId, String assignees) async {
+    final text = taskTextEdit.text.trim();
+    if (text.isEmpty) return;
+
+    if (_uiState == UiState.loading) return;
+    _uiState = UiState.loading;
+    _isSuccessTask = false;
+    notifyListeners();
+    try {
+      final response = await ntdRepo.saveTask(
+          title: text.replaceAll("%", " percent "),
+          details: text.replaceAll("%", " percent "),
+          dueDate: _selectedDate ??
+              DateTime.now().toFormattedString(
+                format: "yyyy-MM-dd",
+              ),
+          priorityId: _selectedPriorityDropdownOption != null
+              ? _selectedPriorityDropdownOption!.id.toString()
+              : "401",
+          userId: userId,
+          assignees: assignees);
+
+      if (response) {
+        taskTextEdit.clear();
+        await getTasks();
+      }
+
+      _isSuccessTask = response;
+      _uiState = UiState.success;
+    } catch (error) {
+      _uiState = UiState.error;
+      _message = error.toString();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  String _createAssigneesJSON(String staffId, String name) {
+    final List<Map<String, dynamic>> assignedTasks = [];
+
+    if (_selectedStaffs.isNotEmpty) {
+      for (var user in _selectedStaffs) {
+        assignedTasks.add({
+          "NAME": user.userName,
+          "STAFFID": user.userId.toString(),
+          "DATETIME": _selectedDate, // make sure this is already formatted
+          "COMMENTS": taskTextEdit.text.replaceAll("%", " percent "),
+        });
+      }
+    } else {
+      assignedTasks.add({
+        "NAME": name,
+        "STAFFID": staffId,
+        "DATETIME": _selectedDate,
+        "COMMENTS": taskTextEdit.text.replaceAll("%", " percent "),
+      });
+    }
+    return assignedTasks.isNotEmpty ? jsonEncode(assignedTasks) : "";
   }
 
 }
