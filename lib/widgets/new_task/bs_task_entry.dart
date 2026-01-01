@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tmbi/network/ui_state.dart';
 import 'package:tmbi/widgets/new_task/bs_assigns.dart';
 import 'package:tmbi/widgets/new_task/dropdown_type.dart';
 
@@ -39,15 +40,34 @@ class BsTaskEntry extends StatelessWidget {
                       child: Column(
                         children: [
                           TextField(
-                            maxLines: 5,
-                            minLines: 3,
+                            maxLines: 2,
+                            minLines: 2,
                             onChanged: (value) {
                               provider.onTaskTextChanged(value);
                             },
                             controller: provider.taskTextEdit,
                             keyboardType: TextInputType.multiline,
                             decoration: InputDecoration(
-                              hintText: 'Enter task ',
+                              hintText: 'Untitled Task',
+                              hintStyle: TextStyle(color: Colors.black54, fontSize: Converts.c20),
+                              border: InputBorder.none, // no visible border
+                            ),
+                            style: TextStyle(
+                              fontSize: Converts.c16,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black,
+                            ),
+                          ),
+                          TextField(
+                            maxLines: 5,
+                            minLines: 3,
+                            onChanged: (value) {
+                              //provider.onTaskTextChanged(value);
+                            },
+                            controller: provider.taskDetailTextEdit,
+                            keyboardType: TextInputType.multiline,
+                            decoration: InputDecoration(
+                              hintText: 'Tap to add a description...',
                               hintStyle: TextStyle(color: Colors.grey.shade400),
                               border: InputBorder.none, // no visible border
                             ),
@@ -179,7 +199,8 @@ class BsTaskEntry extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: 120, // fixed width avoids unbounded width
+                            width: 120,
+                            // fixed width avoids unbounded width
                             child: DropdownType(
                               selected: provider.selectedDropdownOption ??
                                   DropdownOption(
@@ -188,11 +209,18 @@ class BsTaskEntry extends StatelessWidget {
                                     label: 'TO DO',
                                   ),
                               onTap: () async {
-                                final selected = await DropdownType.showOptionBottomSheet(
+                                final selected =
+                                    await DropdownType.showOptionBottomSheet(
                                   context: context,
                                   options: [
-                                    DropdownOption(id: 1, icon: Icons.circle_outlined, label: 'TO DO'),
-                                    DropdownOption(id: 2, icon: Icons.folder_outlined, label: 'Project'),
+                                    DropdownOption(
+                                        id: 1,
+                                        icon: Icons.circle_outlined,
+                                        label: 'TO DO'),
+                                    DropdownOption(
+                                        id: 2,
+                                        icon: Icons.folder_outlined,
+                                        label: 'Project'),
                                   ],
                                 );
 
@@ -208,23 +236,47 @@ class BsTaskEntry extends StatelessWidget {
                               // priority
                               IconButton(
                                 onPressed: () async {
-                                  final selected = await DropdownType.showOptionBottomSheet(
+                                  final selected =
+                                      await DropdownType.showOptionBottomSheet(
                                     context: context,
                                     options: [
-                                      DropdownOption(id: 1, icon: Icons.flag_outlined, label: 'Urgent', color: Colors.red),
-                                      DropdownOption(id: 2, icon: Icons.flag_outlined, label: 'High', color: Colors.orange.shade200),
-                                      DropdownOption(id: 3, icon: Icons.flag_outlined, label: 'Normal', color: Colors.blue),
-                                      DropdownOption(id: 4, icon: Icons.flag_outlined, label: 'Low'),
+                                      DropdownOption(
+                                          id: 1,
+                                          icon: Icons.flag_outlined,
+                                          label: 'Urgent',
+                                          color: Colors.red),
+                                      DropdownOption(
+                                          id: 2,
+                                          icon: Icons.flag_outlined,
+                                          label: 'High',
+                                          color: Colors.orange.shade200),
+                                      DropdownOption(
+                                          id: 3,
+                                          icon: Icons.flag_outlined,
+                                          label: 'Normal',
+                                          color: Colors.blue),
+                                      DropdownOption(
+                                          id: 4,
+                                          icon: Icons.flag_outlined,
+                                          label: 'Low'),
                                     ],
                                   );
                                   if (selected != null) {
                                     provider.setPriorityDropDownValue(selected);
                                   }
-
                                 },
-                                icon:  Icon(
-                                  provider.selectedPriorityDropdownOption == null ? Icons.flag_outlined : Icons.flag,
-                                  color: provider.selectedPriorityDropdownOption == null ? Colors.black38 : provider.selectedPriorityDropdownOption!.color,
+                                icon: Icon(
+                                  provider.selectedPriorityDropdownOption ==
+                                          null
+                                      ? Icons.flag_outlined
+                                      : Icons.flag,
+                                  color:
+                                      provider.selectedPriorityDropdownOption ==
+                                              null
+                                          ? Colors.black38
+                                          : provider
+                                              .selectedPriorityDropdownOption!
+                                              .color,
                                 ),
                               ),
                               // line
@@ -238,29 +290,43 @@ class BsTaskEntry extends StatelessWidget {
                               const SizedBox(
                                 width: 16,
                               ),
-                              SizedBox(
-                                height: Converts.c40,
-                                child: ElevatedButton(
-                                  //onPressed: () => Navigator.pop(context),
-                                  onPressed: provider.canCreate
-                                      ? () {
-                                          onCreate(provider.taskTextEdit.text);
-                                        }
-                                      : null,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.redAccent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                              provider.uiStateTask == UiState.loading
+                                  ? SizedBox(
+                                      height: Converts.c40,
+                                      width: Converts.c40,
+                                      child: const CircularProgressIndicator(),
+                                    )
+                                  : SizedBox(
+                                      height: Converts.c40,
+                                      child: ElevatedButton(
+                                        //onPressed: () => Navigator.pop(context),
+                                        onPressed: provider.canCreate
+                                            ? () async {
+                                                onCreate(
+                                                    provider.taskTextEdit.text);
+                                                await provider.saveTask();
+                                                if (provider.isSuccessTask &&
+                                                    context.mounted) {
+                                                  provider.resetTaskEntry();
+                                                  Navigator.pop(context);
+                                                }
+                                              }
+                                            : null,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.redAccent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Create',
+                                          style: TextStyle(
+                                              fontSize: Converts.c16 - 2,
+                                              color: Colors.white),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  child: Text(
-                                    'Create',
-                                    style: TextStyle(
-                                        fontSize: Converts.c16 - 2,
-                                        color: Colors.white),
-                                  ),
-                                ),
-                              ),
                             ],
                           ),
                         ],

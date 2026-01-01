@@ -287,8 +287,8 @@ extension NameWithDate on String {
   Widget withDate(
     String date, {
     double fontSize = 14,
-    Color nameColor = Colors.black87,
-    Color dateColor = Colors.black87,
+    Color nameColor = Colors.blueGrey,
+    Color dateColor = Colors.blueGrey,
   }) {
     return RichText(
       text: TextSpan(

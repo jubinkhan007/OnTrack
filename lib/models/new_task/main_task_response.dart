@@ -22,6 +22,7 @@ class MainTaskResponse {
 class MainTask {
   String mainTaskId;
   String mainTaskName;
+  String mainTaskDetail;
   String totalCompletion;
   String date;
   String status;
@@ -30,6 +31,7 @@ class MainTask {
   MainTask({
     required this.mainTaskId,
     required this.mainTaskName,
+    this.mainTaskDetail = "-",
     required this.totalCompletion,
     required this.date,
     required this.status,
@@ -43,6 +45,7 @@ class MainTask {
     return MainTask(
       mainTaskId: json['MAIN_TASK_ID'].toString(),
       mainTaskName: json['MAIN_TASK_NAME'].toString(),
+      mainTaskDetail: json['MAIN_TASK_DETAIL'].toString(),
       totalCompletion: json['TOTAL_COMPLETION'].toString(),
       date: json['ENTRY_DATE'].toString(),
       status: json['STATUS'].toString(),
@@ -54,6 +57,7 @@ class MainTask {
     return {
       'MAIN_TASK_ID': mainTaskId,
       'MAIN_TASK_NAME': mainTaskName,
+      'MAIN_TASK_DETAIL': mainTaskDetail,
       'TOTAL_COMPLETION': totalCompletion,
       'ENTRY_DATE': date,
       'STATUS': status,

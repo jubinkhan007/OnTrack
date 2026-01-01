@@ -16,8 +16,10 @@ import '../../widgets/new_task/dropdown_type.dart';
 class NewTaskDashboardViewmodel extends ChangeNotifier {
   final NewTaskDashboardRepo ntdRepo;
   final String staffId;
+  final String name;
 
-  NewTaskDashboardViewmodel({required this.staffId, required this.ntdRepo}) {
+  NewTaskDashboardViewmodel(
+      {required this.name, required this.staffId, required this.ntdRepo}) {
     getBUStaffs();
     //getTasks();
   }
@@ -155,15 +157,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     clearStaff();
   }
 
-  void reset() {
-    buStaffId = "";
-    selectedBU = compInfoList.first;
-    selectedTab = 0;
-    statusTab = TaskStatusFlag.pending;
-    setStaffName("");
-    clearStaff();
-  }
-
   Future<bool> isEmailUser() async {
     if (staffId.isEmail()) {
       buStaffId = "";
@@ -289,6 +282,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   /// NEW TASK ENTRY \\\
   TextEditingController taskTextEdit = TextEditingController();
+  TextEditingController taskDetailTextEdit = TextEditingController();
   TextEditingController searchTextEdit = TextEditingController();
   String? _selectedDate = DateTime.now().toFormattedString(
     format: "yyyy-MM-dd",
@@ -304,6 +298,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   @override
   void dispose() {
     taskTextEdit.dispose();
+    taskDetailTextEdit.dispose();
     searchTextEdit.dispose();
     super.dispose();
   }
@@ -360,6 +355,18 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   DropdownOption? get selectedPriorityDropdownOption =>
       _selectedPriorityDropdownOption;
 
+
+  void reset() {
+    buStaffId = "";
+    selectedBU = compInfoList.first;
+    selectedTab = 0;
+    statusTab = TaskStatusFlag.pending;
+    _selectedDropdownOption = null;
+    _selectedPriorityDropdownOption = null;
+    setStaffName("");
+    clearStaff();
+  }
+
   void setDropDownValue(DropdownOption option) {
     _selectedDropdownOption = option;
     notifyListeners();
@@ -376,7 +383,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   UiState get uiStateTask => _uiStateTask;
 
   set uiStateTask(UiState newState) {
-    if (_uiState != newState) {
+    if (_uiStateTask != newState) {
       _uiStateTask = newState;
       notifyListeners();
     }
@@ -388,6 +395,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   void resetTaskEntry() {
     taskTextEdit.text = "";
+    taskDetailTextEdit.text = "";
     _canCreate = false;
     _selectedDate = DateTime.now().toFormattedString(
       format: "yyyy-MM-dd",
@@ -404,51 +412,55 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> saveTask(String userId, String assignees) async {
+  Future<void> saveTask() async {
     final text = taskTextEdit.text.trim();
+    String textDetail = taskDetailTextEdit.text.trim();
     if (text.isEmpty) return;
+    if (textDetail.isEmpty) textDetail = "-";
 
-    if (_uiState == UiState.loading) return;
-    _uiState = UiState.loading;
+    if (_uiStateTask == UiState.loading) return;
+    _uiStateTask = UiState.loading;
     _isSuccessTask = false;
     notifyListeners();
     try {
       final response = await ntdRepo.saveTask(
           title: text.replaceAll("%", " percent "),
-          details: text.replaceAll("%", " percent "),
+          details: textDetail.replaceAll("%", " percent "),
           dueDate: _selectedDate ??
               DateTime.now().toFormattedString(
                 format: "yyyy-MM-dd",
               ),
+          isSample: _selectedDropdownOption != null ? _selectedDropdownOption!.id == 1 ? "Y": "N" : "Y",
           priorityId: _selectedPriorityDropdownOption != null
               ? _selectedPriorityDropdownOption!.id.toString()
-              : "401",
-          userId: userId,
-          assignees: assignees);
+              : "1",
+          userId: staffId,
+          assignees: _createAssigneesJSON());
 
       if (response) {
         taskTextEdit.clear();
+        taskDetailTextEdit.clear();
         await getTasks();
       }
 
       _isSuccessTask = response;
-      _uiState = UiState.success;
+      _uiStateTask = UiState.success;
     } catch (error) {
-      _uiState = UiState.error;
+      _uiStateTask = UiState.error;
       _message = error.toString();
     } finally {
       notifyListeners();
     }
   }
 
-  String _createAssigneesJSON(String staffId, String name) {
+  String _createAssigneesJSON() {
     final List<Map<String, dynamic>> assignedTasks = [];
 
     if (_selectedStaffs.isNotEmpty) {
       for (var user in _selectedStaffs) {
         assignedTasks.add({
           "NAME": user.userName,
-          "STAFFID": user.userId.toString(),
+          "STAFFID": user.userHris.toString(),
           "DATETIME": _selectedDate, // make sure this is already formatted
           "COMMENTS": taskTextEdit.text.replaceAll("%", " percent "),
         });
@@ -463,5 +475,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     }
     return assignedTasks.isNotEmpty ? jsonEncode(assignedTasks) : "";
   }
+
 
 }

@@ -416,139 +416,136 @@ class TaskDetailsScreen extends StatelessWidget {
 
           return Scaffold(
             backgroundColor: Colors.white,
-            body: CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  title: Text(
-                    Strings.task_details,
-                    style: TextStyle(fontSize: Converts.c16),
+            body: RefreshIndicator(
+              onRefresh: ()=> provider.getSubTasks(staffId, taskId),
+              child: CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    title: Text(
+                      Strings.task_details,
+                      style: TextStyle(fontSize: Converts.c16),
+                    ),
+                    centerTitle: true,
+                    backgroundColor: Colors.redAccent,
                   ),
-                  centerTitle: true,
-                  backgroundColor: Colors.redAccent,
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          provider.mainTaskResponse!.data.first.mainTaskName,
-                          style: TextStyle(
-                            fontSize: Converts.c16 + 2,
-                            color: Colors.blue,
-                            fontWeight: FontWeight.w400,
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            provider.mainTaskResponse!.data.first.mainTaskName,
+                            style: TextStyle(
+                              fontSize: Converts.c16 + 2,
+                              color: Colors.blue,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                        ),
-                        assignName.withDate(
-                          " • ${provider.mainTaskResponse!.data.first.date}",
-                          fontSize: Converts.c16 - 2,
-                        ),
-                        /*Row(
-                          children: [
-                            //index == 0 // 0 = assign to, 1 = assign by
-                                //? const Text(Strings.assignedTo)
-                                //: const Text(Strings.assignedBy),
-                            Expanded(
-                              child: Text(
-                                " $assignName",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
+                          assignName.withDate(
+                            " • ${provider.mainTaskResponse!.data.first.date}",
+                            fontSize: Converts.c16 - 2,
+                          ),
+                          const SizedBox(height: 4),
+                          provider.mainTaskResponse!.data.first.mainTaskDetail != "null" ? Text(
+                            provider.mainTaskResponse!.data.first.mainTaskDetail,
+                            style: TextStyle(
+                              fontSize: Converts.c16,
+                              color: Colors.black87,
+                              //fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ) : const SizedBox.shrink(),
+                          const SizedBox(height: 8),
+                          /*Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey.shade300,
+                                width: 1.0,
                               ),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            Text(
-                                " • ${provider.mainTaskResponse!.data.first.date}"),
-                          ],
-                        ),*/
-                        const SizedBox(height: 12),
-                        /*Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey.shade300,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    Strings.overAllProgress,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    "${provider.mainTaskResponse!.data.first.totalCompletion}% | ${provider.mainTaskResponse!.data.first.status}",
-                                    style: TextStyle(
-                                      color: TaskStatusFlag
-                                                  .completed.getData.first ==
-                                              provider.mainTaskResponse!.data
-                                                  .first.status
-                                          ? Colors.green
-                                          : Colors.red,
-                                      fontWeight: FontWeight.w700,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      Strings.overAllProgress,
+                                      style:
+                                          TextStyle(fontWeight: FontWeight.bold),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              ProgressBar(
-                                progress: double.tryParse(provider
-                                        .mainTaskResponse!
-                                        .data
-                                        .first
-                                        .totalCompletion) ??
-                                    0,
-                              ),
-                            ],
-                          ),
-                        ),*/
-                      ],
+                                    Text(
+                                      "${provider.mainTaskResponse!.data.first.totalCompletion}% | ${provider.mainTaskResponse!.data.first.status}",
+                                      style: TextStyle(
+                                        color: TaskStatusFlag
+                                                    .completed.getData.first ==
+                                                provider.mainTaskResponse!.data
+                                                    .first.status
+                                            ? Colors.green
+                                            : Colors.red,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                ProgressBar(
+                                  progress: double.tryParse(provider
+                                          .mainTaskResponse!
+                                          .data
+                                          .first
+                                          .totalCompletion) ??
+                                      0,
+                                ),
+                              ],
+                            ),
+                          ),*/
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SectionHeader(
-                  title:
-                      "Sub-tasks (${task.data.first.tasks.where((s) => s.completion == "100").length}/${task.data.first.tasks.length})",
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return SubTaskItem(
-                        subtask: task.data.first.tasks[index],
-                        staffId: staffId,
-                        onUpdate: (id) async {
-                          //_openStatusDialog(context, taskId, provider);
-                          _openStatusDialog(context, id, provider,
-                              task.data.first.tasks[index]);
+                  SectionHeader(
+                    title:
+                        "Sub-tasks (${task.data.first.tasks.where((s) => s.completion == "100").length}/${task.data.first.tasks.length})",
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return SubTaskItem(
+                          subtask: task.data.first.tasks[index],
+                          staffId: staffId,
+                          onUpdate: (id) async {
+                            //_openStatusDialog(context, taskId, provider);
+                            _openStatusDialog(context, id, provider,
+                                task.data.first.tasks[index]);
 
-                          /*await provider.updateTask(taskId, task.data.first.tasks[index].id, "7", "done", staffId, 100, []);
+                            /*await provider.updateTask(taskId, task.data.first.tasks[index].id, "7", "done", staffId, 100, []);
 
-                          if (provider.isUpdated != null) {
-                            if (provider.isUpdated!) {
-                              provider.getSubTasks(staffId, taskId);
+                            if (provider.isUpdated != null) {
+                              if (provider.isUpdated!) {
+                                provider.getSubTasks(staffId, taskId);
+                              } else {
+                                if (context.mounted) {
+                                  showCustomSnackbar(context, provider.message ?? "Something went wring");
+                                }
+                              }
                             } else {
                               if (context.mounted) {
                                 showCustomSnackbar(context, provider.message ?? "Something went wring");
                               }
-                            }
-                          } else {
-                            if (context.mounted) {
-                              showCustomSnackbar(context, provider.message ?? "Something went wring");
-                            }
-                          }*/
-                        },
-                        mainTaskId: task.data.last.mainTaskId,
-                      );
-                    },
-                    childCount: task.data.first.tasks.length,
+                            }*/
+                          },
+                          mainTaskId: task.data.last.mainTaskId,
+                        );
+                      },
+                      childCount: task.data.first.tasks.length,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

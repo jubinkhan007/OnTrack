@@ -115,7 +115,7 @@ class SubTaskItem extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    "Last Note# ${subtask.lastComment}",
+                    subtask.lastComment != "null" ? "Last Note# ${subtask.lastComment}" : "",
                     style: TextStyle(
                         fontSize: Converts.c16 - 4, color: Colors.purpleAccent),
                   ),

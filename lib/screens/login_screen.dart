@@ -277,19 +277,31 @@ class _LoginOperationState extends State<LoginOperation> {
                                   .isTableEmpty(DBConstant.tableStaff);
                               if (context.mounted) {
                                 Navigator.pushNamed(
-                                    context,
-                                    isExist && !isEmpty
-                                        ? NewTaskDashboardScreen.routeName
-                                        : SyncScreen.routeName,
-                                    arguments: loginViewModel
-                                        .userResponse!.users![0].staffId);
+                                  context,
+                                  isExist && !isEmpty
+                                      ? NewTaskDashboardScreen.routeName
+                                      : SyncScreen.routeName,
+                                  //arguments: loginViewModel.userResponse!.users![0].staffId
+                                  arguments: {
+                                    'staffId': loginViewModel
+                                        .userResponse!.users![0].staffId,
+                                    'name': loginViewModel
+                                        .userResponse!.users![0].staffName,
+                                  },
+                                );
                               }
                             } else {
                               if (context.mounted) {
                                 Navigator.pushNamed(
-                                    context, NewTaskDashboardScreen.routeName,
-                                    arguments: loginViewModel
-                                        .userResponse!.users![0].staffId);
+                                  context, NewTaskDashboardScreen.routeName,
+                                  //arguments: loginViewModel.userResponse!.users![0].staffId
+                                  arguments: {
+                                    'staffId': loginViewModel
+                                        .userResponse!.users![0].staffId,
+                                    'name': loginViewModel
+                                        .userResponse!.users![0].staffName,
+                                  },
+                                );
                               }
                             }
                           } else {

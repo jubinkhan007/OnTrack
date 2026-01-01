@@ -28,19 +28,25 @@ import 'notification_screen.dart';
 class NewTaskDashboardScreen extends StatelessWidget {
   static const String routeName = '/new_task_dashboard_screen';
   final String staffId;
+  final String staffName;
 
-  const NewTaskDashboardScreen({super.key, required this.staffId});
+  const NewTaskDashboardScreen(
+      {super.key, required this.staffId, required this.staffName});
 
-  static Widget create(String staffId) {
+  static Widget create(String staffId, String staffName) {
     return ChangeNotifierProvider(
       create: (_) => NewTaskDashboardViewmodel(
         staffId: staffId,
+        name: staffName,
         ntdRepo: NewTaskDashboardRepo(
             dio:
                 ApiService("https://ego.rflgroupbd.com:8077/ords/rpro/kickall/")
                     .provideDio()),
       ),
-      child: NewTaskDashboardScreen(staffId: staffId),
+      child: NewTaskDashboardScreen(
+        staffId: staffId,
+        staffName: staffName,
+      ),
     );
   }
 
@@ -87,170 +93,145 @@ class NewTaskDashboardScreen extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          if (!staffId.isEmail()) {
-            vm.reset();
+    return PopScope(
+      canPop: false, // prevent auto pop
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        final shouldLeave = await _showLogoutDialog(context);
+
+        if (context.mounted && shouldLeave != null) {
+          if (shouldLeave) {
+            Navigator.of(context).pop();
           }
-          Navigator.pushNamed(context, TodoHomeScreen.routeName,
-              arguments: staffId);
-          /*showModalBottomSheet(context: context, builder: (_) =>
-              BsTaskEntry(peoples: [], onCreate: (value){})
-          );*/
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            /*if (!staffId.isEmail()) {
+              vm.reset();
+            }*/
+            /*Navigator.pushNamed(context, TodoHomeScreen.routeName,
+                arguments: staffId);*/
+            /*showModalBottomSheet(context: context, builder: (_) =>
+                BsTaskEntry(peoples: [], onCreate: (value){})
+            );*/
 
-          /*final vm = context.read<NewTaskDashboardViewmodel>();
+            final vm = context.read<NewTaskDashboardViewmodel>();
 
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            // disable tap outside
-            isDismissible: false,
-            // disable swipe down
-            enableDrag: false,
-            builder: (_) {
-              return ChangeNotifierProvider.value(
-                value: vm,
-                child: BsTaskEntry(
-                  onCreate: (value) {},
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              // disable tap outside
+              isDismissible: false,
+              // disable swipe down
+              enableDrag: false,
+              builder: (_) {
+                return ChangeNotifierProvider.value(
+                  value: vm,
+                  child: BsTaskEntry(
+                    onCreate: (value) {},
+                  ),
+                );
+              },
+            );
+          },
+        ),
+        drawer: AppDrawer(
+          isEmailUser: staffId.isEmail(),
+          staffId: staffId,
+          staffName: staffName,
+          onSync: () {
+            Navigator.pushNamed(context, SyncScreen.routeName,
+                arguments: staffId);
+          },
+          onLogout: () {
+            _showLogoutDialog(context);
+          },
+          onAccountDeletion: () {
+            showDeleteAccountDialog(context, vm);
+          },
+          /*onCardScan: () {
+            Navigator.pushNamed(context, CardScanScreen.routeName,
+                arguments: staffId);
+          },*/
+        ),
+        body: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: () => _onRefresh(context),
+            // Trigger refresh on pull-to-refresh
+            child: CustomScrollView(
+              slivers: [
+                // --- App Bar --- \\
+                SliverToBoxAdapter(
+                  child: AppHeader(
+                    onNotificationTap: () {
+                      Navigator.pushNamed(
+                          context, NotificationScreen2.routeName,
+                          arguments: staffId);
+                    },
+                  ),
                 ),
-              );
-            },
-          );*/
-        },
-      ),
-      drawer: AppDrawer(
-        isEmailUser: staffId.isEmail(),
-        staffId: staffId,
-        staffName: "",
-        onSync: () {
-          Navigator.pushNamed(context, SyncScreen.routeName,
-              arguments: staffId);
-        },
-        onLogout: () {
-          _showLogoutDialog(context);
-        },
-        onAccountDeletion: () {
-          showDeleteAccountDialog(context, vm);
-        },
-        /*onCardScan: () {
-          Navigator.pushNamed(context, CardScanScreen.routeName,
-              arguments: staffId);
-        },*/
-      ),
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () => _onRefresh(context),
-          // Trigger refresh on pull-to-refresh
-          child: CustomScrollView(
-            slivers: [
-              // --- App Bar --- \\
-              SliverToBoxAdapter(
-                child: AppHeader(
-                  onNotificationTap: () {
-                    Navigator.pushNamed(context, NotificationScreen2.routeName,
-                        arguments: staffId);
-                  },
+                // --- Tab Selector# Created By Me | Assigned To me -- \\
+                SliverToBoxAdapter(
+                  child: SizedBox(height: Converts.c12),
                 ),
-              ),
-              // --- Tab Selector# Created By Me | Assigned To me -- \\
-              SliverToBoxAdapter(
-                child: SizedBox(height: Converts.c12),
-              ),
-              SliverToBoxAdapter(
-                child: staffId.isEmail()
-                    ? const SizedBox.shrink()
-                    : TabSelector(
-                        createdSelected: vm.selectedTab == 0,
-                        onCreatedTap: () => vm.changeTab(0),
-                        onAssignedTap: () => vm.changeTab(1),
-                      ),
-              ),
-              // --- Filter Section --- \\
-              SliverToBoxAdapter(
-                child: staffId.isEmail()
-                    ? const SizedBox.shrink()
-                    : FilterSection(
-                        selectedBU: vm.selectedBU,
-                        buOptions: vm.compInfoList,
-                        staffController: vm.staffController,
-                        onBUChanged: (value) => vm.changeBU(value),
-                        onClean: () {
-                          vm.setStaffName("");
-                          vm.clearStaff();
-                          vm.changeStaff("");
-                        },
-                        onStaffTap: () async {
-                          await _showStaffSearchDialog(context, vm);
-                        },
-                      ),
-              ),
-              // --- Count Card View --- \\
-              SliverToBoxAdapter(
-                child: StatusCards(
-                  pending: vm.pending,
-                  overdue: vm.overdue,
-                  completed: vm.completed,
-                  onFinalTap: (tsf) {
-                    vm.changeStatus(tsf);
-                  },
+                SliverToBoxAdapter(
+                  child: staffId.isEmail()
+                      ? const SizedBox.shrink()
+                      : TabSelector(
+                          createdSelected: vm.selectedTab == 0,
+                          onCreatedTap: () => vm.changeTab(0),
+                          onAssignedTap: () => vm.changeTab(1),
+                        ),
                 ),
-              ),
-              // --- Tab Menu --- \\
-              SliverToBoxAdapter(
-                child: SizedBox(height: Converts.c12),
-              ),
-              SliverToBoxAdapter(
-                child: _tabMenu(vm),
-              ),
-              // --- Task List --- \\
-              vm.tasks.isNotEmpty
-                  ? /*SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final task = vm.tasks[index];
-                          return TaskItem(
-                            task: task,
-                            staffId: staffId,
-                            completionText:
-                                "${task.completion}% | ${task.status}",
-                            completionColor: task.status ==
-                                    TaskStatusFlag.completed.getData.first
-                                ? Colors.green
-                                : Colors.red,
-                          );
-                        },
-                        childCount: vm.tasks.length,
-                      ),
-                    )*/
-                  SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final task = vm.tasks[index];
-
-                          return Dismissible(
-                            key: ValueKey(task.id),
-                            direction: DismissDirection.startToEnd,
-                            // right swipe
-                            confirmDismiss: (direction) async {
-                              // only open the dialog if status 'Created By Me'
-                              if (vm.selectedTab == 0) {
-                                _showDeleteDialog(context, task, vm);
-                                return false; // don’t dismiss the item
-                              } else {
-                                return false; // do nothing
-                              }
-                            },
-                            background: Container(
-                              color: Colors.redAccent,
-                              padding: const EdgeInsets.only(left: 20),
-                              alignment: Alignment.centerLeft,
-                              child: const Icon(Icons.delete_forever,
-                                  color: Colors.white),
-                            ),
-                            child: TaskItem(
+                // --- Filter Section --- \\
+                SliverToBoxAdapter(
+                  child: staffId.isEmail()
+                      ? const SizedBox.shrink()
+                      : FilterSection(
+                          selectedBU: vm.selectedBU,
+                          buOptions: vm.compInfoList,
+                          staffController: vm.staffController,
+                          onBUChanged: (value) => vm.changeBU(value),
+                          onClean: () {
+                            vm.setStaffName("");
+                            vm.clearStaff();
+                            vm.changeStaff("");
+                          },
+                          onStaffTap: () async {
+                            await _showStaffSearchDialog(context, vm);
+                          },
+                        ),
+                ),
+                // --- Count Card View --- \\
+                SliverToBoxAdapter(
+                  child: StatusCards(
+                    pending: vm.pending,
+                    overdue: vm.overdue,
+                    completed: vm.completed,
+                    onFinalTap: (tsf) {
+                      vm.changeStatus(tsf);
+                    },
+                  ),
+                ),
+                // --- Tab Menu --- \\
+                SliverToBoxAdapter(
+                  child: SizedBox(height: Converts.c12),
+                ),
+                SliverToBoxAdapter(
+                  child: _tabMenu(vm),
+                ),
+                // --- Task List --- \\
+                vm.tasks.isNotEmpty
+                    ? /*SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final task = vm.tasks[index];
+                            return TaskItem(
                               task: task,
                               staffId: staffId,
                               completionText:
@@ -259,24 +240,64 @@ class NewTaskDashboardScreen extends StatelessWidget {
                                       TaskStatusFlag.completed.getData.first
                                   ? Colors.green
                                   : Colors.red,
-                              onCommentTap: () {},
+                            );
+                          },
+                          childCount: vm.tasks.length,
+                        ),
+                      )*/
+                    SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final task = vm.tasks[index];
+
+                            return Dismissible(
+                              key: ValueKey(task.id),
+                              direction: DismissDirection.startToEnd,
+                              // right swipe
+                              confirmDismiss: (direction) async {
+                                // only open the dialog if status 'Created By Me'
+                                if (vm.selectedTab == 0) {
+                                  _showDeleteDialog(context, task, vm);
+                                  return false; // don’t dismiss the item
+                                } else {
+                                  return false; // do nothing
+                                }
+                              },
+                              background: Container(
+                                color: Colors.redAccent,
+                                padding: const EdgeInsets.only(left: 20),
+                                alignment: Alignment.centerLeft,
+                                child: const Icon(Icons.delete_forever,
+                                    color: Colors.white),
+                              ),
+                              child: TaskItem(
+                                task: task,
+                                staffId: staffId,
+                                completionText:
+                                    "${task.completion}% | ${task.status}",
+                                completionColor: task.status ==
+                                        TaskStatusFlag.completed.getData.first
+                                    ? Colors.green
+                                    : Colors.red,
+                                onCommentTap: () {},
+                              ),
+                            );
+                          },
+                          childCount: vm.tasks.length,
+                        ),
+                      )
+                    : SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: Center(
+                            child: ErrorContainer(
+                              message: vm.message ?? "Something went wrong!",
                             ),
-                          );
-                        },
-                        childCount: vm.tasks.length,
-                      ),
-                    )
-                  : SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        child: Center(
-                          child: ErrorContainer(
-                            message: vm.message ?? "Something went wrong!",
                           ),
                         ),
                       ),
-                    ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -315,7 +336,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _showLogoutDialog(BuildContext context) async {
+  Future<bool?> _showLogoutDialog(BuildContext context) async {
     bool? logoutConfirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -348,6 +369,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
         );
       },
     );
+    return logoutConfirmed;
   }
 
   Future<void> _showStaffSearchDialog(
