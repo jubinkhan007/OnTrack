@@ -9,13 +9,13 @@ import '../../viewmodel/new_task/sync_viewmodel.dart';
 import 'new_task_dashboard_screen.dart';
 
 class SyncScreen extends StatelessWidget {
-  final String staffId;
+  final String staffId, staffName;
 
-  const SyncScreen({super.key, required this.staffId});
+  const SyncScreen({super.key, required this.staffId, required this.staffName});
 
   static const String routeName = '/sync_screen';
 
-  static Widget create(String staffId) {
+  static Widget create(String staffId, String staffName) {
     return ChangeNotifierProvider(
       create: (_) => SyncViewmodel(
         staffId: staffId,
@@ -25,7 +25,7 @@ class SyncScreen extends StatelessWidget {
                     .provideDio()),
       ),
       child: SyncScreen(
-        staffId: staffId,
+        staffId: staffId, staffName: staffName,
       ),
     );
   }
@@ -76,7 +76,10 @@ class SyncScreen extends StatelessWidget {
                         NewTaskDashboardScreen.routeName,
                         (Route<dynamic> route) =>
                             false,
-                        arguments: staffId,
+                        arguments: {
+                          'staffId': staffId,
+                          'name': staffName, // if needed
+                        },
                       );
                     },
                   )

@@ -27,7 +27,7 @@ class DropdownType extends StatelessWidget {
                 selected.icon,
                 size: Converts.c16,
                 color: Colors.grey.shade500,
-                fontWeight: FontWeight.bold,
+                //fontWeight: FontWeight.bold,
               ),
               const SizedBox(width: 8),
               Text(

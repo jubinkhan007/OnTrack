@@ -145,8 +145,10 @@ class NewTaskDashboardScreen extends StatelessWidget {
           staffId: staffId,
           staffName: staffName,
           onSync: () {
-            Navigator.pushNamed(context, SyncScreen.routeName,
-                arguments: staffId);
+            Navigator.pushNamed(context, SyncScreen.routeName, arguments: {
+              'staffId': staffId,
+              'name': staffName, // if needed
+            });
           },
           onLogout: () {
             _showLogoutDialog(context);
