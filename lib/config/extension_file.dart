@@ -240,7 +240,7 @@ extension TaskStatusFlagExtension on TaskStatusFlag {
   Pair<String, String> get getData {
     switch (this) {
       case TaskStatusFlag.pending:
-        return Pair("Pending", "2");
+        return Pair("In Queue", "2");
       case TaskStatusFlag.overdue:
         return Pair("Overdue", "4");
       case TaskStatusFlag.completed:

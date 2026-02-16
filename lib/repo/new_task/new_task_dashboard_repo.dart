@@ -37,7 +37,7 @@ class NewTaskDashboardRepo {
     } on DioException catch (error) {
       debugPrint('Dio Exception: ${error.message}');
       debugPrint('Response Data: ${error.response?.data}');
-      throw Exception('Error occurred while fetching tasks: ${error.message}');
+      rethrow;
     } catch (e) {
       debugPrint('General error: $e');
       throw Exception('Unknown error occurred: $e');
@@ -101,6 +101,7 @@ class NewTaskDashboardRepo {
       required String title,
       required String details,
       required String dueDate,
+      String? startDate,
       required String priorityId,
       required String userId,
       required String assignees}) async {
@@ -114,6 +115,7 @@ class NewTaskDashboardRepo {
         "inqrdesc": details,
         "salmpleflag": isSample,
         "needdate": dueDate,
+        "startdate": startDate ?? dueDate,
         "userid": userId,
         "custname": customerName,
         "priorityid": priorityId,
@@ -128,7 +130,7 @@ class NewTaskDashboardRepo {
       return response.data['status'] == "200";
     } on DioException catch (error) {
       debugPrint("RESPONSE_ERROR#$error");
-      throw Exception(error);
+      rethrow;
     }
   }
 }

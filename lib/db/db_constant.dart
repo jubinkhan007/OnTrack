@@ -1,4 +1,3 @@
-
 class DBConstant {
   static const String idType = "INTEGER PRIMARY KEY AUTOINCREMENT";
   static const String textType = "TEXT NOT NULL";
@@ -24,6 +23,31 @@ class DBConstant {
   static const String id = "ID";
   static const String buName = "BU_NAME";
 
+  static const String tablePendingTaskQueue = "pending_task_queue";
+  static const String queueId = "ID";
+  static const String queueCompanyId = "COMPANY_ID";
+  static const String queueInquiryId = "INQUIRY_ID";
+  static const String queueCustomerId = "CUSTOMER_ID";
+  static const String queueCustomerName = "CUSTOMER_NAME";
+  static const String queueIsSample = "IS_SAMPLE";
+  static const String queueTitle = "TITLE";
+  static const String queueDetails = "DETAILS";
+  static const String queueDueDate = "DUE_DATE";
+  static const String queueStartDate = "START_DATE";
+  static const String queuePriorityId = "PRIORITY_ID";
+  static const String queueUserId = "USER_ID";
+  static const String queueAssignees = "ASSIGNEES";
+  static const String queueCreatedAt = "CREATED_AT";
+  static const String queueRetryCount = "RETRY_COUNT";
 
-
+  static const String tablePendingTaskUpdateQueue = "pending_task_update_queue";
+  static const String updateQueueId = "ID";
+  static const String updateQueueInquiryId = "INQUIRY_ID";
+  static const String updateQueueTaskId = "TASK_ID";
+  static const String updateQueuePriorityId = "PRIORITY_ID";
+  static const String updateQueueDescription = "DESCRIPTION";
+  static const String updateQueueUserId = "USER_ID";
+  static const String updateQueuePercentage = "PERCENTAGE";
+  static const String updateQueueCreatedAt = "CREATED_AT";
+  static const String updateQueueRetryCount = "RETRY_COUNT";
 }

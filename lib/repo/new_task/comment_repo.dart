@@ -37,9 +37,7 @@ class CommentRepo {
       return []; // no comments
     } on DioException catch (error) {
       debugPrint("Error fetching comments: ${error.message}");
-      throw Exception(
-        "Failed to fetch comments: ${error.response?.statusMessage}",
-      );
+      rethrow;
     }
   }
 
@@ -67,8 +65,8 @@ class CommentRepo {
       );
       debugPrint("RESPONSE#${response.data}");
       return response.data['status'] == "200";
-    } on DioException catch (error) {
-      throw Exception(error);
+    } on DioException {
+      rethrow;
     }
   }
 }

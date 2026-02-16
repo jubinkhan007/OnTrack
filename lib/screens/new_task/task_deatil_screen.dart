@@ -320,25 +320,39 @@ class TaskDetailsScreen extends StatelessWidget {
                     // use the data (status + note)
                     debugPrint("Status Code: $selectedStatus");
                     debugPrint("Note: ${noteController.text}");
+
+                    final rawPct = selectedStatus == 7
+                        ? "100"
+                        : currentDiscreteSliderValue != null
+                            ? currentDiscreteSliderValue.toString()
+                            : "0";
+                    final pctInt = double.tryParse(rawPct)?.round() ?? 0;
+                    // If user sets 100%, force "Completed" status so it won't stay in "In Queue".
+                    final effectiveStatus = pctInt >= 100 ? 7 : (selectedStatus ?? 3);
                     await provider.updateTask(
                         taskId,
                         id,
-                        selectedStatus.toString(),
+                        effectiveStatus.toString(),
                         noteController.text
                             .toString()
                             .replaceAll("%", " percent"),
                         staffId,
                         //selectedStatus == 7 ? 100 : 0,
-                        selectedStatus == 7
-                            ? "100"
-                            : currentDiscreteSliderValue != null
-                                ? currentDiscreteSliderValue.toString()
-                                : "0",
+                        pctInt >= 100 ? "100" : rawPct,
                         []);
 
                     if (provider.isUpdated != null) {
                       if (provider.isUpdated!) {
-                        provider.getSubTasks(staffId, taskId);
+                        if (provider.isOfflineUpdateSaved) {
+                          if (context.mounted) {
+                            showCustomSnackbar(
+                              context,
+                              "Task update saved offline. It will sync automatically when internet is available.",
+                            );
+                          }
+                        } else {
+                          provider.getSubTasks(staffId, taskId);
+                        }
                       } else {
                         if (context.mounted) {
                           showCustomSnackbar(context,
@@ -539,6 +553,7 @@ class TaskDetailsScreen extends StatelessWidget {
                             }*/
                           },
                           mainTaskId: task.data.last.mainTaskId,
+                          onReturn: () => provider.getSubTasks(staffId, taskId),
                         );
                       },
                       childCount: task.data.first.tasks.length,

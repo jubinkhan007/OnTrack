@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tmbi/config/extension_file.dart';
+import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/network/ui_state.dart';
 import 'package:tmbi/repo/new_task/sync_repo.dart';
 
@@ -9,13 +11,13 @@ import '../../viewmodel/new_task/sync_viewmodel.dart';
 import 'new_task_dashboard_screen.dart';
 
 class SyncScreen extends StatelessWidget {
-  final String staffId, staffName;
+  final String staffId;
 
-  const SyncScreen({super.key, required this.staffId, required this.staffName});
+  const SyncScreen({super.key, required this.staffId});
 
   static const String routeName = '/sync_screen';
 
-  static Widget create(String staffId, String staffName) {
+  static Widget create(String staffId) {
     return ChangeNotifierProvider(
       create: (_) => SyncViewmodel(
         staffId: staffId,
@@ -25,7 +27,7 @@ class SyncScreen extends StatelessWidget {
                     .provideDio()),
       ),
       child: SyncScreen(
-        staffId: staffId, staffName: staffName,
+        staffId: staffId,
       ),
     );
   }
@@ -71,16 +73,18 @@ class SyncScreen extends StatelessWidget {
             : vm.uiState == UiState.success
                 ? //const Text("Sync Complete!")
                 AllSetWidget(
-                    onStart: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        NewTaskDashboardScreen.routeName,
-                        (Route<dynamic> route) =>
-                            false,
-                        arguments: {
-                          'staffId': staffId,
-                          'name': staffName, // if needed
-                        },
-                      );
+                    onStart: () async {
+                      final staffName = await SPHelper().getUserInfo(isName: true);
+                      if (context.mounted) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          NewTaskDashboardScreen.routeName,
+                          (Route<dynamic> route) => false,
+                          arguments: {
+                            'staffId': staffId,
+                            'name': staffName,
+                          },
+                        );
+                      }
                     },
                   )
                 : vm.uiState == UiState.error

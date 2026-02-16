@@ -6,7 +6,7 @@ import '../models/models.dart';
 class HomeFlagItem {
   List<HomeFlag> homeFlagItems = [
     //HomeFlag(status: StatusFlag.delayed, title: "Delayed", isSelected: false),
-    HomeFlag(status: StatusFlag.pending, title: "Pending", isSelected: true),
+    HomeFlag(status: StatusFlag.pending, title: "In Queue", isSelected: true),
     //HomeFlag(status: StatusFlag.upcoming, title: "Upcoming", isSelected: false),
     HomeFlag(status: StatusFlag.completed, title: "Completed", isSelected: false),
   ];

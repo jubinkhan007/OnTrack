@@ -1,6 +1,5 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../models/new_task/bu_response.dart';
 import 'db_constant.dart';
 
 class LocalDB {
@@ -22,13 +21,19 @@ class LocalDB {
     final path = '$defaultPath/trackAll.db';
     return await openDatabase(
       path,
-      version: 2,
+      version: 4,
       onCreate: _createDB,
+      onUpgrade: _onUpgrade,
     );
   }
 
   Future<void> _createDB(Database db, int version) async {
-    // staff
+    await _createStaffTable(db);
+    await _createPendingTaskQueueTable(db);
+    await _createPendingTaskUpdateQueueTable(db);
+  }
+
+  Future<void> _createStaffTable(Database db) async {
     await db.execute('''
         CREATE TABLE ${DBConstant.tableStaff}(
           ID INTEGER PRIMARY KEY,
@@ -41,6 +46,53 @@ class LocalDB {
           ${DBConstant.displayName} ${DBConstant.textTypeWithNull}
         )
       ''');
+  }
+
+  Future<void> _createPendingTaskQueueTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE ${DBConstant.tablePendingTaskQueue}(
+        ${DBConstant.queueId} ${DBConstant.idType},
+        ${DBConstant.queueCompanyId} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueInquiryId} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueCustomerId} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueCustomerName} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueIsSample} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueTitle} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueDetails} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueDueDate} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueStartDate} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queuePriorityId} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueUserId} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueAssignees} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueCreatedAt} ${DBConstant.textTypeWithNull},
+        ${DBConstant.queueRetryCount} INTEGER DEFAULT 0
+      )
+    ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 3) {
+      await _createPendingTaskQueueTable(db);
+    }
+    if (oldVersion < 4) {
+      await _createPendingTaskUpdateQueueTable(db);
+    }
+  }
+
+  Future<void> _createPendingTaskUpdateQueueTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE ${DBConstant.tablePendingTaskUpdateQueue}(
+        ${DBConstant.updateQueueId} ${DBConstant.idType},
+        ${DBConstant.updateQueueInquiryId} ${DBConstant.textTypeWithNull},
+        ${DBConstant.updateQueueTaskId} ${DBConstant.textTypeWithNull},
+        ${DBConstant.updateQueuePriorityId} ${DBConstant.textTypeWithNull},
+        ${DBConstant.updateQueueDescription} ${DBConstant.textTypeWithNull},
+        ${DBConstant.updateQueueUserId} ${DBConstant.textTypeWithNull},
+        ${DBConstant.updateQueuePercentage} ${DBConstant.textTypeWithNull},
+        ${DBConstant.updateQueueCreatedAt} ${DBConstant.textTypeWithNull},
+        ${DBConstant.updateQueueRetryCount} INTEGER DEFAULT 0
+      )
+    ''');
   }
 
   Future<void> close() async {

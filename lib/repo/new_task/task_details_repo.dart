@@ -25,8 +25,8 @@ class TaskDetailsRepo {
       debugPrint("RESPONSE#${response.data}");
       final parsed = MainTaskResponse.fromJson(response.data);
       return parsed;
-    } on DioException catch (error) {
-      throw Exception(error);
+    } on DioException {
+      rethrow;
     }
   }
 
@@ -55,8 +55,8 @@ class TaskDetailsRepo {
       );
       debugPrint("RESPONSE#${response.data}");
       return response.data['status'] == "200";
-    } on DioException catch (error) {
-      throw Exception(error);
+    } on DioException {
+      rethrow;
     }
   }
 

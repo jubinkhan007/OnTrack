@@ -48,8 +48,10 @@ class BsTaskEntry extends StatelessWidget {
                             controller: provider.taskTextEdit,
                             keyboardType: TextInputType.multiline,
                             decoration: InputDecoration(
-                              hintText: 'Untitled Task',
-                              hintStyle: TextStyle(color: Colors.black54, fontSize: Converts.c20),
+                              hintText: 'Tap to add a title*',
+                              hintStyle: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: Converts.c20),
                               border: InputBorder.none, // no visible border
                             ),
                             style: TextStyle(
@@ -141,7 +143,7 @@ class BsTaskEntry extends StatelessWidget {
                       ),
                     ),
 
-                    // set dates
+                    // set start date
                     ListTile(
                       leading: Icon(
                         Icons.calendar_today_outlined,
@@ -153,16 +155,16 @@ class BsTaskEntry extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Set date',
+                            'Start date',
                             style: TextStyle(
                               color: Colors.grey.shade700,
                               fontSize: Converts.c16 - 2,
                             ),
                           ),
-                          provider.selectedDate == null
+                          provider.selectedStartDate == null
                               ? const SizedBox.shrink()
                               : Text(
-                                  provider.selectedDate!,
+                                  provider.selectedStartDate!,
                                   style: TextStyle(
                                       color: Colors.black87,
                                       fontSize: Converts.c16 - 2,
@@ -170,17 +172,47 @@ class BsTaskEntry extends StatelessWidget {
                                 )
                         ],
                       ),
-                      onTap: () async {
-                        final DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2101),
-                        );
-                        if (pickedDate != null) {
-                          provider.setDate(pickedDate);
-                        }
-                      },
+                      onTap: () => _pickStartDate(context, provider),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 38.0),
+                      child: Container(
+                        height: 1,
+                        color: Colors.grey.shade300,
+                      ),
+                    ),
+
+                    // set end date
+                    ListTile(
+                      leading: Icon(
+                        Icons.event_available_outlined,
+                        color: Colors.grey.shade600,
+                        size: Converts.c16,
+                      ),
+                      title: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'End date',
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
+                              fontSize: Converts.c16 - 2,
+                            ),
+                          ),
+                          provider.selectedEndDate == null
+                              ? const SizedBox.shrink()
+                              : Text(
+                                  provider.selectedEndDate!,
+                                  style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: Converts.c16 - 2,
+                                      fontWeight: FontWeight.w500),
+                                )
+                        ],
+                      ),
+                      onTap: () => _pickEndDate(context, provider),
                     ),
 
                     Padding(
@@ -302,13 +334,33 @@ class BsTaskEntry extends StatelessWidget {
                                         //onPressed: () => Navigator.pop(context),
                                         onPressed: provider.canCreate
                                             ? () async {
+                                                final rootContext = context;
                                                 onCreate(
                                                     provider.taskTextEdit.text);
                                                 await provider.saveTask();
                                                 if (provider.isSuccessTask &&
-                                                    context.mounted) {
+                                                    rootContext.mounted) {
+                                                  final wasOfflineSave =
+                                                      provider
+                                                          .isOfflineTaskSaved;
+                                                  await provider
+                                                      .showCreatedInQueue();
                                                   provider.resetTaskEntry();
-                                                  Navigator.pop(context);
+                                                  if (!rootContext.mounted) {
+                                                    return;
+                                                  }
+                                                  Navigator.pop(rootContext);
+                                                  ScaffoldMessenger.of(
+                                                          rootContext)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        wasOfflineSave
+                                                            ? "Task saved offline. It will sync automatically when internet returns."
+                                                            : "Task created successfully.",
+                                                      ),
+                                                    ),
+                                                  );
                                                 }
                                               }
                                             : null,
@@ -367,5 +419,41 @@ class BsTaskEntry extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _pickStartDate(
+      BuildContext context, NewTaskDashboardViewmodel provider) async {
+    provider.ensureDateRangeDefaults();
+    final DateTime initialDate = provider.startDateTime;
+    final DateTime firstDate = provider.todayDate;
+    final DateTime lastDate = DateTime(2101);
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    );
+    if (pickedDate != null) {
+      provider.setStartDate(pickedDate);
+    }
+  }
+
+  Future<void> _pickEndDate(
+      BuildContext context, NewTaskDashboardViewmodel provider) async {
+    provider.ensureDateRangeDefaults();
+    final DateTime initialDate = provider.endDateTime;
+    final DateTime firstDate = provider.minEndDate;
+    final DateTime lastDate = DateTime(2101);
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    );
+    if (pickedDate != null) {
+      provider.setEndDate(pickedDate);
+    }
   }
 }

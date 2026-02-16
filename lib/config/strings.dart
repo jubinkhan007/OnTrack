@@ -23,12 +23,12 @@ class Strings {
   static const String login_using_your_hris = 'Log in to continue managing your tasks.';
   static const String login = 'Login';
   static const String summary = 'Summary';
-  static const String pending_inquiry = 'Pending';
+  static const String pending_inquiry = 'In Queue';
   static const String delayed_inquiry = 'Delayed';
   static const String completed_inquiry = 'Completed';
   static const String inquiry = 'Inquiry';
   static const String inquiry_view = 'Task View';
-  static const String pending = 'Pending';
+  static const String pending = 'In Queue';
   //static const String attachment = 'Attachment';
   static const String attachment = 'Images';
   static const String change = 'change';

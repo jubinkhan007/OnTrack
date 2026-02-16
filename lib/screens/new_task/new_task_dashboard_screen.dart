@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
@@ -94,17 +95,11 @@ class NewTaskDashboardScreen extends StatelessWidget {
     }
 
     return PopScope(
-      canPop: false, // prevent auto pop
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-
-        final shouldLeave = await _showLogoutDialog(context);
-
-        if (context.mounted && shouldLeave != null) {
-          if (shouldLeave) {
-            Navigator.of(context).pop();
-          }
-        }
+        // Minimize the app instead of logging out
+        SystemNavigator.pop();
       },
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -252,37 +247,20 @@ class NewTaskDashboardScreen extends StatelessWidget {
                           (context, index) {
                             final task = vm.tasks[index];
 
-                            return Dismissible(
-                              key: ValueKey(task.id),
-                              direction: DismissDirection.startToEnd,
-                              // right swipe
-                              confirmDismiss: (direction) async {
-                                // only open the dialog if status 'Created By Me'
-                                if (vm.selectedTab == 0) {
-                                  _showDeleteDialog(context, task, vm);
-                                  return false; // don’t dismiss the item
-                                } else {
-                                  return false; // do nothing
-                                }
-                              },
-                              background: Container(
-                                color: Colors.redAccent,
-                                padding: const EdgeInsets.only(left: 20),
-                                alignment: Alignment.centerLeft,
-                                child: const Icon(Icons.delete_forever,
-                                    color: Colors.white),
-                              ),
-                              child: TaskItem(
-                                task: task,
-                                staffId: staffId,
-                                completionText:
-                                    "${task.completion}% | ${task.status}",
-                                completionColor: task.status ==
-                                        TaskStatusFlag.completed.getData.first
-                                    ? Colors.green
-                                    : Colors.red,
-                                onCommentTap: () {},
-                              ),
+                            return TaskItem(
+                              task: task,
+                              staffId: staffId,
+                              completionText:
+                                  "${task.completion}% | ${task.status}",
+                              completionColor: task.status ==
+                                      TaskStatusFlag.completed.getData.first
+                                  ? Colors.green
+                                  : Colors.red,
+                              onCommentTap: () {},
+                              onReturn: () => vm.getTasks(),
+                              onLongPress: vm.selectedTab == 0
+                                  ? () => _showDeleteDialog(context, task, vm)
+                                  : null,
                             );
                           },
                           childCount: vm.tasks.length,

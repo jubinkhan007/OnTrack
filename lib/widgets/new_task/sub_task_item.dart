@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/size_config.dart';
@@ -14,6 +12,7 @@ class SubTaskItem extends StatelessWidget {
   final String mainTaskId;
   final String staffId;
   final void Function(String subtaskId) onUpdate;
+  final VoidCallback? onReturn;
 
   const SubTaskItem({
     super.key,
@@ -21,6 +20,7 @@ class SubTaskItem extends StatelessWidget {
     required this.staffId,
     required this.onUpdate,
     required this.mainTaskId,
+    this.onReturn,
   });
 
   @override
@@ -120,10 +120,9 @@ class SubTaskItem extends StatelessWidget {
                         fontSize: Converts.c16 - 4, color: Colors.purpleAccent),
                   ),
                 ),
-                Platform.isAndroid
-                    ? InkWell(
-                        onTap: () {
-                          Navigator.push(
+                InkWell(
+                        onTap: () async {
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) => CommentsScreen(
@@ -133,9 +132,9 @@ class SubTaskItem extends StatelessWidget {
                               ),
                             ),
                           );
+                          onReturn?.call();
                         },
                         borderRadius: BorderRadius.circular(8),
-                        // optional for rounded ripple
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -157,7 +156,6 @@ class SubTaskItem extends StatelessWidget {
                           ),
                         ),
                       )
-                    : const SizedBox.shrink()
               ],
             ),
             subtask.assignToId == staffId && subtask.completion != "100"

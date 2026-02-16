@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:tmbi/screens/new_task/task_deatil_screen.dart';
 
@@ -15,6 +13,8 @@ class TaskItem extends StatelessWidget {
   final Task task;
   final String staffId;
   final Function() onCommentTap;
+  final VoidCallback? onReturn;
+  final VoidCallback? onLongPress;
 
   const TaskItem(
       {super.key,
@@ -24,25 +24,28 @@ class TaskItem extends StatelessWidget {
       required this.completionColor,
       required this.task,
       required this.staffId,
-      required this.onCommentTap});
+      required this.onCommentTap,
+      this.onReturn,
+      this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        await Navigator.push(
           context,
           MaterialPageRoute(
-            //builder: (_) => TaskDetailsScreen.create(0, task), // show demoTasks[0]
             builder: (_) => TaskDetailsScreen(
               index: 0,
               assignName: task.assignToName,
               taskId: task.id,
               staffId: staffId,
-            ), // show demoTasks[0]
+            ),
           ),
         );
+        onReturn?.call();
       },
+      onLongPress: onLongPress,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         padding: const EdgeInsets.all(8),
@@ -73,43 +76,41 @@ class TaskItem extends StatelessWidget {
                       color: completionColor,
                       fontWeight: FontWeight.bold),
                 ),
-                Platform.isAndroid
-                    ? InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CommentsScreen(
-                                staffId: staffId,
-                                inqId: task.id,
-                              ),
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        // optional for rounded ripple
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.comment,
-                                size: 16,
-                                color: Colors.grey,
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                task.commentCount,
-                                style: TextStyle(
-                                    fontSize: Converts.c16 - 4,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                InkWell(
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CommentsScreen(
+                          staffId: staffId,
+                          inqId: task.id,
                         ),
-                      )
-                    : const SizedBox.shrink()
+                      ),
+                    );
+                    onReturn?.call();
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.comment,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          task.commentCount,
+                          style: TextStyle(
+                              fontSize: Converts.c16 - 4,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ],
