@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
+import 'package:tmbi/config/notification/notification_service.dart';
 import 'package:tmbi/db/dao/pending_task_queue_dao.dart';
 import 'package:tmbi/db/dao/pending_task_update_queue_dao.dart';
 import 'package:tmbi/db/dao/sync_dao.dart';
@@ -49,6 +50,20 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   List<Task> _localPendingTasks = [];
   final Map<String, List<Task>> _completionCompletedByContext = {};
 
+  int get _localPendingNotCompletedCount {
+    if (selectedTab != 0) return 0;
+    return _localPendingTasks
+        .where((t) => t.completion.split('.').first != "100")
+        .length;
+  }
+
+  int get _localCompletedCount {
+    if (selectedTab != 0) return 0;
+    return _localPendingTasks
+        .where((t) => t.completion.split('.').first == "100")
+        .length;
+  }
+
   List<BusinessUnit> _buStaffs = [];
 
   List<Task> get tasks {
@@ -60,7 +75,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       return [...pendingLocal, ..._tasks];
     }
     if (statusTab == TaskStatusFlag.completed) {
-      final derived = _completionCompletedByContext[_filterContextKey] ?? const [];
+      final derived =
+          _completionCompletedByContext[_filterContextKey] ?? const [];
       // Include local tasks that ARE completed.
       final completedLocal = selectedTab == 0
           ? _localPendingTasks
@@ -362,13 +378,13 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       }
     } on DioException catch (error) {
       if (_isOfflineError(error)) {
-      final hasCache = await _loadCachedTaskSnapshot();
-      if (hasCache) {
-        await _applyPendingUpdateQueueToTasks();
-        _reclassifyCompletedByCompletion();
-        await _applyPendingCommentCounts();
-        _syncCountWithTaskList();
-      }
+        final hasCache = await _loadCachedTaskSnapshot();
+        if (hasCache) {
+          await _applyPendingUpdateQueueToTasks();
+          _reclassifyCompletedByCompletion();
+          await _applyPendingCommentCounts();
+          _syncCountWithTaskList();
+        }
         if (!hasCache && _localPendingTasks.isEmpty) {
           _message = "No internet connection. Pull to refresh when online.";
         } else {
@@ -823,7 +839,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
             assignees: item.assignees,
           );
           if (isSaved && item.id != null) {
-            debugPrint("[SYNC] Task '${item.title}' saved to server. Resolving server ID for $localTaskId...");
+            debugPrint(
+                "[SYNC] Task '${item.title}' saved to server. Resolving server ID for $localTaskId...");
             final serverTaskId = await _resolveServerTaskIdForLocalTask(item);
             debugPrint("[SYNC] Resolved server ID: $serverTaskId");
             if (serverTaskId != null && serverTaskId.isNotEmpty) {
@@ -833,7 +850,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
               );
               debugPrint("[SYNC] Remapped $localTaskId → $serverTaskId");
             } else {
-              debugPrint("[SYNC] WARNING: Could not resolve server ID for '${item.title}'");
+              debugPrint(
+                  "[SYNC] WARNING: Could not resolve server ID for '${item.title}'");
             }
             await _pendingTaskQueueDao.deleteById(item.id!);
             didSyncAny = true;
@@ -910,7 +928,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     debugPrint("[SYNC_UPDATES] Found ${pendingUpdates.length} pending updates");
 
     for (final item in pendingUpdates) {
-      debugPrint("[SYNC_UPDATES] Item: inquiryId=${item.inquiryId}, taskId=${item.taskId}, percentage=${item.percentage}");
+      debugPrint(
+          "[SYNC_UPDATES] Item: inquiryId=${item.inquiryId}, taskId=${item.taskId}, percentage=${item.percentage}");
       if (item.inquiryId.startsWith("local_")) {
         debugPrint("[SYNC_UPDATES] Skipping local_ item: ${item.inquiryId}");
         // Wait until the local task is remapped to a real server id.
@@ -1026,7 +1045,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       ..clear()
       ..addAll(remaining);
 
-    final existing = _completionCompletedByContext[_filterContextKey] ?? const [];
+    final existing =
+        _completionCompletedByContext[_filterContextKey] ?? const [];
     final seen = <String>{};
     final merged = <Task>[];
     for (final t in existing) {
@@ -1185,8 +1205,12 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         final decoded = jsonDecode(raw) as Map<String, dynamic>;
         final cachedTasks = decoded["tasks"] as List? ?? [];
         var count = cachedTasks.length;
-        if (status == TaskStatusFlag.pending && selectedTab == 0) {
-          count += _localPendingTasks.length;
+        if (selectedTab == 0) {
+          if (status == TaskStatusFlag.pending) {
+            count += _localPendingNotCompletedCount;
+          } else if (status == TaskStatusFlag.completed) {
+            count += _localCompletedCount;
+          }
         }
         _verifiedCounts[status] = count.toString();
       } catch (_) {
@@ -1244,28 +1268,52 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         }
 
         if (response.data.isNotEmpty) {
-          var fetchedCount = response.data[0].tasks.length;
-          if (status == TaskStatusFlag.pending && selectedTab == 0) {
-            fetchedCount += _localPendingTasks.length;
+          final serverCounts = response.data[0];
+          final tasksLen = serverCounts.tasks.length;
+          final serverCountRaw = status == TaskStatusFlag.pending
+              ? serverCounts.pending
+              : status == TaskStatusFlag.overdue
+                  ? serverCounts.overdue
+                  : serverCounts.completed;
+          final serverCount = int.tryParse(serverCountRaw) ?? tasksLen;
+
+          // Prefer the server count if it indicates more than the returned list.
+          // Some server responses may omit TASKS while still providing counts.
+          var fetchedCount = serverCount > tasksLen ? serverCount : tasksLen;
+          if (selectedTab == 0) {
+            if (status == TaskStatusFlag.pending) {
+              fetchedCount += _localPendingNotCompletedCount;
+            } else if (status == TaskStatusFlag.completed) {
+              fetchedCount += _localCompletedCount;
+            }
           }
           _verifiedCounts[status] = fetchedCount.toString();
           _logCount("fetchOther_set_count", extra: {
             "requestVersion": requestVersion,
             "status": status.name,
-            "serverTaskListLen": response.data[0].tasks.length,
+            "serverCountRaw": serverCountRaw,
+            "serverTaskListLen": tasksLen,
             "storedCount": _verifiedCounts[status],
+            "localPendingNotCompleted": _localPendingNotCompletedCount,
+            "localCompleted": _localCompletedCount,
             "verifiedCounts": _verifiedCounts.toString(),
           });
         } else {
-          if (status == TaskStatusFlag.pending && selectedTab == 0) {
-            _verifiedCounts[status] = _localPendingTasks.length.toString();
-          } else {
-            _verifiedCounts[status] = "0";
+          var emptyCount = 0;
+          if (selectedTab == 0) {
+            if (status == TaskStatusFlag.pending) {
+              emptyCount = _localPendingNotCompletedCount;
+            } else if (status == TaskStatusFlag.completed) {
+              emptyCount = _localCompletedCount;
+            }
           }
+          _verifiedCounts[status] = emptyCount.toString();
           _logCount("fetchOther_set_empty", extra: {
             "requestVersion": requestVersion,
             "status": status.name,
             "storedCount": _verifiedCounts[status],
+            "localPendingNotCompleted": _localPendingNotCompletedCount,
+            "localCompleted": _localCompletedCount,
             "verifiedCounts": _verifiedCounts.toString(),
           });
         }
@@ -1306,8 +1354,9 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       final serverCount = int.tryParse(task.commentCount) ?? 0;
       final cachedMainCount = _countCachedComments(prefs, cacheMainKey);
       final pendingMainCount = _countPendingComments(prefs, mainQueueKey);
-      final localMainCount =
-          cachedMainCount > pendingMainCount ? cachedMainCount : pendingMainCount;
+      final localMainCount = cachedMainCount > pendingMainCount
+          ? cachedMainCount
+          : pendingMainCount;
       final effectiveCount =
           serverCount > localMainCount ? serverCount : localMainCount;
       task.commentCount = effectiveCount.toString();
@@ -1424,10 +1473,12 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       final exact = tasks.where((t) => t.name == localItem.title).toList();
       if (exact.isNotEmpty) {
         exact.sort((a, b) => b.createdDate.compareTo(a.createdDate));
-        debugPrint("[SYNC] Found server task: id=${exact.first.id}, name=${exact.first.name}");
+        debugPrint(
+            "[SYNC] Found server task: id=${exact.first.id}, name=${exact.first.name}");
         return exact.first.id;
       }
-      debugPrint("[SYNC] No name match found for '${localItem.title}' among ${tasks.length} tasks");
+      debugPrint(
+          "[SYNC] No name match found for '${localItem.title}' among ${tasks.length} tasks");
       return null;
     } catch (e) {
       debugPrint("[SYNC] _resolveServerTaskIdForLocalTask error: $e");
@@ -1440,6 +1491,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     required String serverTaskId,
   }) async {
     final prefs = await SharedPreferences.getInstance();
+    final notificationService = NotificationService();
     final localNumericId = localTaskId.replaceFirst("local_", "");
     final localSubTaskId = "local_subtask_$localNumericId";
 
@@ -1471,7 +1523,10 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         // dateTime format differs from local.
         if (key.startsWith("comments_pending_queue_")) {
           await _syncAndClearPendingCommentQueue(
-            prefs, key, serverTaskId, serverSubTaskId,
+            prefs,
+            key,
+            serverTaskId,
+            serverSubTaskId,
           );
           continue;
         }
@@ -1480,6 +1535,51 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
               localSubTaskId,
               serverSubTaskId ?? localSubTaskId,
             );
+
+        // Reminders are scheduled with a payload that contains inquiryId/subTaskId.
+        // When we remap local -> server IDs we must reschedule, otherwise tapping
+        // the reminder tries to open a non-existent local task.
+        if (key.startsWith("task_reminder_")) {
+          await prefs.setString(newKey, raw);
+          await prefs.remove(key);
+
+          try {
+            final decoded = jsonDecode(raw) as Map<String, dynamic>;
+            final remindAtIso = decoded["remindAt"]?.toString();
+            final notifId = decoded["notifId"];
+            final title = (decoded["title"] ?? "Task Reminder").toString();
+            final body = (decoded["body"] ?? "").toString();
+
+            final remindAt =
+                remindAtIso != null ? DateTime.tryParse(remindAtIso) : null;
+            if (notifId is int &&
+                remindAt != null &&
+                remindAt
+                    .isAfter(DateTime.now().add(const Duration(seconds: 5)))) {
+              await notificationService.cancelReminder(notifId);
+              await notificationService.scheduleReminder(
+                id: notifId,
+                scheduledAt: remindAt,
+                title: title,
+                body: body,
+                payload: {
+                  "staffId": staffId,
+                  "taskId": serverTaskId,
+                  "subTaskId": serverSubTaskId ?? localSubTaskId,
+                  "assignName": "You",
+                  "type": "task_reminder",
+                },
+              );
+              debugPrint(
+                "[REMAP] Rescheduled reminder notifId=$notifId at $remindAt for $serverTaskId/${serverSubTaskId ?? localSubTaskId}",
+              );
+            }
+          } catch (e) {
+            debugPrint("[REMAP] Failed to reschedule reminder for $key: $e");
+          }
+          continue;
+        }
+
         await prefs.setString(newKey, raw);
         await prefs.remove(key);
       }
@@ -1516,9 +1616,16 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         if (body.isEmpty) continue;
         try {
           await _taskDetailsSyncRepo.updateTask(
-            serverTaskId, taskId, "0", body, userId, "0", [],
+            serverTaskId,
+            taskId,
+            "0",
+            body,
+            userId,
+            "0",
+            [],
           );
-          debugPrint("[REMAP] Synced pending comment '$body' to $serverTaskId/$taskId");
+          debugPrint(
+              "[REMAP] Synced pending comment '$body' to $serverTaskId/$taskId");
         } catch (e) {
           debugPrint("[REMAP] Failed to sync comment '$body': $e");
         }

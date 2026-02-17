@@ -51,6 +51,9 @@ dependencies:
   firebase_core: ^3.8.1
   firebase_messaging: ^15.1.6
   flutter_local_notifications: ^17.2.1+2
+  timezone: ^0.9.4
+  flutter_native_timezone:
+    path: third_party/flutter_native_timezone
   googleapis_auth: ^1.6.0
   url_launcher: ^6.3.1
   # sqlite

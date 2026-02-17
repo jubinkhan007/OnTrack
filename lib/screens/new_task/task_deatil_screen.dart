@@ -222,6 +222,211 @@ class TaskDetailsScreen extends StatelessWidget {
     );
   }
 
+  DateTime? _tryParseDueDate(String taskDate) {
+    // Task date strings usually look like: "YYYY-MM-DD - YYYY-MM-DD"
+    // or other formats containing ISO dates. Use the last ISO date as due date.
+    final matches = RegExp(r"\d{4}-\d{2}-\d{2}").allMatches(taskDate).toList();
+    if (matches.isEmpty) return null;
+    final iso = matches.last.group(0);
+    if (iso == null || iso.isEmpty) return null;
+    return DateTime.tryParse(iso);
+  }
+
+  Future<void> _openReminderSheet(
+    BuildContext context,
+    TaskDetailsViewmodel provider,
+    String staffId,
+    String inquiryId,
+    SubTask subTask,
+  ) async {
+    final now = DateTime.now();
+    final dueDate = _tryParseDueDate(subTask.date);
+    final dueMorning = dueDate == null
+        ? null
+        : DateTime(dueDate.year, dueDate.month, dueDate.day, 9, 0);
+    final dayBeforeDueMorning =
+        dueMorning == null ? null : dueMorning.subtract(const Duration(days: 1));
+
+    DateTime laterToday = DateTime(now.year, now.month, now.day, 18, 0);
+    if (!laterToday.isAfter(now)) {
+      laterToday = DateTime(now.year, now.month, now.day + 1, 9, 0);
+    }
+
+    final tomorrow9 = DateTime(now.year, now.month, now.day + 1, 9, 0);
+    final nextWeek9 = DateTime(now.year, now.month, now.day + 7, 9, 0);
+
+    await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (dayBeforeDueMorning != null &&
+                  dayBeforeDueMorning.isAfter(now.add(const Duration(seconds: 5))))
+                ListTile(
+                  leading: const Icon(Icons.notifications_none),
+                  title: const Text("1 day before due date"),
+                  subtitle: Text("${dayBeforeDueMorning.toLocal()}".split(".").first),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    final err = await provider.setReminder(
+                      staffId: staffId,
+                      inquiryId: inquiryId,
+                      subTask: subTask,
+                      remindAt: dayBeforeDueMorning,
+                    );
+                    if (context.mounted) {
+                      showCustomSnackbar(
+                        context,
+                        err ?? "Reminder set.",
+                      );
+                    }
+                  },
+                ),
+              if (dueMorning != null &&
+                  dueMorning.isAfter(now.add(const Duration(seconds: 5))))
+                ListTile(
+                  leading: const Icon(Icons.notifications_none),
+                  title: const Text("On due date"),
+                  subtitle: Text("${dueMorning.toLocal()}".split(".").first),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    final err = await provider.setReminder(
+                      staffId: staffId,
+                      inquiryId: inquiryId,
+                      subTask: subTask,
+                      remindAt: dueMorning,
+                    );
+                    if (context.mounted) {
+                      showCustomSnackbar(
+                        context,
+                        err ?? "Reminder set.",
+                      );
+                    }
+                  },
+                ),
+              ListTile(
+                leading: const Icon(Icons.notifications_none),
+                title: const Text("Later today"),
+                subtitle: Text("${laterToday.toLocal()}".split(".").first),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final err = await provider.setReminder(
+                    staffId: staffId,
+                    inquiryId: inquiryId,
+                    subTask: subTask,
+                    remindAt: laterToday,
+                  );
+                  if (context.mounted) {
+                    showCustomSnackbar(
+                      context,
+                      err ?? "Reminder set.",
+                    );
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.notifications_none),
+                title: const Text("Tomorrow morning"),
+                subtitle: const Text("9:00 AM"),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final err = await provider.setReminder(
+                    staffId: staffId,
+                    inquiryId: inquiryId,
+                    subTask: subTask,
+                    remindAt: tomorrow9,
+                  );
+                  if (context.mounted) {
+                    showCustomSnackbar(context, err ?? "Reminder set.");
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.notifications_none),
+                title: const Text("Next week"),
+                subtitle: const Text("9:00 AM"),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final err = await provider.setReminder(
+                    staffId: staffId,
+                    inquiryId: inquiryId,
+                    subTask: subTask,
+                    remindAt: nextWeek9,
+                  );
+                  if (context.mounted) {
+                    showCustomSnackbar(context, err ?? "Reminder set.");
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.edit_calendar_outlined),
+                title: const Text("Pick date & time"),
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: now.add(const Duration(days: 1)),
+                    firstDate: now,
+                    lastDate: DateTime(now.year + 5),
+                  );
+                  if (!context.mounted) return;
+                  if (pickedDate == null) return;
+
+                  final pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: const TimeOfDay(hour: 9, minute: 0),
+                  );
+                  if (!context.mounted) return;
+                  if (pickedTime == null) return;
+
+                  final remindAt = DateTime(
+                    pickedDate.year,
+                    pickedDate.month,
+                    pickedDate.day,
+                    pickedTime.hour,
+                    pickedTime.minute,
+                  );
+
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  final err = await provider.setReminder(
+                    staffId: staffId,
+                    inquiryId: inquiryId,
+                    subTask: subTask,
+                    remindAt: remindAt,
+                  );
+                  if (context.mounted) {
+                    showCustomSnackbar(context, err ?? "Reminder set.");
+                  }
+                },
+              ),
+              if (provider.hasReminder(subTask.id))
+                ListTile(
+                  leading: const Icon(Icons.notifications_off_outlined),
+                  title: const Text("Remove reminder"),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    await provider.clearReminder(
+                      staffId,
+                      inquiryId,
+                      subTask.id,
+                    );
+                    if (context.mounted) {
+                      showCustomSnackbar(context, "Reminder removed.");
+                    }
+                  },
+                ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _openStatusDialog(BuildContext context, String id,
       TaskDetailsViewmodel provider, SubTask subtask) {
     int? selectedStatus = 3; // default = Pending
@@ -528,13 +733,40 @@ class TaskDetailsScreen extends StatelessWidget {
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
+                        final sub = task.data.first.tasks[index];
+                        final isAssignee = sub.assignToId == staffId;
                         return SubTaskItem(
-                          subtask: task.data.first.tasks[index],
+                          subtask: sub,
                           staffId: staffId,
+                          reminderText: isAssignee
+                              ? provider.reminderLabel(sub.id)
+                              : null,
+                          onReminderTap: isAssignee
+                              ? () => _openReminderSheet(
+                                    context,
+                                    provider,
+                                    staffId,
+                                    taskId,
+                                    sub,
+                                  )
+                              : null,
+                          onReminderClear: isAssignee && provider.hasReminder(sub.id)
+                              ? () async {
+                                  await provider.clearReminder(
+                                    staffId,
+                                    taskId,
+                                    sub.id,
+                                  );
+                                  if (context.mounted) {
+                                    showCustomSnackbar(
+                                        context, "Reminder removed.");
+                                  }
+                                }
+                              : null,
                           onUpdate: (id) async {
                             //_openStatusDialog(context, taskId, provider);
                             _openStatusDialog(context, id, provider,
-                                task.data.first.tasks[index]);
+                                sub);
 
                             /*await provider.updateTask(taskId, task.data.first.tasks[index].id, "7", "done", staffId, 100, []);
 

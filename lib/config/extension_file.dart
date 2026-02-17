@@ -13,8 +13,8 @@ import '../widgets/widgets.dart';
 import 'converts.dart';
 
 extension DateTimeFormatter on DateTime {
-  String toFormattedString({isFullYear = false, format = "dd MMM, yy"}) {
-    String fullYearFormat = "dd MMM, yyyy";
+  String toFormattedString({isFullYear = false, format = "dd-MM-yyyy"}) {
+    String fullYearFormat = "dd-MM-yyyy";
     DateFormat dateFormat =
         isFullYear ? DateFormat(fullYearFormat) : DateFormat(format);
     return dateFormat.format(this);
@@ -44,7 +44,7 @@ extension InquiryResponseExtensions on InquiryResponse {
 
 /*extension DateCheckExtension on String {
   bool isOverdue() {
-    final dateFormat = DateFormat("d MMM, yy");
+    final dateFormat = DateFormat("dd-MM-yyyy");
     final DateTime targetDate = dateFormat.parse(this);
     final DateTime currentDate = DateTime.now();
     debugPrint("DATE::$targetDate");
@@ -83,16 +83,16 @@ extension DateCheckExtension on String {
 }*/
 
 extension DateFormatExtension on String {
-  /// Converts "yyyy-MM-dd" to "dd MMM, yy" safely
+  /// Converts "yyyy-MM-dd" to "dd-MM-yyyy" safely
   String toFormattedDate() {
     try {
       // Try parsing as ISO (e.g. "2025-06-12")
       DateTime date = DateTime.parse(this);
-      return DateFormat('dd MMM, yy').format(date);
+      return DateFormat('dd-MM-yyyy').format(date);
     } catch (_) {
       try {
-        // Check if it's already in "dd MMM, yy" format
-        DateFormat('dd MMM, yy').parseStrict(this);
+        // Check if it's already in "dd-MM-yyyy" format
+        DateFormat('dd-MM-yyyy').parseStrict(this);
         return this;
       } catch (_) {
         return 'Invalid date';

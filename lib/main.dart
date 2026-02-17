@@ -3,6 +3,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/extension_file.dart';
+import 'package:tmbi/config/app_navigator.dart';
+import 'package:tmbi/config/notification/notification_service.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/screen_config.dart';
 import 'package:tmbi/config/sp_helper.dart';
@@ -26,6 +28,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Initialize local notifications early so reminder taps are handled even if
+  // the user bypasses the login screen (auto-login path).
+  await NotificationService().initLocalNotification(requestPermissions: false);
 
   runApp(const MyApp());
 }
@@ -90,6 +96,7 @@ class MyApp extends StatelessWidget {
           title: 'Kick Track',
           debugShowCheckedModeBanner: false,
           onGenerateRoute: (settings) => generateRoute(settings),
+          navigatorKey: AppNavigator.key,
           theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: Palette.mainColor),
               useMaterial3: true,

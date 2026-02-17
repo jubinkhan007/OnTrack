@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/extension_file.dart';
-import 'package:tmbi/config/size_config.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/models/new_task/main_task_response.dart';
 
@@ -12,6 +11,9 @@ class SubTaskItem extends StatelessWidget {
   final String mainTaskId;
   final String staffId;
   final void Function(String subtaskId) onUpdate;
+  final String? reminderText;
+  final VoidCallback? onReminderTap;
+  final VoidCallback? onReminderClear;
   final VoidCallback? onReturn;
 
   const SubTaskItem({
@@ -20,6 +22,9 @@ class SubTaskItem extends StatelessWidget {
     required this.staffId,
     required this.onUpdate,
     required this.mainTaskId,
+    this.reminderText,
+    this.onReminderTap,
+    this.onReminderClear,
     this.onReturn,
   });
 
@@ -92,6 +97,57 @@ class SubTaskItem extends StatelessWidget {
             const SizedBox(height: 2),
             subtask.assignToName.withDate(" ${Strings.dot} ${subtask.date}",
                 fontSize: Converts.c12),
+            if (onReminderTap != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: onReminderTap,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 6),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.notifications_none,
+                              size: 16,
+                              color: Colors.blueGrey,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                reminderText == null
+                                    ? "Add reminder"
+                                    : "Remind me at $reminderText",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: Converts.c16 - 4,
+                                  color: Colors.blueGrey,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (reminderText != null && onReminderClear != null)
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 18),
+                      color: Colors.blueGrey,
+                      onPressed: onReminderClear,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                    ),
+                ],
+              ),
+            ],
             /*Row(
               children: [
                 /*Text(

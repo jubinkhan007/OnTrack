@@ -164,7 +164,7 @@ class BsTaskEntry extends StatelessWidget {
                           provider.selectedStartDate == null
                               ? const SizedBox.shrink()
                               : Text(
-                                  provider.selectedStartDate!,
+                                  _formatDisplayDate(provider.selectedStartDate!),
                                   style: TextStyle(
                                       color: Colors.black87,
                                       fontSize: Converts.c16 - 2,
@@ -204,7 +204,7 @@ class BsTaskEntry extends StatelessWidget {
                           provider.selectedEndDate == null
                               ? const SizedBox.shrink()
                               : Text(
-                                  provider.selectedEndDate!,
+                                  _formatDisplayDate(provider.selectedEndDate!),
                                   style: TextStyle(
                                       color: Colors.black87,
                                       fontSize: Converts.c16 - 2,
@@ -454,6 +454,19 @@ class BsTaskEntry extends StatelessWidget {
     );
     if (pickedDate != null) {
       provider.setEndDate(pickedDate);
+    }
+  }
+
+  String _formatDisplayDate(String isoDate) {
+    // Convert from yyyy-MM-dd to dd-MM-yyyy
+    try {
+      final parts = isoDate.split('-');
+      if (parts.length == 3) {
+        return '${parts[2]}-${parts[1]}-${parts[0]}';
+      }
+      return isoDate;
+    } catch (_) {
+      return isoDate;
     }
   }
 }

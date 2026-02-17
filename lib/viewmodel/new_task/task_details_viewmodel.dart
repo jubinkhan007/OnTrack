@@ -3,7 +3,9 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tmbi/config/notification/notification_service.dart';
 import 'package:tmbi/db/dao/pending_task_update_queue_dao.dart';
 import 'package:tmbi/models/new_task/main_task_response.dart';
 import 'package:tmbi/models/new_task/pending_task_update_queue_item.dart';
@@ -16,6 +18,7 @@ class TaskDetailsViewmodel extends ChangeNotifier {
   final TaskDetailsRepo taskDetailsRepo;
   final PendingTaskUpdateQueueDao _pendingTaskUpdateQueueDao =
       PendingTaskUpdateQueueDao();
+  final NotificationService _notificationService = NotificationService();
   bool _disposed = false;
   Timer? _pendingSyncTimer;
 
@@ -50,6 +53,8 @@ class TaskDetailsViewmodel extends ChangeNotifier {
   bool _isOfflineUpdateSaved = false;
 
   bool get isOfflineUpdateSaved => _isOfflineUpdateSaved;
+
+  final Map<String, _TaskReminder> _remindersBySubTaskId = {};
 
   // UI state
   UiState _uiState = UiState.init;
@@ -87,6 +92,7 @@ class TaskDetailsViewmodel extends ChangeNotifier {
       final hasCache = await _loadCachedTaskDetails(staffId, taskId);
       if (hasCache) {
         await _applyQueuedUpdatesToCurrentTask(taskId);
+        await _loadReminders(staffId, taskId);
         _message = null;
         _uiState = UiState.success;
       } else {
@@ -116,6 +122,7 @@ class TaskDetailsViewmodel extends ChangeNotifier {
         await _applyQueuedUpdatesToCurrentTask(taskId);
         _uiState = UiState.success;
         await _cacheTaskDetails(staffId, taskId, _mainTaskResponse!);
+        await _loadReminders(staffId, taskId);
       } else {
         _message = "Something went wrong, please try again.";
         _uiState = UiState.error;
@@ -126,6 +133,7 @@ class TaskDetailsViewmodel extends ChangeNotifier {
         final hasCache = await _loadCachedTaskDetails(staffId, taskId);
         if (hasCache) {
           await _applyQueuedUpdatesToCurrentTask(taskId);
+          await _loadReminders(staffId, taskId);
           _message = null;
           _uiState = UiState.success;
         } else {
@@ -188,21 +196,26 @@ class TaskDetailsViewmodel extends ChangeNotifier {
       await _pendingTaskUpdateQueueDao.enqueue(queuedUpdate);
       _applyLocalSubtaskUpdate(
         taskId,
-        percentage,
+        effectivePercentage,
         note: description,
       );
       await _applyCachedSubtaskUpdate(
         userId,
         inquiryId,
         taskId,
-        percentage,
+        effectivePercentage,
         note: description,
       );
       await _updateDashboardTaskCachesForInquiry(
         userId,
         inquiryId,
-        _calculateMainCompletionFromCurrentDetails(fallback: percentage),
+        _calculateMainCompletionFromCurrentDetails(
+          fallback: effectivePercentage,
+        ),
       );
+      if (pctInt >= 100) {
+        await clearReminder(userId, inquiryId, taskId);
+      }
       _isUpdated = true;
       _isOfflineUpdateSaved = true;
       _uiState = UiState.success;
@@ -217,6 +230,9 @@ class TaskDetailsViewmodel extends ChangeNotifier {
           effectivePercentage,
           fileNames);
       _isUpdated = response;
+      if (response && pctInt >= 100) {
+        await clearReminder(userId, inquiryId, taskId);
+      }
       _uiState = UiState.success;
     } on DioException catch (error) {
       if (_isOfflineError(error)) {
@@ -240,6 +256,9 @@ class TaskDetailsViewmodel extends ChangeNotifier {
             fallback: effectivePercentage,
           ),
         );
+        if (pctInt >= 100) {
+          await clearReminder(userId, inquiryId, taskId);
+        }
         _isUpdated = true;
         _isOfflineUpdateSaved = true;
         _uiState = UiState.success;
@@ -555,4 +574,159 @@ class TaskDetailsViewmodel extends ChangeNotifier {
       }
     }
   }
+
+  String? reminderLabel(String subTaskId) {
+    final reminder = _remindersBySubTaskId[subTaskId];
+    if (reminder == null) return null;
+    try {
+      final dt = reminder.remindAt.toLocal();
+      return DateFormat("h:mm a, EEE, d MMM").format(dt);
+    } catch (_) {
+      return reminder.remindAt.toLocal().toString();
+    }
+  }
+
+  bool hasReminder(String subTaskId) =>
+      _remindersBySubTaskId.containsKey(subTaskId);
+
+  Future<String?> setReminder({
+    required String staffId,
+    required String inquiryId,
+    required SubTask subTask,
+    required DateTime remindAt,
+  }) async {
+    debugPrint(
+      "[REMINDER] setReminder staffId=$staffId inquiryId=$inquiryId subTaskId=${subTask.id} at=${remindAt.toIso8601String()}",
+    );
+    final now = DateTime.now();
+    if (!remindAt.isAfter(now.add(const Duration(seconds: 5)))) {
+      return "Reminder time must be in the future.";
+    }
+
+    final canPost = await _notificationService.canPostNotifications();
+    if (!canPost) {
+      return "Notifications are disabled for this app. Enable notifications in Settings and try again.";
+    }
+
+    final key = _reminderKey(staffId, inquiryId, subTask.id);
+    final prefs = await SharedPreferences.getInstance();
+    final existingRaw = prefs.getString(key);
+    var notifId = _makeNotificationId(staffId, inquiryId, subTask.id);
+
+    if (existingRaw != null && existingRaw.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(existingRaw) as Map<String, dynamic>;
+        final storedId = decoded["notifId"];
+        if (storedId is int) notifId = storedId;
+      } catch (_) {}
+    }
+
+    await _notificationService.cancelReminder(notifId);
+    final title = "Task Reminder";
+    final body = "${subTask.name}\n${subTask.date}";
+    await _notificationService.scheduleReminder(
+      id: notifId,
+      scheduledAt: remindAt,
+      title: title,
+      body: body,
+      payload: {
+        "staffId": staffId,
+        "taskId": inquiryId,
+        "subTaskId": subTask.id,
+        "assignName": "You",
+        "type": "task_reminder",
+      },
+    );
+
+    await prefs.setString(
+      key,
+      jsonEncode({
+        "remindAt": remindAt.toIso8601String(),
+        "notifId": notifId,
+        "title": title,
+        "body": body,
+        "createdAt": DateTime.now().toIso8601String(),
+      }),
+    );
+
+    _remindersBySubTaskId[subTask.id] = _TaskReminder(remindAt, notifId);
+    notifyListeners();
+    return null;
+  }
+
+  Future<void> clearReminder(
+    String staffId,
+    String inquiryId,
+    String subTaskId,
+  ) async {
+    debugPrint(
+      "[REMINDER] clearReminder staffId=$staffId inquiryId=$inquiryId subTaskId=$subTaskId",
+    );
+    final key = _reminderKey(staffId, inquiryId, subTaskId);
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(key);
+
+    int? notifId = _remindersBySubTaskId[subTaskId]?.notificationId;
+    if (notifId == null && raw != null && raw.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        final storedId = decoded["notifId"];
+        if (storedId is int) notifId = storedId;
+      } catch (_) {}
+    }
+
+    if (notifId != null) {
+      await _notificationService.cancelReminder(notifId);
+    }
+
+    await prefs.remove(key);
+    _remindersBySubTaskId.remove(subTaskId);
+    notifyListeners();
+  }
+
+  Future<void> _loadReminders(String staffId, String inquiryId) async {
+    final prefs = await SharedPreferences.getInstance();
+    _remindersBySubTaskId.clear();
+
+    for (final sub in _subtasks) {
+      final key = _reminderKey(staffId, inquiryId, sub.id);
+      final raw = prefs.getString(key);
+      if (raw == null || raw.isEmpty) continue;
+      try {
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        final remindAtRaw = decoded["remindAt"]?.toString();
+        final notifId = decoded["notifId"];
+        if (remindAtRaw == null || notifId is! int) continue;
+        final remindAt = DateTime.tryParse(remindAtRaw);
+        if (remindAt == null) continue;
+        if (remindAt.isBefore(
+          DateTime.now().subtract(const Duration(minutes: 1)),
+        )) {
+          await prefs.remove(key);
+          await _notificationService.cancelReminder(notifId);
+          continue;
+        }
+        _remindersBySubTaskId[sub.id] = _TaskReminder(remindAt, notifId);
+      } catch (_) {
+        // Ignore malformed reminder entries.
+      }
+    }
+    notifyListeners();
+  }
+
+  String _reminderKey(String staffId, String inquiryId, String subTaskId) {
+    return "task_reminder_${staffId}_${inquiryId}_$subTaskId";
+  }
+
+  int _makeNotificationId(String staffId, String inquiryId, String subTaskId) {
+    final raw = Object.hash(staffId, inquiryId, subTaskId);
+    final positive = raw & 0x7fffffff;
+    return positive == 0 ? 1 : positive;
+  }
+}
+
+class _TaskReminder {
+  final DateTime remindAt;
+  final int notificationId;
+  const _TaskReminder(this.remindAt, this.notificationId);
 }
