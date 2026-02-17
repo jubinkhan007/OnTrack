@@ -116,15 +116,13 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
     case SyncScreen.routeName:
       //final args = routeSettings.arguments as String;
 
-      final args =
-      routeSettings.arguments as Map<String, dynamic>;
+      final args = routeSettings.arguments as Map<String, dynamic>;
 
       final String staffId = args['staffId'];
-      final String staffName = args['name'];
 
       return MaterialPageRoute(
         settings: routeSettings,
-        builder: (_) => SyncScreen.create(staffId, staffName),
+        builder: (_) => SyncScreen.create(staffId),
       );
     /*case CardScanScreen.routeName:
       final args = routeSettings.arguments as String;
@@ -144,12 +142,10 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       );
     case NewTaskDashboardScreen.routeName:
       //final args = routeSettings.arguments as String;
-      final args =
-      routeSettings.arguments as Map<String, dynamic>;
+      final args = routeSettings.arguments as Map<String, dynamic>;
 
       final String staffId = args['staffId'];
       final String staffName = args['name'];
-
 
       return MaterialPageRoute(
         settings: routeSettings,
