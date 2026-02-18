@@ -25,6 +25,7 @@ import '../../widgets/new_task/task_item.dart';
 import '../login_screen.dart';
 import '../todo/todo_home_screen.dart';
 import 'notification_screen.dart';
+import 'report_screen.dart';
 
 class NewTaskDashboardScreen extends StatelessWidget {
   static const String routeName = '/new_task_dashboard_screen';
@@ -150,6 +151,15 @@ class NewTaskDashboardScreen extends StatelessWidget {
           },
           onAccountDeletion: () {
             showDeleteAccountDialog(context, vm);
+          },
+          onReports: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>
+                    ReportScreen.create(staffId, vm.compInfoList),
+              ),
+            );
           },
           /*onCardScan: () {
             Navigator.pushNamed(context, CardScanScreen.routeName,

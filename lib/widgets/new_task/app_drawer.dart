@@ -14,6 +14,7 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback onSync;
   final VoidCallback onLogout;
   final VoidCallback onAccountDeletion;
+  final VoidCallback? onReports;
   //final VoidCallback onCardScan;
 
   const AppDrawer(
@@ -24,6 +25,7 @@ class AppDrawer extends StatelessWidget {
       required this.onLogout,
       required this.onAccountDeletion,
       required this.isEmailUser,
+      this.onReports,
       //required this.onCardScan
       });
 
@@ -92,6 +94,13 @@ class AppDrawer extends StatelessWidget {
               onCardScan();
             },
           ),*/
+          _drawerItem(
+            icon: Icons.bar_chart,
+            text: 'Reports',
+            onTap: () {
+              onReports?.call();
+            },
+          ),
           _drawerItem(
             icon: Icons.logout,
             text: 'Logout',

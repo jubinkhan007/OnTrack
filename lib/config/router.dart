@@ -3,6 +3,7 @@ import 'package:tmbi/models/models.dart';
 
 import '../screens/new_task/card_scan_screen.dart';
 import '../screens/new_task/notification_screen.dart';
+import '../screens/new_task/report_screen.dart';
 import '../screens/new_task/signup_screen.dart';
 import '../screens/new_task/sync_screen.dart';
 import '../screens/new_task/task_deatil_screen.dart';
@@ -169,6 +170,11 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => SignupScreen.create(),
+      );
+    case ReportScreen.routeName:
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => ReportScreen.create('', []),
       );
     default:
       return MaterialPageRoute(
