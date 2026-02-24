@@ -33,14 +33,27 @@ class ReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final vm = Provider.of<ReportViewmodel>(context);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Reports'),
-        backgroundColor: Palette.navyBlueColor,
-        foregroundColor: Colors.white,
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: const Text('Reports'),
+          backgroundColor: Palette.navyBlueColor,
+          foregroundColor: Colors.white,
+          bottom: const TabBar(
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            indicatorColor: Colors.white,
+            tabs: [
+              Tab(text: 'Department'),
+              Tab(text: 'Company'),
+              Tab(text: 'User'),
+            ],
+          ),
+        ),
+        body: _buildBody(context, vm),
       ),
-      body: _buildBody(context, vm),
     );
   }
 
@@ -53,50 +66,31 @@ class ReportScreen extends StatelessWidget {
       return Center(child: ErrorContainer(message: vm.errorMessage));
     }
 
-    return RefreshIndicator(
-      onRefresh: () => vm.loadReport(),
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(Converts.c12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _FilterBar(vm: vm),
-            SizedBox(height: Converts.c12),
-            _sectionLabel('Task Summary'),
-            SizedBox(height: Converts.c8),
-            _SummaryCards(summary: vm.reportData.taskSummary, showRunning: false),
-            SizedBox(height: Converts.c12),
-            _sectionLabel('TNA Summary'),
-            SizedBox(height: Converts.c8),
-            _SummaryCards(summary: vm.reportData.tnaSummary, showRunning: true),
-            SizedBox(height: Converts.c16),
-            _sectionLabel('Department Wise Status'),
-            SizedBox(height: Converts.c8),
-            _DeptWiseTable(rows: vm.reportData.deptWise),
-            SizedBox(height: Converts.c16),
-            _sectionLabel('Company Wise Status'),
-            SizedBox(height: Converts.c8),
-            _CompanyWiseTable(rows: vm.reportData.companyWise),
-            SizedBox(height: Converts.c16),
-            _sectionLabel('User Wise Status'),
-            SizedBox(height: Converts.c8),
-            _UserWiseTable(rows: vm.reportData.userWise),
-            SizedBox(height: Converts.c32),
-          ],
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(Converts.c12),
+          child: _FilterBar(vm: vm),
         ),
-      ),
-    );
-  }
-
-  Widget _sectionLabel(String text) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: Converts.c16,
-        fontWeight: FontWeight.bold,
-        color: Palette.navyBlueColor,
-      ),
+        Expanded(
+          child: TabBarView(
+            children: [
+              SingleChildScrollView(
+                padding: EdgeInsets.all(Converts.c12),
+                child: _DeptWiseTable(rows: vm.deptData),
+              ),
+              SingleChildScrollView(
+                padding: EdgeInsets.all(Converts.c12),
+                child: _CompanyWiseTable(rows: vm.companyData),
+              ),
+              SingleChildScrollView(
+                padding: EdgeInsets.all(Converts.c12),
+                child: _UserWiseTable(rows: vm.userData),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -196,26 +190,40 @@ class _FilterBar extends StatelessWidget {
     required ValueChanged<T?> onChanged,
   }) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: Converts.c8),
+      padding: EdgeInsets.fromLTRB(Converts.c8, 4, Converts.c8, 0),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(Converts.c8),
       ),
-      child: DropdownButton<T>(
-        value: value,
-        hint: Text(label, style: TextStyle(fontSize: Converts.c12)),
-        underline: const SizedBox.shrink(),
-        isDense: true,
-        items: items.map((item) {
-          return DropdownMenuItem<T>(
-            value: item,
-            child: Text(
-              itemLabel(item),
-              style: TextStyle(fontSize: Converts.c12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
             ),
-          );
-        }).toList(),
-        onChanged: onChanged,
+          ),
+          DropdownButton<T>(
+            value: value,
+            hint: Text('All', style: TextStyle(fontSize: Converts.c12)),
+            underline: const SizedBox.shrink(),
+            isDense: true,
+            items: items.map((item) {
+              return DropdownMenuItem<T>(
+                value: item,
+                child: Text(
+                  itemLabel(item),
+                  style: TextStyle(fontSize: Converts.c12),
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
+          ),
+        ],
       ),
     );
   }
@@ -234,88 +242,39 @@ class _FilterBar extends StatelessWidget {
     );
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: Converts.c8),
+      padding: EdgeInsets.fromLTRB(Converts.c8, 4, Converts.c8, 0),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(Converts.c8),
       ),
-      child: DropdownButton<ReportFilterOption>(
-        value: currentValue,
-        hint: Text(label, style: TextStyle(fontSize: Converts.c12)),
-        underline: const SizedBox.shrink(),
-        isDense: true,
-        items: allItems.map((opt) {
-          return DropdownMenuItem<ReportFilterOption>(
-            value: opt,
-            child: Text(
-              opt.name.isEmpty ? label : opt.name,
-              style: TextStyle(fontSize: Converts.c12),
-            ),
-          );
-        }).toList(),
-        onChanged: (opt) {
-          if (opt != null) onChanged(opt.id);
-        },
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Summary Cards
-// ---------------------------------------------------------------------------
-
-class _SummaryCards extends StatelessWidget {
-  final ReportSummary summary;
-  final bool showRunning;
-
-  const _SummaryCards({required this.summary, required this.showRunning});
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _card('Last 30 Days', summary.last30Days, Colors.green[100]!),
-          SizedBox(width: Converts.c8),
-          _card('Overdue', summary.overdue, Colors.red[100]!),
-          SizedBox(width: Converts.c8),
-          _card('On Queue', summary.onQueue, Colors.orange[100]!),
-          SizedBox(width: Converts.c8),
-          _card('Upcoming', summary.upcoming, Colors.blue[100]!),
-          SizedBox(width: Converts.c8),
-          _card('Completed', summary.completed, Colors.green[200]!),
-          if (showRunning) ...[
-            SizedBox(width: Converts.c8),
-            _card('Running', summary.running, Colors.grey[200]!),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _card(String label, String value, Color color) {
-    return Container(
-      width: Converts.c112,
-      padding: EdgeInsets.all(Converts.c8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(Converts.c12),
-        color: color,
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: Converts.c12, color: Colors.black54),
-          ),
-          Text(
-            value,
             style: TextStyle(
-              fontSize: Converts.c20,
-              fontWeight: FontWeight.bold,
+              fontSize: 10,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
             ),
+          ),
+          DropdownButton<ReportFilterOption>(
+            value: currentValue,
+            underline: const SizedBox.shrink(),
+            isDense: true,
+            items: allItems.map((opt) {
+              return DropdownMenuItem<ReportFilterOption>(
+                value: opt,
+                child: Text(
+                  opt.name.isEmpty ? 'All' : opt.name,
+                  style: TextStyle(fontSize: Converts.c12),
+                ),
+              );
+            }).toList(),
+            onChanged: (opt) {
+              if (opt != null) onChanged(opt.id);
+            },
           ),
         ],
       ),
@@ -338,7 +297,7 @@ class _DeptWiseTable extends StatelessWidget {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(Converts.c16),
-          child: Text('No data', style: TextStyle(color: Colors.grey)),
+          child: const Text('No data', style: TextStyle(color: Colors.grey)),
         ),
       );
     }
@@ -349,7 +308,7 @@ class _DeptWiseTable extends StatelessWidget {
         headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
         columnSpacing: Converts.c16,
         columns: _headers(
-            ['Department', 'Total', 'Last 30D', 'On Hand', 'Overdue', 'Success%', 'Delay']),
+            ['Department', 'Total', 'This Month', 'On Hand', 'Overdue', 'Success%', 'Fail%']),
         rows: rows.map((r) {
           return DataRow(cells: [
             DataCell(Text(r.deptName,
@@ -382,7 +341,7 @@ class _CompanyWiseTable extends StatelessWidget {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(Converts.c16),
-          child: Text('No data', style: TextStyle(color: Colors.grey)),
+          child: const Text('No data', style: TextStyle(color: Colors.grey)),
         ),
       );
     }
@@ -393,7 +352,7 @@ class _CompanyWiseTable extends StatelessWidget {
         headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
         columnSpacing: Converts.c16,
         columns: _headers(
-            ['Company', 'Total', 'Last 30D', 'On Hand', 'Overdue', 'Success%']),
+            ['Company', 'Total', 'This Month', 'On Hand', 'Overdue', 'Success%', 'Fail%']),
         rows: rows.map((r) {
           return DataRow(cells: [
             DataCell(Text(r.companyName,
@@ -403,6 +362,7 @@ class _CompanyWiseTable extends StatelessWidget {
             DataCell(_badgeCell(r.onHand, Colors.orange[100]!)),
             DataCell(_badgeCell(r.overdue, Colors.red[100]!)),
             DataCell(_percentCell(r.successPercent)),
+            DataCell(_percentCell(r.failPercent)),
           ]);
         }).toList(),
       ),
@@ -425,7 +385,7 @@ class _UserWiseTable extends StatelessWidget {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(Converts.c16),
-          child: Text('No data', style: TextStyle(color: Colors.grey)),
+          child: const Text('No data', style: TextStyle(color: Colors.grey)),
         ),
       );
     }
@@ -436,7 +396,7 @@ class _UserWiseTable extends StatelessWidget {
         headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
         columnSpacing: Converts.c16,
         columns: _headers(
-            ['User', 'Total', 'Last 30D', 'On Hand', 'Overdue', 'Success%', 'Delay']),
+            ['User', 'Total', 'This Month', 'On Hand', 'Overdue', 'Success%', 'Fail%']),
         rows: rows.map((r) {
           return DataRow(cells: [
             DataCell(Text(r.userName,

@@ -1,41 +1,3 @@
-class ReportSummary {
-  final String last30Days;
-  final String overdue;
-  final String onQueue;
-  final String upcoming;
-  final String completed;
-  final String running;
-
-  ReportSummary({
-    required this.last30Days,
-    required this.overdue,
-    required this.onQueue,
-    required this.upcoming,
-    required this.completed,
-    required this.running,
-  });
-
-  factory ReportSummary.fromJson(Map<String, dynamic> json) {
-    return ReportSummary(
-      last30Days: json['LAST_30_DAYS']?.toString() ?? '0',
-      overdue: json['OVERDUE']?.toString() ?? '0',
-      onQueue: json['ON_QUEUE']?.toString() ?? '0',
-      upcoming: json['UPCOMING']?.toString() ?? '0',
-      completed: json['COMPLETED']?.toString() ?? '0',
-      running: json['RUNNING']?.toString() ?? '0',
-    );
-  }
-
-  factory ReportSummary.empty() => ReportSummary(
-        last30Days: '0',
-        overdue: '0',
-        onQueue: '0',
-        upcoming: '0',
-        completed: '0',
-        running: '0',
-      );
-}
-
 class DeptWiseStatus {
   final String deptName;
   final String total;
@@ -58,12 +20,12 @@ class DeptWiseStatus {
   factory DeptWiseStatus.fromJson(Map<String, dynamic> json) {
     return DeptWiseStatus(
       deptName: json['DEPT_NAME']?.toString() ?? '',
-      total: json['TOTAL']?.toString() ?? '0',
-      last30Days: json['LAST_30_DAYS']?.toString() ?? '0',
-      onHand: json['ON_HAND']?.toString() ?? '0',
-      overdue: json['OVERDUE']?.toString() ?? '0',
+      total: json['TOTAL_INQM']?.toString() ?? '0',
+      last30Days: json['THIS_MONTH_INQM']?.toString() ?? '0',
+      onHand: json['ON_HAND_CNT']?.toString() ?? '0',
+      overdue: json['OVERDUE_CNT']?.toString() ?? '0',
       successPercent: json['SUCCESS_PERCENT']?.toString() ?? '0',
-      delay: json['DELAY']?.toString() ?? '0',
+      delay: json['FAIL_PERCENT']?.toString() ?? '0',
     );
   }
 }
@@ -75,6 +37,7 @@ class CompanyWiseStatus {
   final String onHand;
   final String overdue;
   final String successPercent;
+  final String failPercent;
 
   CompanyWiseStatus({
     required this.companyName,
@@ -83,16 +46,18 @@ class CompanyWiseStatus {
     required this.onHand,
     required this.overdue,
     required this.successPercent,
+    required this.failPercent,
   });
 
   factory CompanyWiseStatus.fromJson(Map<String, dynamic> json) {
     return CompanyWiseStatus(
-      companyName: json['COMPANY_NAME']?.toString() ?? '',
-      total: json['TOTAL']?.toString() ?? '0',
-      last30Days: json['LAST_30_DAYS']?.toString() ?? '0',
-      onHand: json['ON_HAND']?.toString() ?? '0',
-      overdue: json['OVERDUE']?.toString() ?? '0',
+      companyName: json['COMP_NAME']?.toString() ?? '',
+      total: json['TOTAL_INQM']?.toString() ?? '0',
+      last30Days: json['THIS_MONTH_INQM']?.toString() ?? '0',
+      onHand: json['ON_HAND_CNT']?.toString() ?? '0',
+      overdue: json['OVERDUE_CNT']?.toString() ?? '0',
       successPercent: json['SUCCESS_PERCENT']?.toString() ?? '0',
+      failPercent: json['FAIL_PERCENT']?.toString() ?? '0',
     );
   }
 }
@@ -119,58 +84,14 @@ class UserWiseStatus {
   factory UserWiseStatus.fromJson(Map<String, dynamic> json) {
     return UserWiseStatus(
       userName: json['USER_NAME']?.toString() ?? '',
-      total: json['TOTAL']?.toString() ?? '0',
-      last30Days: json['LAST_30_DAYS']?.toString() ?? '0',
-      onHand: json['ON_HAND']?.toString() ?? '0',
-      overdue: json['OVERDUE']?.toString() ?? '0',
+      total: json['TOTAL_TASK']?.toString() ?? '0',
+      last30Days: json['THIS_MONTH_TASK']?.toString() ?? '0',
+      onHand: json['ON_HAND_TASK']?.toString() ?? '0',
+      overdue: json['OVERDUE_TASK']?.toString() ?? '0',
       successPercent: json['SUCCESS_PERCENT']?.toString() ?? '0',
-      delay: json['DELAY']?.toString() ?? '0',
+      delay: json['FAIL_PERCENT']?.toString() ?? '0',
     );
   }
-}
-
-class ReportData {
-  final ReportSummary taskSummary;
-  final ReportSummary tnaSummary;
-  final List<DeptWiseStatus> deptWise;
-  final List<CompanyWiseStatus> companyWise;
-  final List<UserWiseStatus> userWise;
-
-  ReportData({
-    required this.taskSummary,
-    required this.tnaSummary,
-    required this.deptWise,
-    required this.companyWise,
-    required this.userWise,
-  });
-
-  factory ReportData.fromJson(Map<String, dynamic> json) {
-    return ReportData(
-      taskSummary: json['TASK_SUMMARY'] != null
-          ? ReportSummary.fromJson(json['TASK_SUMMARY'])
-          : ReportSummary.empty(),
-      tnaSummary: json['TNA_SUMMARY'] != null
-          ? ReportSummary.fromJson(json['TNA_SUMMARY'])
-          : ReportSummary.empty(),
-      deptWise: (json['DEPT_WISE'] as List? ?? [])
-          .map((e) => DeptWiseStatus.fromJson(e))
-          .toList(),
-      companyWise: (json['COMPANY_WISE'] as List? ?? [])
-          .map((e) => CompanyWiseStatus.fromJson(e))
-          .toList(),
-      userWise: (json['USER_WISE'] as List? ?? [])
-          .map((e) => UserWiseStatus.fromJson(e))
-          .toList(),
-    );
-  }
-
-  factory ReportData.empty() => ReportData(
-        taskSummary: ReportSummary.empty(),
-        tnaSummary: ReportSummary.empty(),
-        deptWise: [],
-        companyWise: [],
-        userWise: [],
-      );
 }
 
 class ReportFilterOption {

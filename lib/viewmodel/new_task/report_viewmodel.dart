@@ -22,8 +22,14 @@ class ReportViewmodel extends ChangeNotifier {
   UiState _uiState = UiState.loading;
   UiState get uiState => _uiState;
 
-  ReportData _reportData = ReportData.empty();
-  ReportData get reportData => _reportData;
+  List<DeptWiseStatus> _deptData = [];
+  List<DeptWiseStatus> get deptData => _deptData;
+
+  List<CompanyWiseStatus> _companyData = [];
+  List<CompanyWiseStatus> get companyData => _companyData;
+
+  List<UserWiseStatus> _userData = [];
+  List<UserWiseStatus> get userData => _userData;
 
   ReportFilters _filterOptions = ReportFilters.empty();
   ReportFilters get filterOptions => _filterOptions;
@@ -51,7 +57,8 @@ class ReportViewmodel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _reportData = await reportRepo.getReport(
+      // Start all three fetches concurrently
+      final deptFuture = reportRepo.getDeptReport(
         staffId: staffId,
         compId: _selectedCompId,
         groupId: _selectedGroupId,
@@ -59,6 +66,26 @@ class ReportViewmodel extends ChangeNotifier {
         subDeptId: _selectedSubDeptId,
         tnaTypeId: _selectedTnaTypeId,
       );
+      final companyFuture = reportRepo.getCompanyReport(
+        staffId: staffId,
+        compId: _selectedCompId,
+        groupId: _selectedGroupId,
+        deptId: _selectedDeptId,
+        subDeptId: _selectedSubDeptId,
+        tnaTypeId: _selectedTnaTypeId,
+      );
+      final userFuture = reportRepo.getUserReport(
+        staffId: staffId,
+        compId: _selectedCompId,
+        groupId: _selectedGroupId,
+        deptId: _selectedDeptId,
+        subDeptId: _selectedSubDeptId,
+        tnaTypeId: _selectedTnaTypeId,
+      );
+
+      _deptData = await deptFuture;
+      _companyData = await companyFuture;
+      _userData = await userFuture;
       _uiState = UiState.success;
     } catch (e) {
       _errorMessage = e.toString();
@@ -92,7 +119,6 @@ class ReportViewmodel extends ChangeNotifier {
     if (compId != null && compId != _selectedCompId) {
       _selectedCompId = compId;
       changed = true;
-      // reload filters when company changes
       loadFilters();
     }
     if (groupId != null && groupId != _selectedGroupId) {
