@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:tmbi/models/new_task/bu_response.dart';
 import 'package:tmbi/models/new_task/report_response.dart';
 import 'package:tmbi/network/ui_state.dart';
 import 'package:tmbi/repo/new_task/report_repo.dart';
 
 class ReportViewmodel extends ChangeNotifier {
   final String staffId;
-  final List<CompInfo> companyList;
   final ReportRepo reportRepo;
 
   ReportViewmodel({
     required this.staffId,
-    required this.companyList,
     required this.reportRepo,
   }) {
     _selectedCompId = '0';
@@ -57,7 +54,6 @@ class ReportViewmodel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Start all three fetches concurrently
       final deptFuture = reportRepo.getDeptReport(
         staffId: staffId,
         compId: _selectedCompId,
@@ -102,8 +98,8 @@ class ReportViewmodel extends ChangeNotifier {
         compId: _selectedCompId,
       );
       notifyListeners();
-    } catch (_) {
-      // filters are non-critical; silently ignore
+    } catch (e) {
+      debugPrint('[ReportViewmodel] loadFilters error: $e');
     }
   }
 

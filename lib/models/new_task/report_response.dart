@@ -109,36 +109,22 @@ class ReportFilterOption {
 }
 
 class ReportFilters {
+  final List<ReportFilterOption> companies;
   final List<ReportFilterOption> groups;
   final List<ReportFilterOption> depts;
   final List<ReportFilterOption> subDepts;
   final List<ReportFilterOption> tnaTypes;
 
   ReportFilters({
+    required this.companies,
     required this.groups,
     required this.depts,
     required this.subDepts,
     required this.tnaTypes,
   });
 
-  factory ReportFilters.fromJson(Map<String, dynamic> json) {
-    return ReportFilters(
-      groups: (json['GROUPS'] as List? ?? [])
-          .map((e) => ReportFilterOption.fromJson(e))
-          .toList(),
-      depts: (json['DEPTS'] as List? ?? [])
-          .map((e) => ReportFilterOption.fromJson(e))
-          .toList(),
-      subDepts: (json['SUB_DEPTS'] as List? ?? [])
-          .map((e) => ReportFilterOption.fromJson(e))
-          .toList(),
-      tnaTypes: (json['TNA_TYPES'] as List? ?? [])
-          .map((e) => ReportFilterOption.fromJson(e))
-          .toList(),
-    );
-  }
-
   factory ReportFilters.empty() => ReportFilters(
+        companies: [],
         groups: [],
         depts: [],
         subDepts: [],

@@ -110,25 +110,47 @@ class ReportRepo {
     required String staffId,
     required String compId,
   }) async {
-    try {
-      final headers = {
-        'vm': 'GET_REPORT_FILTERS',
-        'va': staffId,
-        'vb': compId,
-      };
-      final response = await dio.get(
-        'getall',
-        options: Options(headers: headers),
-      );
-      return ReportFilters.fromJson(response.data);
-    } on DioException catch (error) {
-      debugPrint('Dio Exception (getReportFilters): ${error.message}');
-      debugPrint('Response Data: ${error.response?.data}');
-      rethrow;
-    } catch (e) {
-      debugPrint('General error (getReportFilters): $e');
-      throw Exception('Unknown error occurred: $e');
+    Future<List<ReportFilterOption>> safeFetch(
+        String vm, String idKey, String nameKey) async {
+      try {
+        final response = await dio.get(
+          'getall',
+          options: Options(headers: {
+            'vm': vm,
+            'va': staffId,
+            'vb': compId,
+            'vc': '0',
+            'vd': '0',
+            've': '0',
+            'vf': '0',
+          }),
+        );
+        return _parseList(
+          response.data,
+          (json) => ReportFilterOption(
+            id: json[idKey]?.toString() ?? '0',
+            name: json[nameKey]?.toString() ?? '',
+          ),
+        );
+      } catch (e) {
+        debugPrint('[ReportRepo] $vm failed: $e');
+        return [];
+      }
     }
+
+    final compsFuture    = safeFetch('FILTER_COM',      'R',       'D');
+    final groupsFuture   = safeFetch('FILTER_GROUP',    'R',       'D');
+    final deptsFuture    = safeFetch('FILTER_DEPT',     'DEPT_ID', 'D');
+    final subDeptsFuture = safeFetch('FILTER_SUB_DEPT', 'R',       'D');
+    final tnaFuture      = safeFetch('FILTER_TNA_TYPE', 'R',       'D');
+
+    return ReportFilters(
+      companies: await compsFuture,
+      groups:    await groupsFuture,
+      depts:     await deptsFuture,
+      subDepts:  await subDeptsFuture,
+      tnaTypes:  await tnaFuture,
+    );
   }
 }
 

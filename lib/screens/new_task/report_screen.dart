@@ -15,11 +15,10 @@ class ReportScreen extends StatelessWidget {
 
   const ReportScreen({super.key});
 
-  static Widget create(String staffId, List<CompInfo> companyList) {
+  static Widget create(String staffId, [List<CompInfo> companyList = const []]) {
     return ChangeNotifierProvider(
       create: (_) => ReportViewmodel(
         staffId: staffId,
-        companyList: companyList,
         reportRepo: ReportRepo(
           dio: ApiService('https://ego.rflgroupbd.com:8077/ords/rpro/kickall/')
               .provideDio(),
@@ -113,18 +112,12 @@ class _FilterBar extends StatelessWidget {
       child: Row(
         children: [
           // Company dropdown
-          _buildDropdown<CompInfo>(
+          _buildFilterDropdown(
             label: 'Company',
-            value: vm.companyList.isEmpty
-                ? null
-                : vm.companyList.firstWhere(
-                    (c) => c.compId == vm.selectedCompId,
-                    orElse: () => vm.companyList.first,
-                  ),
-            items: vm.companyList,
-            itemLabel: (c) => c.name,
-            onChanged: (c) =>
-                vm.onFilterChanged(compId: c?.compId ?? '0'),
+            selectedId: vm.selectedCompId,
+            options: vm.filterOptions.companies,
+            allOption: allOption,
+            onChanged: (id) => vm.onFilterChanged(compId: id),
           ),
           SizedBox(width: Converts.c8),
 
@@ -182,52 +175,6 @@ class _FilterBar extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdown<T>({
-    required String label,
-    required T? value,
-    required List<T> items,
-    required String Function(T) itemLabel,
-    required ValueChanged<T?> onChanged,
-  }) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(Converts.c8, 4, Converts.c8, 0),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(Converts.c8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          DropdownButton<T>(
-            value: value,
-            hint: Text('All', style: TextStyle(fontSize: Converts.c12)),
-            underline: const SizedBox.shrink(),
-            isDense: true,
-            items: items.map((item) {
-              return DropdownMenuItem<T>(
-                value: item,
-                child: Text(
-                  itemLabel(item),
-                  style: TextStyle(fontSize: Converts.c12),
-                ),
-              );
-            }).toList(),
-            onChanged: onChanged,
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFilterDropdown({
     required String label,
     required String selectedId,
@@ -235,10 +182,12 @@ class _FilterBar extends StatelessWidget {
     required ReportFilterOption allOption,
     required ValueChanged<String> onChanged,
   }) {
-    final allItems = [allOption, ...options];
+    // Use backend-provided list; only prepend manual "All" if backend has no id=0 item
+    final hasDefault = options.any((o) => o.id == '0');
+    final allItems = hasDefault ? options : [allOption, ...options];
     final currentValue = allItems.firstWhere(
       (o) => o.id == selectedId,
-      orElse: () => allOption,
+      orElse: () => allItems.first,
     );
 
     return Container(
@@ -267,7 +216,7 @@ class _FilterBar extends StatelessWidget {
               return DropdownMenuItem<ReportFilterOption>(
                 value: opt,
                 child: Text(
-                  opt.name.isEmpty ? 'All' : opt.name,
+                  opt.name.isEmpty ? label : opt.name,
                   style: TextStyle(fontSize: Converts.c12),
                 ),
               );
