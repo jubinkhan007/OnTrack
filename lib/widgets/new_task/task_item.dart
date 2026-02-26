@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tmbi/screens/new_task/task_deatil_screen.dart';
 
 import '../../config/converts.dart';
+import '../../config/app_theme.dart';
 import '../../models/new_task/task_response.dart';
 import '../../screens/new_task/comment_screen.dart';
 
@@ -30,90 +31,176 @@ class TaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => TaskDetailsScreen(
-              index: 0,
-              assignName: task.assignToName,
-              taskId: task.id,
-              staffId: staffId,
-            ),
-          ),
-        );
-        onReturn?.call();
-      },
-      onLongPress: onLongPress,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(task.name, style: const TextStyle(fontSize: 14)),
-                  Text(task.assignToName,
-                      style: const TextStyle(color: Colors.grey)),
-                ],
-              ),
-            ),
-            Column(
-              children: [
-                Text(
-                  completionText,
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: completionColor,
-                      fontWeight: FontWeight.bold),
+    final textTheme = Theme.of(context).textTheme;
+    final assignName = task.assignToName.trim();
+    final initials =
+        assignName.isNotEmpty ? assignName.characters.first.toUpperCase() : '?';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => TaskDetailsScreen(
+                  index: 0,
+                  assignName: task.assignToName,
+                  taskId: task.id,
+                  staffId: staffId,
                 ),
-                InkWell(
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CommentsScreen(
-                          staffId: staffId,
-                          inqId: task.id,
-                        ),
-                      ),
-                    );
-                    onReturn?.call();
-                  },
-                  borderRadius: BorderRadius.circular(8),
+              ),
+            );
+            onReturn?.call();
+          },
+          onLongPress: onLongPress,
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.outline),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 5,
+                  height: 86,
+                  decoration: BoxDecoration(
+                    color: completionColor.withOpacity(0.9),
+                    borderRadius: const BorderRadius.horizontal(
+                      left: Radius.circular(16),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
-                          Icons.comment,
-                          size: 16,
-                          color: Colors.grey,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                task.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            _StatusChip(
+                              text: completionText,
+                              color: completionColor,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 2),
-                        Text(
-                          task.commentCount,
-                          style: TextStyle(
-                              fontSize: Converts.c16 - 4,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 12,
+                              backgroundColor: completionColor.withOpacity(0.14),
+                              child: Text(
+                                initials,
+                                style: textTheme.labelMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: completionColor.withOpacity(0.9),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                task.assignToName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.bodyMedium
+                                    ?.copyWith(color: AppColors.muted),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () async {
+                                onCommentTap();
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CommentsScreen(
+                                      staffId: staffId,
+                                      inqId: task.id,
+                                    ),
+                                  ),
+                                );
+                                onReturn?.call();
+                              },
+                              borderRadius: BorderRadius.circular(999),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.comment_rounded,
+                                      size: 16,
+                                      color: AppColors.muted,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      task.commentCount,
+                                      style: textTheme.labelMedium?.copyWith(
+                                        color: AppColors.muted,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                )
+                ),
+                const SizedBox(width: 10),
               ],
             ),
-          ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final String text;
+  final Color color;
+
+  const _StatusChip({required this.text, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withOpacity(0.25)),
+      ),
+      child: Text(
+        text,
+        style: textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w800,
+          color: color.withOpacity(0.9),
         ),
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tmbi/config/palette.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/network/ui_state.dart';
 import 'package:tmbi/repo/new_task/notification_repo.dart';
 import 'package:tmbi/viewmodel/new_task/notification_viewmodel.dart';
@@ -25,9 +25,10 @@ class NotificationScreen2 extends StatelessWidget {
                     .provideDio()),
       )..getNotif(staffId),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         appBar: AppBar(
-          backgroundColor: Palette.mainColor,
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
           title: Text(
             "Notifications",
             style: TextStyle(fontSize: Converts.c16),
@@ -50,14 +51,17 @@ class NotificationScreen2 extends StatelessWidget {
                   child: ErrorContainer(message: "(no notification found)"));
             }
 
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: provider.notificationList.length,
-              itemBuilder: (context, index) {
-                return NotificationItem(
-                  model: provider.notificationList[index],
-                );
-              },
+            return RefreshIndicator(
+              onRefresh: () => provider.getNotif(staffId),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: provider.notificationList.length,
+                itemBuilder: (context, index) {
+                  return NotificationItem(
+                    model: provider.notificationList[index],
+                  );
+                },
+              ),
             );
           },
         ),

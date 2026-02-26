@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:tmbi/models/new_task/report_response.dart';
+import 'package:tmbi/models/new_task/dashboard_response.dart';
 import 'package:tmbi/network/ui_state.dart';
-import 'package:tmbi/repo/new_task/report_repo.dart';
+import 'package:tmbi/repo/new_task/dashboard_repo.dart';
 
-class ReportViewmodel extends ChangeNotifier {
+class DashboardViewmodel extends ChangeNotifier {
   final String staffId;
-  final ReportRepo reportRepo;
+  final DashboardRepo dashboardRepo;
 
-  ReportViewmodel({
-    required this.staffId,
-    required this.reportRepo,
-  }) {
+  DashboardViewmodel({required this.staffId, required this.dashboardRepo}) {
     _selectedCompId = '0';
     loadFilters();
-    loadReport();
+    loadDashboard();
   }
 
   UiState _uiState = UiState.loading;
@@ -28,8 +25,8 @@ class ReportViewmodel extends ChangeNotifier {
   List<UserWiseStatus> _userData = [];
   List<UserWiseStatus> get userData => _userData;
 
-  ReportFilters _filterOptions = ReportFilters.empty();
-  ReportFilters get filterOptions => _filterOptions;
+  DashboardFilters _filterOptions = DashboardFilters.empty();
+  DashboardFilters get filterOptions => _filterOptions;
 
   String _selectedCompId = '0';
   String get selectedCompId => _selectedCompId;
@@ -49,12 +46,12 @@ class ReportViewmodel extends ChangeNotifier {
   String _errorMessage = '';
   String get errorMessage => _errorMessage;
 
-  Future<void> loadReport() async {
+  Future<void> loadDashboard() async {
     _uiState = UiState.loading;
     notifyListeners();
 
     try {
-      final deptFuture = reportRepo.getDeptReport(
+      final deptFuture = dashboardRepo.getDeptDashboard(
         staffId: staffId,
         compId: _selectedCompId,
         groupId: _selectedGroupId,
@@ -62,7 +59,7 @@ class ReportViewmodel extends ChangeNotifier {
         subDeptId: _selectedSubDeptId,
         tnaTypeId: _selectedTnaTypeId,
       );
-      final companyFuture = reportRepo.getCompanyReport(
+      final companyFuture = dashboardRepo.getCompanyDashboard(
         staffId: staffId,
         compId: _selectedCompId,
         groupId: _selectedGroupId,
@@ -70,7 +67,7 @@ class ReportViewmodel extends ChangeNotifier {
         subDeptId: _selectedSubDeptId,
         tnaTypeId: _selectedTnaTypeId,
       );
-      final userFuture = reportRepo.getUserReport(
+      final userFuture = dashboardRepo.getUserDashboard(
         staffId: staffId,
         compId: _selectedCompId,
         groupId: _selectedGroupId,
@@ -93,13 +90,15 @@ class ReportViewmodel extends ChangeNotifier {
 
   Future<void> loadFilters() async {
     try {
-      _filterOptions = await reportRepo.getReportFilters(
+      _filterOptions = await dashboardRepo.getDashboardFilters(
         staffId: staffId,
         compId: _selectedCompId,
+        groupId: _selectedGroupId,
+        deptId: _selectedDeptId,
       );
       notifyListeners();
     } catch (e) {
-      debugPrint('[ReportViewmodel] loadFilters error: $e');
+      debugPrint('[DashboardViewmodel] loadFilters error: $e');
     }
   }
 
@@ -114,16 +113,27 @@ class ReportViewmodel extends ChangeNotifier {
 
     if (compId != null && compId != _selectedCompId) {
       _selectedCompId = compId;
+      _selectedGroupId = '0';
+      _selectedDeptId = '0';
+      _selectedSubDeptId = '0';
+      _selectedTnaTypeId = '0';
       changed = true;
       loadFilters();
     }
     if (groupId != null && groupId != _selectedGroupId) {
       _selectedGroupId = groupId;
+      _selectedDeptId = '0';
+      _selectedSubDeptId = '0';
+      _selectedTnaTypeId = '0';
       changed = true;
+      loadFilters();
     }
     if (deptId != null && deptId != _selectedDeptId) {
       _selectedDeptId = deptId;
+      _selectedSubDeptId = '0';
+      _selectedTnaTypeId = '0';
       changed = true;
+      loadFilters();
     }
     if (subDeptId != null && subDeptId != _selectedSubDeptId) {
       _selectedSubDeptId = subDeptId;
@@ -135,7 +145,7 @@ class ReportViewmodel extends ChangeNotifier {
     }
 
     if (changed) {
-      loadReport();
+      loadDashboard();
     }
   }
 
@@ -146,6 +156,6 @@ class ReportViewmodel extends ChangeNotifier {
     _selectedSubDeptId = '0';
     _selectedTnaTypeId = '0';
     loadFilters();
-    loadReport();
+    loadDashboard();
   }
 }

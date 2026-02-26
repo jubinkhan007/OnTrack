@@ -11,7 +11,6 @@ import 'package:tmbi/viewmodel/new_task/new_task_detail_task_viewmodel.dart';
 import '../../config/strings.dart';
 import '../../network/api_service.dart';
 import '../../viewmodel/new_task/task_details_viewmodel.dart';
-import '../../widgets/new_task/progressbar.dart';
 import '../../widgets/new_task/section_header.dart';
 import '../../widgets/new_task/sub_task_item.dart';
 
@@ -172,6 +171,7 @@ class TaskDetailsScreen extends StatelessWidget {
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
@@ -429,151 +429,187 @@ class TaskDetailsScreen extends StatelessWidget {
 
   void _openStatusDialog(BuildContext context, String id,
       TaskDetailsViewmodel provider, SubTask subtask) {
-    int? selectedStatus = 3; // default = Pending
-    TextEditingController noteController = TextEditingController();
-    double? currentDiscreteSliderValue =
-        double.tryParse(subtask.completion ?? '');
+    var selectedStatus = 3; // In Progress
+    final noteController = TextEditingController();
+    var sliderValue = double.tryParse(subtask.completion ?? '') ?? 0;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) {
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: Colors.white,
-              title: Text(
-                "Update Status",
-                style: TextStyle(
-                    fontSize: Converts.c16, fontWeight: FontWeight.w400),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Drop-down
-                  DropdownButtonFormField<int>(
-                    value: selectedStatus,
-                    decoration: const InputDecoration(
-                      labelText: "Status",
-                      border: OutlineInputBorder(),
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                          value: 3,
-                          child: Text("In Progress",
-                              style: TextStyle(fontSize: Converts.c16 - 2))),
-                      DropdownMenuItem(
-                          value: 7,
-                          child: Text("Completed",
-                              style: TextStyle(fontSize: Converts.c16 - 2))),
-                    ],
-                    onChanged: (value) {
-                      setState(() => selectedStatus = value);
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  // Note TextField
-                  TextField(
-                    controller: noteController,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.deny(RegExp(r'[\n\r]')),
-                    ],
-                    decoration: const InputDecoration(
-                      labelText: "Note",
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 5,
-                  ),
-                  // percentage indicator
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "How much done? (${currentDiscreteSliderValue!.round().toString()}/100)",
-                        style: TextStyle(
-                            color: currentDiscreteSliderValue!.round() > 60
-                                ? currentDiscreteSliderValue!.round() == 100
-                                    ? Colors.green
-                                    : Colors.orangeAccent
-                                : Colors.deepOrange,
-                            fontSize: Converts.c12,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
+            final pctInt = sliderValue.round().clamp(0, 100);
+            final pctColor = pctInt >= 100
+                ? AppColors.success
+                : (pctInt >= 60 ? AppColors.warning : AppColors.danger);
 
-                  Slider(
-                    value: currentDiscreteSliderValue ?? 0.0,
-                    max: 100,
-                    divisions: 10,
-                    label: currentDiscreteSliderValue!.round().toString(),
-                    onChanged: (double value) {
-                      setState(() {
-                        currentDiscreteSliderValue = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel"),
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 12,
+                  right: 12,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 12,
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    // use the data (status + note)
-                    debugPrint("Status Code: $selectedStatus");
-                    debugPrint("Note: ${noteController.text}");
+                child: Material(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 48,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: AppColors.outline,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "Update Status",
+                                style: TextStyle(
+                                  fontSize: Converts.c16 + 2,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.pop(sheetContext),
+                              icon: const Icon(Icons.close_rounded),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<int>(
+                          value: selectedStatus,
+                          decoration: const InputDecoration(
+                            labelText: "Status",
+                          ),
+                          items: const [
+                            DropdownMenuItem(value: 3, child: Text("In Progress")),
+                            DropdownMenuItem(value: 7, child: Text("Completed")),
+                          ],
+                          onChanged: (value) {
+                            setState(() => selectedStatus = value ?? 3);
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: noteController,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.deny(RegExp(r'[\n\r]')),
+                          ],
+                          decoration: const InputDecoration(
+                            labelText: "Note",
+                            hintText: "Add a short update (optional)",
+                          ),
+                          maxLines: 4,
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "How much done?",
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              "$pctInt/100",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                color: pctColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Slider(
+                          value: sliderValue.clamp(0, 100),
+                          max: 100,
+                          divisions: 10,
+                          label: pctInt.toString(),
+                          onChanged: (value) {
+                            setState(() {
+                              sliderValue = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.pop(sheetContext),
+                                child: const Text("Cancel"),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: FilledButton(
+                                onPressed: () async {
+                                  Navigator.pop(sheetContext);
 
-                    final rawPct = selectedStatus == 7
-                        ? "100"
-                        : currentDiscreteSliderValue != null
-                            ? currentDiscreteSliderValue.toString()
-                            : "0";
-                    final pctInt = double.tryParse(rawPct)?.round() ?? 0;
-                    // If user sets 100%, force "Completed" status so it won't stay in "In Queue".
-                    final effectiveStatus = pctInt >= 100 ? 7 : (selectedStatus ?? 3);
-                    await provider.updateTask(
-                        taskId,
-                        id,
-                        effectiveStatus.toString(),
-                        noteController.text
-                            .toString()
-                            .replaceAll("%", " percent"),
-                        staffId,
-                        //selectedStatus == 7 ? 100 : 0,
-                        pctInt >= 100 ? "100" : rawPct,
-                        []);
+                                  final rawPct = selectedStatus == 7
+                                      ? "100"
+                                      : sliderValue.toString();
+                                  final pct = double.tryParse(rawPct)?.round() ?? 0;
+                                  final effectiveStatus = pct >= 100
+                                      ? 7
+                                      : (selectedStatus);
 
-                    if (provider.isUpdated != null) {
-                      if (provider.isUpdated!) {
-                        if (provider.isOfflineUpdateSaved) {
-                          if (context.mounted) {
-                            showCustomSnackbar(
-                              context,
-                              "Task update saved offline. It will sync automatically when internet is available.",
-                            );
-                          }
-                        } else {
-                          provider.getSubTasks(staffId, taskId);
-                        }
-                      } else {
-                        if (context.mounted) {
-                          showCustomSnackbar(context,
-                              provider.message ?? "Something went wrong");
-                        }
-                      }
-                    } else {
-                      if (context.mounted) {
-                        showCustomSnackbar(context,
-                            provider.message ?? "Something went wrong");
-                      }
-                    }
-                  },
-                  child: const Text("Save"),
+                                  await provider.updateTask(
+                                    taskId,
+                                    id,
+                                    effectiveStatus.toString(),
+                                    noteController.text
+                                        .toString()
+                                        .replaceAll("%", " percent"),
+                                    staffId,
+                                    pct >= 100 ? "100" : rawPct,
+                                    [],
+                                  );
+
+                                  if (provider.isUpdated == true) {
+                                    if (provider.isOfflineUpdateSaved) {
+                                      if (context.mounted) {
+                                        showCustomSnackbar(
+                                          context,
+                                          "Task update saved offline. It will sync automatically when internet is available.",
+                                        );
+                                      }
+                                    } else {
+                                      provider.getSubTasks(staffId, taskId);
+                                    }
+                                  } else {
+                                    if (context.mounted) {
+                                      showCustomSnackbar(
+                                        context,
+                                        provider.message ??
+                                            "Something went wrong",
+                                      );
+                                    }
+                                  }
+                                },
+                                child: const Text("Save"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ],
+              ),
             );
           },
         );
@@ -608,7 +644,6 @@ class TaskDetailsScreen extends StatelessWidget {
                   style: TextStyle(fontSize: Converts.c16),
                 ),
                 centerTitle: true,
-                backgroundColor: Colors.redAccent,
               ),
               body: Center(
                   child: ErrorContainer(
@@ -625,7 +660,6 @@ class TaskDetailsScreen extends StatelessWidget {
                   style: TextStyle(fontSize: Converts.c16),
                 ),
                 centerTitle: true,
-                backgroundColor: Colors.redAccent,
               ),
               body: Center(
                   child: ErrorContainer(
@@ -634,48 +668,146 @@ class TaskDetailsScreen extends StatelessWidget {
           }
 
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.surface,
             body: RefreshIndicator(
               onRefresh: ()=> provider.getSubTasks(staffId, taskId),
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar(
-                    title: Text(
-                      Strings.task_details,
-                      style: TextStyle(fontSize: Converts.c16),
-                    ),
+                    pinned: true,
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    title: Text(Strings.task_details,
+                        style: TextStyle(fontSize: Converts.c16)),
                     centerTitle: true,
-                    backgroundColor: Colors.redAccent,
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            provider.mainTaskResponse!.data.first.mainTaskName,
-                            style: TextStyle(
-                              fontSize: Converts.c16 + 2,
-                              color: Colors.blue,
-                              fontWeight: FontWeight.w400,
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 34,
+                                        height: 34,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.accent.withOpacity(0.12),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(
+                                          Icons.assignment_outlined,
+                                          color: AppColors.accent,
+                                          size: 18,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          assignName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: Converts.c16 - 1,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        provider.mainTaskResponse!.data.first.date,
+                                        style: TextStyle(
+                                          color: AppColors.muted,
+                                          fontSize: Converts.c16 - 4,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  if (provider.mainTaskResponse!.data.first.mainTaskDetail !=
+                                      "null")
+                                    Text(
+                                      provider.mainTaskResponse!.data.first.mainTaskDetail,
+                                      style: TextStyle(
+                                        fontSize: Converts.c16 - 2,
+                                        color: AppColors.muted,
+                                        height: 1.35,
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
-                          assignName.withDate(
-                            " • ${provider.mainTaskResponse!.data.first.date}",
-                            fontSize: Converts.c16 - 2,
-                          ),
-                          const SizedBox(height: 4),
-                          provider.mainTaskResponse!.data.first.mainTaskDetail != "null" ? Text(
-                            provider.mainTaskResponse!.data.first.mainTaskDetail,
-                            style: TextStyle(
-                              fontSize: Converts.c16,
-                              color: Colors.black87,
-                              //fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w400,
+                          const SizedBox(height: 12),
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        Strings.overAllProgress,
+                                        style: TextStyle(fontWeight: FontWeight.w800),
+                                      ),
+                                      Builder(builder: (context) {
+                                        final status =
+                                            provider.mainTaskResponse!.data.first.status;
+                                        final pctStr = provider
+                                            .mainTaskResponse!
+                                            .data
+                                            .first
+                                            .totalCompletion;
+                                        final pct = double.tryParse(pctStr) ?? 0;
+                                        final isDone = status ==
+                                            TaskStatusFlag.completed.getData.first;
+                                        final color = isDone
+                                            ? AppColors.success
+                                            : (status ==
+                                                    TaskStatusFlag.overdue.getData.first
+                                                ? AppColors.danger
+                                                : AppColors.warning);
+                                        return Text(
+                                          "${pct.round()}% | $status",
+                                          style: TextStyle(
+                                            color: color,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        );
+                                      }),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Builder(builder: (context) {
+                                    final pct = double.tryParse(provider
+                                            .mainTaskResponse!
+                                            .data
+                                            .first
+                                            .totalCompletion) ??
+                                        0;
+                                    return ClipRRect(
+                                      borderRadius: BorderRadius.circular(999),
+                                      child: LinearProgressIndicator(
+                                        value: (pct / 100).clamp(0, 1),
+                                        minHeight: 10,
+                                        backgroundColor: AppColors.outline,
+                                        valueColor: const AlwaysStoppedAnimation(
+                                            AppColors.accent),
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
                             ),
-                          ) : const SizedBox.shrink(),
-                          const SizedBox(height: 8),
+                          ),
                           /*Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(

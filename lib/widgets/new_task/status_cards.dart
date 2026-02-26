@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../config/converts.dart';
 import '../../config/enum.dart';
 import '../../config/strings.dart';
-
+import '../../config/app_theme.dart';
 
 class StatusCards extends StatelessWidget {
   final String pending;
@@ -27,41 +27,111 @@ class StatusCards extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _statusBox(Strings.pending, pending.toString(), Colors.orange[100]!, () {
-              onFinalTap(TaskStatusFlag.pending);
-            }),
+            _statusCard(
+              context: context,
+              label: Strings.pending,
+              value: pending.toString(),
+              icon: Icons.hourglass_bottom_rounded,
+              base: AppColors.warning,
+              onStatusTap: () => onFinalTap(TaskStatusFlag.pending),
+            ),
             SizedBox(width: Converts.c8),
-            _statusBox(Strings.overdue1, overdue.toString(), Colors.red[100]!, () {
-              onFinalTap(TaskStatusFlag.overdue);
-            }),
+            _statusCard(
+              context: context,
+              label: Strings.overdue1,
+              value: overdue.toString(),
+              icon: Icons.error_outline_rounded,
+              base: AppColors.danger,
+              onStatusTap: () => onFinalTap(TaskStatusFlag.overdue),
+            ),
             SizedBox(width: Converts.c8),
-            _statusBox(Strings.completed, completed.toString(), Colors.green[100]!, () {
-              onFinalTap(TaskStatusFlag.completed);
-            }),
+            _statusCard(
+              context: context,
+              label: Strings.completed,
+              value: completed.toString(),
+              icon: Icons.check_circle_outline_rounded,
+              base: AppColors.success,
+              onStatusTap: () => onFinalTap(TaskStatusFlag.completed),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _statusBox(String label, String value, Color color, Function() onStatusTap) {
-    return GestureDetector(
-      onTap: () {
-        onStatusTap();
-      },
-      child: Container(
-        width: Converts.c112,
-        padding: EdgeInsets.all(Converts.c8),
+  Widget _statusCard({
+    required BuildContext context,
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color base,
+    required VoidCallback onStatusTap,
+  }) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return InkWell(
+      onTap: onStatusTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Ink(
+        width: Converts.c128,
+        padding: EdgeInsets.all(Converts.c12),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(Converts.c12),
-          color: color,
+          borderRadius: BorderRadius.circular(16),
+          gradient: AppGradients.status(base),
+          border: Border.all(color: AppColors.outline),
         ),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(fontSize: Converts.c12, color: Colors.black54)),
-            //SizedBox(height: Converts.c8),
-            Text(value, style: TextStyle(fontSize: Converts.c20, fontWeight: FontWeight.bold)),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: base.withOpacity(0.16),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: base, size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.labelMedium?.copyWith(
+                      color: AppColors.muted,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder: (child, animation) =>
+                            ScaleTransition(scale: animation, child: child),
+                        child: Text(
+                          value,
+                          key: ValueKey<String>(value),
+                          style: textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.trending_up_rounded,
+                        size: 16,
+                        color: base.withOpacity(0.75),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

@@ -116,8 +116,8 @@ class Strings {
   /// Notification
   static const String notification = "Notification";
 
-  /// Report
-  static const String reportDashboard = "Report Dashboard";
+  /// Dashboard
+  static const String dashboardDashboard = "Dashboard";
 
   /// TODOs
   static const String upToFiveImages = "Up to five images at a time";

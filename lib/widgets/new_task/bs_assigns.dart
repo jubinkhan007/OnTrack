@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/viewmodel/new_task/new_task_dashboard_viewmodel.dart';
 
 import '../../config/converts.dart';
@@ -17,7 +18,7 @@ class BsAssigns extends StatelessWidget {
           color: Colors.transparent,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white, // dialog background
+              color: Theme.of(context).colorScheme.surface, // dialog background
               borderRadius: BorderRadius.circular(20), // dialog round
             ),
             child: Column(
@@ -38,24 +39,9 @@ class BsAssigns extends StatelessWidget {
                     controller: provider.searchTextEdit,
                     decoration: InputDecoration(
                       hintText: 'Search name',
-                      hintStyle: const TextStyle(color: Colors.black38),
                       prefixIcon:
-                          const Icon(Icons.search, color: Colors.black38),
-                      filled: true,
-                      fillColor: Colors.grey.shade100,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        // search bar round
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
+                          const Icon(Icons.search_rounded, color: AppColors.muted),
+                      isDense: true,
                     ),
                   ),
                 ),
@@ -69,7 +55,7 @@ class BsAssigns extends StatelessWidget {
                       child: Text('Assignee (only one member can be added)',
                           style: TextStyle(
                               fontSize: Converts.c16 - 2,
-                              color: Colors.grey,
+                              color: AppColors.muted,
                               fontWeight: FontWeight.bold)),
                     ),
                   ),
@@ -78,6 +64,8 @@ class BsAssigns extends StatelessWidget {
                   spacing: 2,
                   children: provider.selectedStaffs.map((customer) {
                     return Chip(
+                      backgroundColor: AppColors.accent.withOpacity(0.12),
+                      side: BorderSide(color: AppColors.accent.withOpacity(0.25)),
                       label: Text(
                         customer.userName,
                         style: TextStyle(
@@ -97,7 +85,21 @@ class BsAssigns extends StatelessWidget {
                     itemCount: provider.availableStaffs.length,
                     itemBuilder: (_, index) {
                       final staff = provider.availableStaffs[index];
+                      final name = staff.userName.trim();
+                      final initial =
+                          name.isNotEmpty ? name.characters.first.toUpperCase() : '?';
                       return ListTile(
+                        leading: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: AppColors.accent.withOpacity(0.12),
+                          child: Text(
+                            initial,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.accent,
+                            ),
+                          ),
+                        ),
                         title: Text(
                           staff.userName,
                           style: TextStyle(
@@ -131,7 +133,7 @@ class BsAssigns extends StatelessWidget {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: Colors.grey[400],
+          color: AppColors.outline,
           borderRadius: BorderRadius.circular(10),
         ),
       ),

@@ -8,7 +8,7 @@ import 'package:tmbi/repo/new_task/comment_repo.dart';
 import 'package:tmbi/widgets/error_container.dart';
 
 import '../../config/converts.dart';
-import '../../config/palette.dart';
+import '../../config/app_theme.dart';
 import '../../models/new_task/comment_response.dart';
 import '../../network/api_service.dart';
 import '../../network/ui_state.dart';
@@ -34,9 +34,10 @@ class CommentsScreen extends StatelessWidget {
           inqId,
           subTask),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: AppColors.surface,
         appBar: AppBar(
-          backgroundColor: Palette.mainColor,
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
           title: Text(
             "Comments",
             style: TextStyle(fontSize: Converts.c16),
@@ -151,15 +152,18 @@ class _CommentBubble extends StatelessWidget {
                   '${comment.name} • ${comment.dateTime?.split("T")[0]} • ${comment.dateTime?.split("T")[1]}',
                   style: TextStyle(
                     fontSize: Converts.c16 - 4,
-                    color: Colors.grey,
+                    color: AppColors.muted,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: isMe ? Colors.blue.shade100 : Colors.white,
-                    borderRadius: BorderRadius.circular(14),
+                    color: isMe
+                        ? AppColors.accent.withOpacity(0.14)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.outline),
                   ),
                   child: Text(comment.body?.decoded ?? ""),
                 ),
@@ -181,7 +185,7 @@ class _Avatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: Converts.c20,
-      backgroundColor: Colors.blue.shade50,
+      backgroundColor: AppColors.accent.withOpacity(0.12),
       child: ClipOval(
         child: CachedNetworkImage(
           imageUrl: imageUrl,
@@ -189,9 +193,9 @@ class _Avatar extends StatelessWidget {
           width: Converts.c40,
           height: Converts.c40,
           placeholder: (_, __) =>
-              const Icon(Icons.person_outline, color: Colors.blue),
+              const Icon(Icons.person_outline, color: AppColors.accent),
           errorWidget: (_, __, ___) =>
-              const Icon(Icons.person_outline, color: Colors.blue),
+              const Icon(Icons.person_outline, color: AppColors.accent),
         ),
       ),
     );
@@ -210,12 +214,7 @@ class _InputBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4),
-        ],
-      ),
+      decoration: const BoxDecoration(color: Colors.white),
       child: Row(
         children: [
           //const Icon(Icons.attach_file),
@@ -223,20 +222,14 @@ class _InputBar extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: provider.commentController,
-              decoration: const InputDecoration(
-                hintText: 'Write a comment...',
-                border: InputBorder.none,
-              ),
+              decoration: const InputDecoration(hintText: 'Write a comment...'),
             ),
           ),
-          CircleAvatar(
-            backgroundColor: Colors.blue,
-            child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white),
-              onPressed: () {
-                provider.saveComment(inqId, staffId, subTask);
-              },
-            ),
+          const SizedBox(width: 10),
+          FilledButton.icon(
+            onPressed: () => provider.saveComment(inqId, staffId, subTask),
+            icon: const Icon(Icons.send_rounded, size: 18),
+            label: const Text('Send'),
           ),
         ],
       ),

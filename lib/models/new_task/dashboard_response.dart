@@ -94,28 +94,28 @@ class UserWiseStatus {
   }
 }
 
-class ReportFilterOption {
+class DashboardFilterOption {
   final String id;
   final String name;
 
-  ReportFilterOption({required this.id, required this.name});
+  DashboardFilterOption({required this.id, required this.name});
 
-  factory ReportFilterOption.fromJson(Map<String, dynamic> json) {
-    return ReportFilterOption(
+  factory DashboardFilterOption.fromJson(Map<String, dynamic> json) {
+    return DashboardFilterOption(
       id: json['ID']?.toString() ?? '0',
       name: json['NAME']?.toString() ?? '',
     );
   }
 }
 
-class ReportFilters {
-  final List<ReportFilterOption> companies;
-  final List<ReportFilterOption> groups;
-  final List<ReportFilterOption> depts;
-  final List<ReportFilterOption> subDepts;
-  final List<ReportFilterOption> tnaTypes;
+class DashboardFilters {
+  final List<DashboardFilterOption> companies;
+  final List<DashboardFilterOption> groups;
+  final List<DashboardFilterOption> depts;
+  final List<DashboardFilterOption> subDepts;
+  final List<DashboardFilterOption> tnaTypes;
 
-  ReportFilters({
+  DashboardFilters({
     required this.companies,
     required this.groups,
     required this.depts,
@@ -123,7 +123,7 @@ class ReportFilters {
     required this.tnaTypes,
   });
 
-  factory ReportFilters.empty() => ReportFilters(
+  factory DashboardFilters.empty() => DashboardFilters(
         companies: [],
         groups: [],
         depts: [],

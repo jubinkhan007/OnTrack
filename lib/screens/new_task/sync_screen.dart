@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tmbi/config/extension_file.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/network/ui_state.dart';
 import 'package:tmbi/repo/new_task/sync_repo.dart';
@@ -35,46 +35,74 @@ class SyncScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<SyncViewmodel>();
-    if (vm.uiState == UiState.loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    // Navigate to Home when sync is complete
-    /*if (vm.uiState == UiState.success) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            NewTaskDashboardScreen.routeName, // Your home route
-            (Route<dynamic> route) => false, // Remove all previous routes
-            arguments: staffId, // Pass the staffId
-          );
-        }
-      });
-    }*/
 
     return Scaffold(
-      //appBar: AppBar(title: const Text("Sync BU Units")),
+      backgroundColor: AppColors.surface,
       body: Center(
         child: vm.uiState == UiState.loading
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(
-                    value: vm.progressPercent / 100,
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(
+                        begin: 0.0,
+                        end: vm.progressPercent / 100),
+                    duration: const Duration(milliseconds: 400),
+                    builder: (context, value, _) {
+                      return SizedBox(
+                        width: 92,
+                        height: 92,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              value: vm.progressPercent > 0 ? value : null,
+                              strokeWidth: 10,
+                              backgroundColor: AppColors.outline,
+                              valueColor: const AlwaysStoppedAnimation(
+                                  AppColors.accent),
+                            ),
+                            if (vm.progressPercent > 0)
+                              Text(
+                                "${vm.progressPercent.round()}%",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 14,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 20),
-                  Text("${vm.progressPercent.toStringAsFixed(1)}%"),
                   Text(
-                      "${(vm.progressPercent / 100 * vm.buResponse!.bu.length).toInt()} / ${vm.buResponse!.bu.length} saved"),
+                    vm.progressPercent > 0
+                        ? "Syncing data…"
+                        : "Preparing sync…",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  if (vm.progressPercent > 0 && vm.buResponse != null) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      "${(vm.progressPercent / 100 * vm.buResponse!.bu.length).toInt()} / ${vm.buResponse!.bu.length} saved",
+                      style: const TextStyle(color: AppColors.muted),
+                    ),
+                  ],
                 ],
               )
             : vm.uiState == UiState.success
                 ? //const Text("Sync Complete!")
                 AllSetWidget(
                     onStart: () async {
-                      final staffName = await SPHelper().getUserInfo(isName: true);
+                      final user = await SPHelper().getUser();
+                      final staffName =
+                          user?.users?.firstOrNull?.staffName ?? '';
                       if (context.mounted) {
                         Navigator.of(context).pushNamedAndRemoveUntil(
                           NewTaskDashboardScreen.routeName,
@@ -113,11 +141,11 @@ class AllSetWidget extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.green.withOpacity(0.1),
+                color: AppColors.success.withOpacity(0.10),
               ),
               child: Icon(
                 Icons.check_circle,
-                color: Colors.green,
+                color: AppColors.success,
                 size: Converts.c56,
               ),
             ),
@@ -129,7 +157,7 @@ class AllSetWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: Converts.c24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: AppColors.primary,
               ),
             ),
 
@@ -141,7 +169,7 @@ class AllSetWidget extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: Converts.c16 - 2,
-                color: Colors.black54,
+                color: AppColors.muted,
                 height: 1.4,
               ),
             ),
@@ -158,7 +186,7 @@ class AllSetWidget extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onStart,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: AppColors.accent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -181,8 +209,9 @@ class AllSetWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: AppColors.accent.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.outline),
       ),
       child: Column(
         children: [
@@ -205,12 +234,12 @@ class AllSetWidget extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: Colors.blue),
+        Icon(icon, color: AppColors.accent),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(color: Colors.black87),
+            style: const TextStyle(color: AppColors.primary),
           ),
         ),
       ],

@@ -1,49 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
-import 'package:tmbi/config/palette.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/models/new_task/bu_response.dart';
-import 'package:tmbi/models/new_task/report_response.dart';
+import 'package:tmbi/models/new_task/dashboard_response.dart';
 import 'package:tmbi/network/api_service.dart';
 import 'package:tmbi/network/ui_state.dart';
-import 'package:tmbi/repo/new_task/report_repo.dart';
-import 'package:tmbi/viewmodel/new_task/report_viewmodel.dart';
+import 'package:tmbi/repo/new_task/dashboard_repo.dart';
+import 'package:tmbi/viewmodel/new_task/dashboard_viewmodel.dart';
 import 'package:tmbi/widgets/error_container.dart';
 
-class ReportScreen extends StatelessWidget {
-  static const String routeName = '/report_screen';
+class DashboardScreen extends StatelessWidget {
+  static const String routeName = '/dashboard_screen';
 
-  const ReportScreen({super.key});
+  const DashboardScreen({super.key});
 
-  static Widget create(String staffId, [List<CompInfo> companyList = const []]) {
+  static Widget create(
+    String staffId, [
+    List<CompInfo> companyList = const [],
+  ]) {
     return ChangeNotifierProvider(
-      create: (_) => ReportViewmodel(
+      create: (_) => DashboardViewmodel(
         staffId: staffId,
-        reportRepo: ReportRepo(
-          dio: ApiService('https://ego.rflgroupbd.com:8077/ords/rpro/kickall/')
-              .provideDio(),
+        dashboardRepo: DashboardRepo(
+          dio: ApiService(
+            'https://ego.rflgroupbd.com:8077/ords/rpro/kickall/',
+          ).provideDio(),
         ),
       ),
-      child: const ReportScreen(),
+      child: const DashboardScreen(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final vm = Provider.of<ReportViewmodel>(context);
+    final vm = Provider.of<DashboardViewmodel>(context);
 
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         appBar: AppBar(
-          title: const Text('Reports'),
-          backgroundColor: Palette.navyBlueColor,
+          title: const Text('Dashboards'),
+          backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          bottom: const TabBar(
+          bottom: TabBar(
             labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
+            unselectedLabelColor: Colors.white.withOpacity(0.75),
+            indicatorSize: TabBarIndicatorSize.tab,
+            dividerColor: Colors.transparent,
+            indicator: BoxDecoration(
+              color: Colors.white.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(999),
+            ),
             tabs: [
               Tab(text: 'Department'),
               Tab(text: 'Company'),
@@ -56,7 +65,7 @@ class ReportScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, ReportViewmodel vm) {
+  Widget _buildBody(BuildContext context, DashboardViewmodel vm) {
     if (vm.uiState == UiState.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -99,13 +108,14 @@ class ReportScreen extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _FilterBar extends StatelessWidget {
-  final ReportViewmodel vm;
+  final DashboardViewmodel vm;
 
   const _FilterBar({required this.vm});
 
   @override
   Widget build(BuildContext context) {
-    final allOption = ReportFilterOption(id: '0', name: 'All');
+    final allOption = DashboardFilterOption(id: '0', name: 'All');
+    final hasDeptSelected = vm.selectedDeptId != '0';
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -145,8 +155,10 @@ class _FilterBar extends StatelessWidget {
           _buildFilterDropdown(
             label: 'Sub Dept',
             selectedId: vm.selectedSubDeptId,
-            options: vm.filterOptions.subDepts,
+            options: hasDeptSelected ? vm.filterOptions.subDepts : const [],
             allOption: allOption,
+            enabled: hasDeptSelected,
+            placeholder: 'Select Dept',
             onChanged: (id) => vm.onFilterChanged(subDeptId: id),
           ),
           SizedBox(width: Converts.c8),
@@ -155,8 +167,10 @@ class _FilterBar extends StatelessWidget {
           _buildFilterDropdown(
             label: 'TNA Type',
             selectedId: vm.selectedTnaTypeId,
-            options: vm.filterOptions.tnaTypes,
+            options: hasDeptSelected ? vm.filterOptions.tnaTypes : const [],
             allOption: allOption,
+            enabled: hasDeptSelected,
+            placeholder: 'Select Dept',
             onChanged: (id) => vm.onFilterChanged(tnaTypeId: id),
           ),
           SizedBox(width: Converts.c8),
@@ -165,8 +179,8 @@ class _FilterBar extends StatelessWidget {
           OutlinedButton(
             onPressed: vm.resetFilters,
             style: OutlinedButton.styleFrom(
-              foregroundColor: Palette.mainColor,
-              side: const BorderSide(color: Palette.mainColor),
+              foregroundColor: AppColors.accent,
+              side: const BorderSide(color: AppColors.accent),
             ),
             child: const Text('Reset'),
           ),
@@ -178,10 +192,53 @@ class _FilterBar extends StatelessWidget {
   Widget _buildFilterDropdown({
     required String label,
     required String selectedId,
-    required List<ReportFilterOption> options,
-    required ReportFilterOption allOption,
+    required List<DashboardFilterOption> options,
+    required DashboardFilterOption allOption,
     required ValueChanged<String> onChanged,
+    bool enabled = true,
+    String? placeholder,
   }) {
+    if (!enabled) {
+      final item = DashboardFilterOption(id: '0', name: placeholder ?? label);
+      return Container(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.outline),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: AppColors.muted,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            DropdownButton<DashboardFilterOption>(
+              value: item,
+              underline: const SizedBox.shrink(),
+              isDense: true,
+              items: [
+                DropdownMenuItem<DashboardFilterOption>(
+                  value: item,
+                  child: Text(
+                    item.name,
+                    style: TextStyle(fontSize: Converts.c12),
+                  ),
+                ),
+              ],
+              onChanged: null,
+            ),
+          ],
+        ),
+      );
+    }
+
     // Use backend-provided list; only prepend manual "All" if backend has no id=0 item
     final hasDefault = options.any((o) => o.id == '0');
     final allItems = hasDefault ? options : [allOption, ...options];
@@ -191,10 +248,11 @@ class _FilterBar extends StatelessWidget {
     );
 
     return Container(
-      padding: EdgeInsets.fromLTRB(Converts.c8, 4, Converts.c8, 0),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(Converts.c8),
+        color: Colors.white,
+        border: Border.all(color: AppColors.outline),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,16 +262,16 @@ class _FilterBar extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 10,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
+              color: AppColors.muted,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          DropdownButton<ReportFilterOption>(
+          DropdownButton<DashboardFilterOption>(
             value: currentValue,
             underline: const SizedBox.shrink(),
             isDense: true,
             items: allItems.map((opt) {
-              return DropdownMenuItem<ReportFilterOption>(
+              return DropdownMenuItem<DashboardFilterOption>(
                 value: opt,
                 child: Text(
                   opt.name.isEmpty ? label : opt.name,
@@ -256,19 +314,29 @@ class _DeptWiseTable extends StatelessWidget {
       child: DataTable(
         headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
         columnSpacing: Converts.c16,
-        columns: _headers(
-            ['Department', 'Total', 'This Month', 'On Hand', 'Overdue', 'Success%', 'Fail%']),
+        columns: _headers([
+          'Department',
+          'Total',
+          'This Month',
+          'On Hand',
+          'Overdue',
+          'Success%',
+          'Fail%',
+        ]),
         rows: rows.map((r) {
-          return DataRow(cells: [
-            DataCell(Text(r.deptName,
-                style: TextStyle(fontSize: Converts.c12))),
-            DataCell(_numCell(r.total)),
-            DataCell(_numCell(r.last30Days)),
-            DataCell(_badgeCell(r.onHand, Colors.orange[100]!)),
-            DataCell(_badgeCell(r.overdue, Colors.red[100]!)),
-            DataCell(_percentCell(r.successPercent)),
-            DataCell(_numCell(r.delay)),
-          ]);
+          return DataRow(
+            cells: [
+              DataCell(
+                Text(r.deptName, style: TextStyle(fontSize: Converts.c12)),
+              ),
+              DataCell(_numCell(r.total)),
+              DataCell(_numCell(r.last30Days)),
+              DataCell(_badgeCell(r.onHand, Colors.orange[100]!)),
+              DataCell(_badgeCell(r.overdue, Colors.red[100]!)),
+              DataCell(_percentCell(r.successPercent)),
+              DataCell(_numCell(r.delay)),
+            ],
+          );
         }).toList(),
       ),
     );
@@ -300,19 +368,29 @@ class _CompanyWiseTable extends StatelessWidget {
       child: DataTable(
         headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
         columnSpacing: Converts.c16,
-        columns: _headers(
-            ['Company', 'Total', 'This Month', 'On Hand', 'Overdue', 'Success%', 'Fail%']),
+        columns: _headers([
+          'Company',
+          'Total',
+          'This Month',
+          'On Hand',
+          'Overdue',
+          'Success%',
+          'Fail%',
+        ]),
         rows: rows.map((r) {
-          return DataRow(cells: [
-            DataCell(Text(r.companyName,
-                style: TextStyle(fontSize: Converts.c12))),
-            DataCell(_numCell(r.total)),
-            DataCell(_numCell(r.last30Days)),
-            DataCell(_badgeCell(r.onHand, Colors.orange[100]!)),
-            DataCell(_badgeCell(r.overdue, Colors.red[100]!)),
-            DataCell(_percentCell(r.successPercent)),
-            DataCell(_percentCell(r.failPercent)),
-          ]);
+          return DataRow(
+            cells: [
+              DataCell(
+                Text(r.companyName, style: TextStyle(fontSize: Converts.c12)),
+              ),
+              DataCell(_numCell(r.total)),
+              DataCell(_numCell(r.last30Days)),
+              DataCell(_badgeCell(r.onHand, Colors.orange[100]!)),
+              DataCell(_badgeCell(r.overdue, Colors.red[100]!)),
+              DataCell(_percentCell(r.successPercent)),
+              DataCell(_percentCell(r.failPercent)),
+            ],
+          );
         }).toList(),
       ),
     );
@@ -344,19 +422,29 @@ class _UserWiseTable extends StatelessWidget {
       child: DataTable(
         headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
         columnSpacing: Converts.c16,
-        columns: _headers(
-            ['User', 'Total', 'This Month', 'On Hand', 'Overdue', 'Success%', 'Fail%']),
+        columns: _headers([
+          'User',
+          'Total',
+          'This Month',
+          'On Hand',
+          'Overdue',
+          'Success%',
+          'Fail%',
+        ]),
         rows: rows.map((r) {
-          return DataRow(cells: [
-            DataCell(Text(r.userName,
-                style: TextStyle(fontSize: Converts.c12))),
-            DataCell(_numCell(r.total)),
-            DataCell(_numCell(r.last30Days)),
-            DataCell(_badgeCell(r.onHand, Colors.orange[100]!)),
-            DataCell(_badgeCell(r.overdue, Colors.red[100]!)),
-            DataCell(_percentCell(r.successPercent)),
-            DataCell(_numCell(r.delay)),
-          ]);
+          return DataRow(
+            cells: [
+              DataCell(
+                Text(r.userName, style: TextStyle(fontSize: Converts.c12)),
+              ),
+              DataCell(_numCell(r.total)),
+              DataCell(_numCell(r.last30Days)),
+              DataCell(_badgeCell(r.onHand, Colors.orange[100]!)),
+              DataCell(_badgeCell(r.overdue, Colors.red[100]!)),
+              DataCell(_percentCell(r.successPercent)),
+              DataCell(_numCell(r.delay)),
+            ],
+          );
         }).toList(),
       ),
     );
@@ -369,16 +457,18 @@ class _UserWiseTable extends StatelessWidget {
 
 List<DataColumn> _headers(List<String> labels) {
   return labels
-      .map((l) => DataColumn(
-            label: Text(
-              l,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: Converts.c12,
-                color: Palette.navyBlueColor,
-              ),
+      .map(
+        (l) => DataColumn(
+          label: Text(
+            l,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: Converts.c12,
+              color: AppColors.primary,
             ),
-          ))
+          ),
+        ),
+      )
       .toList();
 }
 
@@ -390,13 +480,17 @@ Widget _badgeCell(String value, Color color) {
   if (value == '0') return Text('0', style: TextStyle(fontSize: Converts.c12));
   return Container(
     padding: EdgeInsets.symmetric(
-        horizontal: Converts.c8, vertical: Converts.c8 / 2),
+      horizontal: Converts.c8,
+      vertical: Converts.c8 / 2,
+    ),
     decoration: BoxDecoration(
       color: color,
       borderRadius: BorderRadius.circular(Converts.c8),
     ),
-    child: Text(value,
-        style: TextStyle(fontSize: Converts.c12, fontWeight: FontWeight.bold)),
+    child: Text(
+      value,
+      style: TextStyle(fontSize: Converts.c12, fontWeight: FontWeight.bold),
+    ),
   );
 }
 

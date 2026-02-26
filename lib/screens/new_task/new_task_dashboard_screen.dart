@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/models/new_task/bu_response.dart';
@@ -25,7 +26,7 @@ import '../../widgets/new_task/task_item.dart';
 import '../login_screen.dart';
 import '../todo/todo_home_screen.dart';
 import 'notification_screen.dart';
-import 'report_screen.dart';
+import 'dashboard_screen.dart';
 
 class NewTaskDashboardScreen extends StatelessWidget {
   static const String routeName = '/new_task_dashboard_screen';
@@ -60,7 +61,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
   }
 
   Future<bool?> _showDeleteDialog(
-      BuildContext context, Task task, NewTaskDashboardViewmodel ntdv) {
+      BuildContext context, Task task) {
     return showDialog<bool>(
       context: context,
       builder: (context) {
@@ -75,7 +76,6 @@ class NewTaskDashboardScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context, true);
-                ntdv.deleteTask(task.id);
               },
               child: const Text("Delete"),
             ),
@@ -103,9 +103,10 @@ class NewTaskDashboardScreen extends StatelessWidget {
         SystemNavigator.pop();
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
+        backgroundColor: AppColors.surface,
+        floatingActionButton: FloatingActionButton.extended(
+          icon: const Icon(Icons.add_rounded),
+          label: const Text('Create Task'),
           onPressed: () {
             /*if (!staffId.isEmail()) {
               vm.reset();
@@ -121,6 +122,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
+              backgroundColor: Colors.transparent,
               // disable tap outside
               isDismissible: false,
               // disable swipe down
@@ -152,12 +154,12 @@ class NewTaskDashboardScreen extends StatelessWidget {
           onAccountDeletion: () {
             showDeleteAccountDialog(context, vm);
           },
-          onReports: () {
+          onDashboards: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) =>
-                    ReportScreen.create(staffId, vm.compInfoList),
+                    DashboardScreen.create(staffId, vm.compInfoList),
               ),
             );
           },
@@ -256,21 +258,66 @@ class NewTaskDashboardScreen extends StatelessWidget {
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
                             final task = vm.tasks[index];
+                            final isCompleted = task.status ==
+                                TaskStatusFlag.completed.getData.first;
+                            final isOverdue = task.status ==
+                                TaskStatusFlag.overdue.getData.first;
+                            final completionColor = isCompleted
+                                ? AppColors.success
+                                : (isOverdue ? AppColors.danger : AppColors.warning);
 
-                            return TaskItem(
+                            final item = TaskItem(
                               task: task,
                               staffId: staffId,
                               completionText:
                                   "${task.completion}% | ${task.status}",
-                              completionColor: task.status ==
-                                      TaskStatusFlag.completed.getData.first
-                                  ? Colors.green
-                                  : Colors.red,
+                              completionColor: completionColor,
                               onCommentTap: () {},
                               onReturn: () => vm.getTasks(),
                               onLongPress: vm.selectedTab == 0
-                                  ? () => _showDeleteDialog(context, task, vm)
+                                  ? () async {
+                                      final ok = await _showDeleteDialog(context, task);
+                                      if (ok == true) vm.deleteTask(task.id);
+                                    }
                                   : null,
+                            );
+
+                            if (vm.selectedTab != 0) return item;
+
+                            return Dismissible(
+                              key: ValueKey<String>(task.id),
+                              direction: DismissDirection.endToStart,
+                              confirmDismiss: (_) async {
+                                final ok = await _showDeleteDialog(context, task);
+                                if (ok == true) vm.deleteTask(task.id);
+                                return ok == true;
+                              },
+                              background: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                alignment: Alignment.centerRight,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                decoration: BoxDecoration(
+                                  color: AppColors.danger.withOpacity(0.92),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon(Icons.delete_outline_rounded,
+                                        color: Colors.white),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Delete',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              child: item,
                             );
                           },
                           childCount: vm.tasks.length,
@@ -301,26 +348,45 @@ class NewTaskDashboardScreen extends StatelessWidget {
       TaskStatusFlag.completed
     ];
 
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: Converts.c12),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: Converts.c12),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(
           tabs.length,
-          (index) => GestureDetector(
-            onTap: () => vm.changeStatus(tabs[index]),
-            child: AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 250),
-              style: TextStyle(
-                fontWeight: vm.statusTab == tabs[index]
-                    ? FontWeight.bold
-                    : FontWeight.w400,
-                color:
-                    vm.statusTab == tabs[index] ? Colors.blue : Colors.black54,
+          (index) {
+            final selected = vm.statusTab == tabs[index];
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => vm.changeStatus(tabs[index]),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? AppColors.accent.withOpacity(0.10)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: selected
+                          ? AppColors.accent.withOpacity(0.25)
+                          : AppColors.outline,
+                    ),
+                  ),
+                  child: Center(
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 220),
+                      style: TextStyle(
+                        fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                        color: selected ? AppColors.accent : AppColors.muted,
+                      ),
+                      child: Text(tabs[index].getData.first),
+                    ),
+                  ),
+                ),
               ),
-              child: Text(tabs[index].getData.first),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

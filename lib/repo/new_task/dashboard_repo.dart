@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:tmbi/models/new_task/report_response.dart';
+import 'package:tmbi/models/new_task/dashboard_response.dart';
 
-class ReportRepo {
+class DashboardRepo {
   final Dio dio;
 
-  ReportRepo({required this.dio});
+  DashboardRepo({required this.dio});
 
-  Future<List<DeptWiseStatus>> getDeptReport({
+  Future<List<DeptWiseStatus>> getDeptDashboard({
     required String staffId,
     required String compId,
     required String groupId,
@@ -31,16 +31,16 @@ class ReportRepo {
       );
       return _parseList(response.data, DeptWiseStatus.fromJson);
     } on DioException catch (error) {
-      debugPrint('Dio Exception (getDeptReport): ${error.message}');
+      debugPrint('Dio Exception (getDeptDashboard): ${error.message}');
       debugPrint('Response Data: ${error.response?.data}');
       rethrow;
     } catch (e) {
-      debugPrint('General error (getDeptReport): $e');
+      debugPrint('General error (getDeptDashboard): $e');
       throw Exception('Unknown error occurred: $e');
     }
   }
 
-  Future<List<CompanyWiseStatus>> getCompanyReport({
+  Future<List<CompanyWiseStatus>> getCompanyDashboard({
     required String staffId,
     required String compId,
     required String groupId,
@@ -64,16 +64,16 @@ class ReportRepo {
       );
       return _parseList(response.data, CompanyWiseStatus.fromJson);
     } on DioException catch (error) {
-      debugPrint('Dio Exception (getCompanyReport): ${error.message}');
+      debugPrint('Dio Exception (getCompanyDashboard): ${error.message}');
       debugPrint('Response Data: ${error.response?.data}');
       rethrow;
     } catch (e) {
-      debugPrint('General error (getCompanyReport): $e');
+      debugPrint('General error (getCompanyDashboard): $e');
       throw Exception('Unknown error occurred: $e');
     }
   }
 
-  Future<List<UserWiseStatus>> getUserReport({
+  Future<List<UserWiseStatus>> getUserDashboard({
     required String staffId,
     required String compId,
     required String groupId,
@@ -97,67 +97,95 @@ class ReportRepo {
       );
       return _parseList(response.data, UserWiseStatus.fromJson);
     } on DioException catch (error) {
-      debugPrint('Dio Exception (getUserReport): ${error.message}');
+      debugPrint('Dio Exception (getUserDashboard): ${error.message}');
       debugPrint('Response Data: ${error.response?.data}');
       rethrow;
     } catch (e) {
-      debugPrint('General error (getUserReport): $e');
+      debugPrint('General error (getUserDashboard): $e');
       throw Exception('Unknown error occurred: $e');
     }
   }
 
-  Future<ReportFilters> getReportFilters({
+  Future<DashboardFilters> getDashboardFilters({
     required String staffId,
     required String compId,
+    required String groupId,
+    required String deptId,
   }) async {
-    Future<List<ReportFilterOption>> safeFetch(
-        String vm, String idKey, String nameKey) async {
+    String _pickString(
+      Map<String, dynamic> json,
+      List<String> keys, {
+      required String fallback,
+    }) {
+      for (final k in keys) {
+        final v = json[k];
+        if (v != null) return v.toString().trim();
+      }
+      return fallback;
+    }
+
+    Future<List<DashboardFilterOption>> safeFetch(
+      String vm,
+      String idKey,
+      String nameKey, {
+      String vc = '0',
+      String vd = '0',
+      String ve = '0',
+      String vf = '0',
+      String? vbOverride,
+    }) async {
       try {
         final response = await dio.get(
           'getall',
-          options: Options(headers: {
-            'vm': vm,
-            'va': staffId,
-            'vb': compId,
-            'vc': '0',
-            'vd': '0',
-            've': '0',
-            'vf': '0',
-          }),
+          options: Options(
+            headers: {
+              'vm': vm,
+              'va': staffId,
+              'vb': vbOverride ?? compId,
+              'vc': vc,
+              'vd': vd,
+              've': ve,
+              'vf': vf,
+            },
+          ),
         );
         return _parseList(
           response.data,
-          (json) => ReportFilterOption(
-            id: json[idKey]?.toString() ?? '0',
-            name: json[nameKey]?.toString() ?? '',
+          (json) => DashboardFilterOption(
+            id: _pickString(json, [idKey, 'R', 'ID'], fallback: '0'),
+            name: _pickString(json, [nameKey, 'D', 'NAME'], fallback: ''),
           ),
         );
       } catch (e) {
-        debugPrint('[ReportRepo] $vm failed: $e');
+        debugPrint('[DashboardRepo] $vm failed: $e');
         return [];
       }
     }
 
-    final compsFuture    = safeFetch('FILTER_COM',      'R',       'D');
-    final groupsFuture   = safeFetch('FILTER_GROUP',    'R',       'D');
-    final deptsFuture    = safeFetch('FILTER_DEPT',     'DEPT_ID', 'D');
-    final subDeptsFuture = safeFetch('FILTER_SUB_DEPT', 'R',       'D');
-    final tnaFuture      = safeFetch('FILTER_TNA_TYPE', 'R',       'D');
+    // Company list should remain available even after selecting a company.
+    final compsFuture = safeFetch('FILTER_COM', 'R', 'D', vbOverride: '0');
+    final groupsFuture = safeFetch('FILTER_GROUP', 'R', 'D');
+    final deptsFuture = safeFetch('FILTER_DEPT', 'DEPT_ID', 'D', vc: groupId);
 
-    return ReportFilters(
+    final shouldLoadDependent = deptId != '0';
+    final subDeptsFuture = shouldLoadDependent
+        ? safeFetch('FILTER_SUB_DEPT', 'R', 'D', vc: groupId, vd: deptId)
+        : Future.value(<DashboardFilterOption>[]);
+    final tnaFuture = shouldLoadDependent
+        ? safeFetch('FILTER_TNA_TYPE', 'R', 'D', vc: groupId, vd: deptId)
+        : Future.value(<DashboardFilterOption>[]);
+
+    return DashboardFilters(
       companies: await compsFuture,
-      groups:    await groupsFuture,
-      depts:     await deptsFuture,
-      subDepts:  await subDeptsFuture,
-      tnaTypes:  await tnaFuture,
+      groups: await groupsFuture,
+      depts: await deptsFuture,
+      subDepts: await subDeptsFuture,
+      tnaTypes: await tnaFuture,
     );
   }
 }
 
-List<T> _parseList<T>(
-  dynamic data,
-  T Function(Map<String, dynamic>) fromJson,
-) {
+List<T> _parseList<T>(dynamic data, T Function(Map<String, dynamic>) fromJson) {
   if (data is List) {
     return data.map((e) => fromJson(e as Map<String, dynamic>)).toList();
   } else if (data is Map<String, dynamic>) {

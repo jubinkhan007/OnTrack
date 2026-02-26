@@ -56,11 +56,11 @@ class InquiryViewModel extends ChangeNotifier {
   }
 
 
-  /// report view flag
-  bool _isOpenReportView = true;
-  bool get isOpenReportView => _isOpenReportView;
-  set isOpenReportView(bool value) {
-    _isOpenReportView = value;
+  /// dashboard view flag
+  bool _isOpenDashboardView = true;
+  bool get isOpenDashboardView => _isOpenDashboardView;
+  set isOpenDashboardView(bool value) {
+    _isOpenDashboardView = value;
     notifyListeners();
   }
 

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/notification/notification_service.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/config/strings.dart';
@@ -32,66 +33,64 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: SizedBox(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              // Center vertically
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: Converts.c48,
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppGradients.header),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 18),
+                    Text(
+                      Strings.app_name,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: Converts.c24 + 4,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      Strings.transforming_inquiries,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: Converts.c12 + 1,
+                        color: Colors.white.withOpacity(0.85),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(14, 16, 14, 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              Strings.login_using_your_hris,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: Converts.c16,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            const LoginOperation(),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                 ),
-                /*TextViewCustom(
-                    text: Strings.app_name,
-                    fontSize: Converts.c24,
-                    tvColor: Palette.mainColor,
-                    isTextAlignCenter: true,
-                    isBold: true),*/
-                Text(
-                  Strings.app_name,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: Converts.c24,
-                      color: Palette.mainColor,
-                      fontWeight: FontWeight.w500),
-                ),
-                /*TextViewCustom(
-                    text: Strings.transforming_inquiries,
-                    fontSize: Converts.c12,
-                    tvColor: Palette.semiTv,
-                    isBold: true),*/
-                Text(
-                  Strings.transforming_inquiries,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: Converts.c12,
-                    color: Colors.black,
-                  ),
-                ),
-                SizedBox(
-                  height: Converts.c56,
-                ),
-                /*TextViewCustom(
-                    text: Strings.login_using_your_hris,
-                    fontSize: Converts.c16,
-                    tvColor: Palette.normalTv,
-                    isBold: false),*/
-                Text(
-                  Strings.login_using_your_hris,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: Converts.c16,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-                SizedBox(
-                  height: Converts.c32,
-                ),
-                const LoginOperation(),
-              ],
+              ),
             ),
           ),
         ),
@@ -175,9 +174,9 @@ class _LoginOperationState extends State<LoginOperation> {
                 textInputType: TextInputType.text,
                 cpVertical: 0,
                 cpHorizontal: 0,
-                hintColor: Palette.semiTv,
-                iconColor: Colors.white,
-                focusedColor: Palette.mainColor,
+                hintColor: AppColors.muted,
+                iconColor: AppColors.muted,
+                focusedColor: AppColors.accent,
                 hintFontSize: Converts.c16,
                 icon: Icons.email_outlined,
                 iconSize: Converts.c24,
@@ -200,9 +199,9 @@ class _LoginOperationState extends State<LoginOperation> {
                 textInputType: TextInputType.text,
                 cpVertical: 0,
                 cpHorizontal: 0,
-                hintColor: Palette.semiTv,
-                iconColor: Colors.white,
-                focusedColor: Palette.mainColor,
+                hintColor: AppColors.muted,
+                iconColor: AppColors.muted,
+                focusedColor: AppColors.accent,
                 hintFontSize: Converts.c16,
                 icon: Icons.lock_outline,
                 iconSize: Converts.c24,
@@ -232,11 +231,11 @@ class _LoginOperationState extends State<LoginOperation> {
               ButtonCustom1(
                 btnText: Strings.login,
                 btnHeight: Converts.c48,
-                bgColor: Palette.mainColor,
+                bgColor: AppColors.accent,
                 btnWidth: double.infinity,
-                cornerRadius: 4,
+                cornerRadius: 14,
                 isLoading: loginViewModel.uiState == UiState.loading,
-                stockColor: Palette.mainColor,
+                stockColor: AppColors.accent,
                 onTap: () async {
                   if (_loginFormKey.currentState!.validate()) {
                     // call api for validate user

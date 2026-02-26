@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../config/converts.dart';
 import '../../config/strings.dart';
+import '../../config/app_theme.dart';
 
 class TabSelector extends StatelessWidget {
   final bool createdSelected;
@@ -17,11 +18,16 @@ class TabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: Converts.c8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(Converts.c12),
-        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(999),
+        color: Colors.white,
+        border: const Border.fromBorderSide(BorderSide(color: AppColors.outline)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x11000000), blurRadius: 10, offset: Offset(0, 6)),
+        ],
       ),
       child: Row(
         children: [
@@ -34,17 +40,16 @@ class TabSelector extends StatelessWidget {
                   duration: const Duration(milliseconds: 250),
                   padding: EdgeInsets.symmetric(vertical: Converts.c8),
                   decoration: BoxDecoration(
-                    color: createdSelected
-                        ? Colors.blueAccent
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(Converts.c12),
+                    color: createdSelected ? cs.secondary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(999),
                   ),
                   child: Center(
                       child: Text(
                     Strings.createdByMe,
                     style: TextStyle(
                         fontSize: Converts.c12,
-                        color: !createdSelected ? Colors.black : Colors.white),
+                        fontWeight: FontWeight.w700,
+                        color: createdSelected ? Colors.white : AppColors.muted),
                   )),
                 ),
               ),
@@ -59,17 +64,17 @@ class TabSelector extends StatelessWidget {
                   duration: const Duration(milliseconds: 250),
                   padding: EdgeInsets.symmetric(vertical: Converts.c8),
                   decoration: BoxDecoration(
-                    color: !createdSelected
-                        ? Colors.blueAccent
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(Converts.c12),
+                    color: !createdSelected ? cs.secondary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(999),
                   ),
                   child: Center(
                       child: Text(
                     Strings.assignedToMe,
                     style: TextStyle(
                         fontSize: Converts.c12,
-                        color: !createdSelected ? Colors.white : Colors.black),
+                        fontWeight: FontWeight.w700,
+                        color:
+                            !createdSelected ? Colors.white : AppColors.muted),
                   )),
                 ),
               ),

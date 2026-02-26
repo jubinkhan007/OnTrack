@@ -3,12 +3,35 @@ import 'package:tmbi/models/models.dart';
 
 import '../screens/new_task/card_scan_screen.dart';
 import '../screens/new_task/notification_screen.dart';
-import '../screens/new_task/report_screen.dart';
+import '../screens/new_task/dashboard_screen.dart';
 import '../screens/new_task/signup_screen.dart';
 import '../screens/new_task/sync_screen.dart';
 import '../screens/new_task/task_deatil_screen.dart';
 import '../screens/screens.dart';
 import '../screens/todo/todo_home_screen.dart';
+
+PageRouteBuilder<T> _buildAppRoute<T>({
+  required RouteSettings settings,
+  required WidgetBuilder builder,
+}) {
+  return PageRouteBuilder<T>(
+    settings: settings,
+    transitionDuration: const Duration(milliseconds: 260),
+    reverseTransitionDuration: const Duration(milliseconds: 220),
+    pageBuilder: (context, animation, secondaryAnimation) => builder(context),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOut);
+      final fade = FadeTransition(opacity: curved, child: child);
+
+      final offsetTween = Tween<Offset>(
+        begin: const Offset(0.02, 0),
+        end: Offset.zero,
+      ).chain(CurveTween(curve: Curves.easeOutCubic));
+
+      return SlideTransition(position: animation.drive(offsetTween), child: fade);
+    },
+  );
+}
 
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
   switch (routeSettings.name) {
@@ -28,20 +51,19 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
     case SettingScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const SettingScreen());
-    case ReportScreen.routeName:
+    case DashboardScreen.routeName:
       return MaterialPageRoute(
-          settings: routeSettings, builder: (_) => const ReportScreen());*/
+          settings: routeSettings, builder: (_) => const DashboardScreen());*/
     /*case NotificationScreen.routeName:
       return MaterialPageRoute(
           settings: routeSettings, builder: (_) => const NotificationScreen());
     */
     case TodoHomeScreen.routeName:
       final args = routeSettings.arguments as String;
-      return MaterialPageRoute(
-          settings: routeSettings,
-          builder: (_) => TodoHomeScreen(
-                staffId: args,
-              ));
+      return _buildAppRoute(
+        settings: routeSettings,
+        builder: (_) => TodoHomeScreen(staffId: args),
+      );
     /*case InquiryView.routeName:
       /*final args = routeSettings.arguments as InquiryResponse;
       final args1 = routeSettings.arguments as String;*/
@@ -115,13 +137,17 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
 
     /// NEW HOME \\\
     case SyncScreen.routeName:
-      //final args = routeSettings.arguments as String;
+      final args = routeSettings.arguments;
+      final String staffId;
+      if (args is String) {
+        staffId = args;
+      } else if (args is Map<String, dynamic>) {
+        staffId = (args['staffId'] ?? '') as String;
+      } else {
+        staffId = '';
+      }
 
-      final args = routeSettings.arguments as Map<String, dynamic>;
-
-      final String staffId = args['staffId'];
-
-      return MaterialPageRoute(
+      return _buildAppRoute(
         settings: routeSettings,
         builder: (_) => SyncScreen.create(staffId),
       );
@@ -135,11 +161,9 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       );*/
     case NotificationScreen2.routeName:
       final args = routeSettings.arguments as String;
-      return MaterialPageRoute(
+      return _buildAppRoute(
         settings: routeSettings,
-        builder: (_) => NotificationScreen2(
-          staffId: args,
-        ),
+        builder: (_) => NotificationScreen2(staffId: args),
       );
     case NewTaskDashboardScreen.routeName:
       //final args = routeSettings.arguments as String;
@@ -148,41 +172,47 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       final String staffId = args['staffId'];
       final String staffName = args['name'];
 
-      return MaterialPageRoute(
+      return _buildAppRoute(
         settings: routeSettings,
         builder: (_) => NewTaskDashboardScreen.create(staffId, staffName),
       );
     case TaskDetailsScreen.routeName:
-      final assignName = routeSettings.arguments as String;
-      final index = routeSettings.arguments as int;
-      final taskId = routeSettings.arguments as String;
-      final staffId = routeSettings.arguments as String;
-      return MaterialPageRoute(
+      final args = routeSettings.arguments;
+      if (args is Map<String, dynamic>) {
+        return _buildAppRoute(
+          settings: routeSettings,
+          builder: (_) => TaskDetailsScreen(
+            index: (args['index'] ?? 0) as int,
+            assignName: (args['assignName'] ?? '') as String,
+            taskId: (args['taskId'] ?? '') as String,
+            staffId: (args['staffId'] ?? '') as String,
+          ),
+        );
+      }
+      return _buildAppRoute(
         settings: routeSettings,
-        builder: (_) => TaskDetailsScreen(
-          index: index,
-          assignName: assignName,
-          taskId: taskId,
-          staffId: staffId,
+        builder: (_) => const Scaffold(
+          body: Center(child: Text('Invalid TaskDetails args')),
         ),
       );
     case SignupScreen.routeName:
-      return MaterialPageRoute(
+      return _buildAppRoute(
         settings: routeSettings,
         builder: (_) => SignupScreen.create(),
       );
-    case ReportScreen.routeName:
-      return MaterialPageRoute(
+    case DashboardScreen.routeName:
+      return _buildAppRoute(
         settings: routeSettings,
-        builder: (_) => ReportScreen.create('', []),
+        builder: (_) => DashboardScreen.create('', []),
       );
     default:
-      return MaterialPageRoute(
-          settings: routeSettings,
-          builder: (_) => const Scaffold(
-                body: Center(
-                  child: Text('Screen does not exist!'),
-                ),
-              ));
+      return _buildAppRoute(
+        settings: routeSettings,
+        builder: (_) => const Scaffold(
+          body: Center(
+            child: Text('Screen does not exist!'),
+          ),
+        ),
+      );
   }
 }

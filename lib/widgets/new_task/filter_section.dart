@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/new_task/bu_response.dart';
+import '../../config/app_theme.dart';
 
 class FilterSection extends StatelessWidget {
   //final String selectedBU;
@@ -23,119 +24,71 @@ class FilterSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade200),
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
-        ),
-        child: Row(
-          children: [
-            /*IntrinsicWidth(
-              child: DropdownButtonFormField<String>(
-                value: selectedBU,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                ),
-                items: buOptions
-                    .map((bu) => DropdownMenuItem(
-                          value: bu,
-                          child: Text(bu, style: const TextStyle(fontSize: 14)),
-                        ))
-                    .toList(),
-                onChanged: onBUChanged,
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 5,
+            child: DropdownButtonFormField<CompInfo>(
+              isExpanded: true,
+              value: selectedBU,
+              decoration: InputDecoration(
+                hintText: 'Business unit',
+                prefixIcon: const Icon(Icons.apartment_rounded, size: 18),
+                isDense: true,
+                hintStyle: textTheme.bodyMedium?.copyWith(color: AppColors.muted),
               ),
-            ),*/
-            IntrinsicWidth(
-              child: DropdownButtonFormField<CompInfo>(
-                value: selectedBU,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                ),
-                items: buOptions.map((bu) {
-                  return DropdownMenuItem<CompInfo>(
-                    value: bu,
-                    child: Text(
-                      bu.name, // show the display name
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  );
-                }).toList(),
-                onChanged: onBUChanged,
-              ),
-            ),
-            Container(
-              width: 1,
-              height: 32,
-              color: Colors.grey.shade300,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-            ),
-            Expanded(
-              child: Stack(
-                children: [
-                  TextFormField(
-                    controller: staffController,
-                    readOnly: true,
-                    style: const TextStyle(fontSize: 14),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Staff name",
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    ),
+              icon: const Icon(Icons.keyboard_arrow_down_rounded),
+              items: buOptions.map((bu) {
+                return DropdownMenuItem<CompInfo>(
+                  value: bu,
+                  child: Text(
+                    bu.name,
+                    overflow: TextOverflow.ellipsis,
                   ),
-
-                  // Overlay for detecting tap ONLY on text area
-                  Positioned.fill(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: onStaffTap,
-                    ),
-                  ),
-
-                  // Place the suffix icon ABOVE the overlay so it does NOT trigger onStaffTap
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: ValueListenableBuilder(
-                      valueListenable: staffController,
-                      builder: (context, value, _) {
-                        if (staffController.text.isEmpty) {
-                          return GestureDetector(
-                            onTap: onStaffTap,
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(Icons.search, size: 18),
-                            ),
-                          );
-                        } else {
-                          return GestureDetector(
-                            //onTap: () => staffController.clear(),
-                            onTap: () {
+                );
+              }).toList(),
+              onChanged: onBUChanged,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            flex: 6,
+            child: ValueListenableBuilder(
+              valueListenable: staffController,
+              builder: (context, _, __) {
+                final hasValue = staffController.text.trim().isNotEmpty;
+                return TextFormField(
+                  controller: staffController,
+                  readOnly: true,
+                  onTap: onStaffTap,
+                  decoration: InputDecoration(
+                    hintText: 'Staff name',
+                    prefixIcon:
+                        const Icon(Icons.person_outline_rounded, size: 18),
+                    isDense: true,
+                    suffixIcon: hasValue
+                        ? IconButton(
+                            tooltip: 'Clear',
+                            onPressed: () {
                               staffController.clear();
                               onClean();
                             },
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(Icons.close, size: 18),
-                            ),
-                          );
-                        }
-                      },
-                    ),
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                          )
+                        : IconButton(
+                            tooltip: 'Search',
+                            onPressed: onStaffTap,
+                            icon: const Icon(Icons.search_rounded, size: 18),
+                          ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

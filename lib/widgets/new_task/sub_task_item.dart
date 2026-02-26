@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/strings.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/models/new_task/main_task_response.dart';
 
 import '../../config/converts.dart';
@@ -30,73 +31,112 @@ class SubTaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: subtask.completion == "100"
-          ? Colors.green.shade50
-          : Colors.red.shade50,
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 12, right: 8, top: 4, bottom: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                /*Icon(
-                  subtask.completion == "100"
-                      ? Icons.check_circle
-                      : Icons.circle_outlined,
-                  color: subtask.completion == "100" ? Colors.green : Colors.orange,
-                  size: Converts.c16,
-                ),*/
-                Icon(
-                  subtask.completion == "100"
-                      ? Icons.check_circle
-                      : Icons.circle_outlined,
-                  color: subtask.completion == "100"
-                      ? Colors.green
-                      : Colors.orange,
-                  size: Converts.c16,
-                ),
+    final textTheme = Theme.of(context).textTheme;
+    final isDone = subtask.completion == "100";
+    final base = isDone ? AppColors.success : AppColors.warning;
+    final name = (subtask.assignToName).trim();
+    final initial = name.isNotEmpty ? name.characters.first.toUpperCase() : '?';
 
-                const SizedBox(width: 8),
-                // --- Title --- \\
-                Expanded(
-                  child: Text(
-                    subtask.name,
-                    style: TextStyle(
-                      fontSize: Converts.c16 - 2,
-                      fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.outline),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 10, 12, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 5,
+                      height: 54,
+                      decoration: BoxDecoration(
+                        color: base.withOpacity(0.9),
+                        borderRadius: const BorderRadius.horizontal(
+                          left: Radius.circular(16),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  subtask.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: base.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                      color: base.withOpacity(0.25)),
+                                ),
+                                child: Text(
+                                  isDone
+                                      ? "Completed • ${subtask.completion}%"
+                                      : "In Progress • ${subtask.completion}%",
+                                  style: textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: base.withOpacity(0.9),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 12,
+                                backgroundColor: base.withOpacity(0.12),
+                                child: Text(
+                                  initial,
+                                  style: textTheme.labelMedium?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    color: base.withOpacity(0.9),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  "${subtask.assignToName} ${Strings.dot} ${subtask.date}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: AppColors.muted,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                // status
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: subtask.completion == "100"
-                        ? Colors.green[100]
-                        : Colors.orange[100],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    subtask.completion == "100"
-                        ? "Completed | ${subtask.completion}% "
-                        : "In Progress | ${subtask.completion}%",
-                    style: TextStyle(
-                        color: subtask.completion == "100"
-                            ? Colors.green
-                            : Colors.orange,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 2),
-            subtask.assignToName.withDate(" ${Strings.dot} ${subtask.date}",
-                fontSize: Converts.c12),
             if (onReminderTap != null) ...[
               const SizedBox(height: 4),
               Row(
@@ -113,7 +153,7 @@ class SubTaskItem extends StatelessWidget {
                             const Icon(
                               Icons.notifications_none,
                               size: 16,
-                              color: Colors.blueGrey,
+                              color: AppColors.muted,
                             ),
                             const SizedBox(width: 6),
                             Expanded(
@@ -124,7 +164,7 @@ class SubTaskItem extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: Converts.c16 - 4,
-                                  color: Colors.blueGrey,
+                                  color: AppColors.muted,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -137,7 +177,7 @@ class SubTaskItem extends StatelessWidget {
                   if (reminderText != null && onReminderClear != null)
                     IconButton(
                       icon: const Icon(Icons.close, size: 18),
-                      color: Colors.blueGrey,
+                      color: AppColors.muted,
                       onPressed: onReminderClear,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(
@@ -171,9 +211,11 @@ class SubTaskItem extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    subtask.lastComment != "null" ? "Last Note# ${subtask.lastComment}" : "",
+                    subtask.lastComment != "null"
+                        ? "Last Note • ${subtask.lastComment}"
+                        : "",
                     style: TextStyle(
-                        fontSize: Converts.c16 - 4, color: Colors.purpleAccent),
+                        fontSize: Converts.c16 - 4, color: AppColors.muted),
                   ),
                 ),
                 InkWell(
@@ -190,7 +232,7 @@ class SubTaskItem extends StatelessWidget {
                           );
                           onReturn?.call();
                         },
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(999),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -198,14 +240,14 @@ class SubTaskItem extends StatelessWidget {
                               const Icon(
                                 Icons.comment,
                                 size: 16,
-                                color: Colors.grey,
+                                color: AppColors.muted,
                               ),
                               const SizedBox(width: 2),
                               Text(
                                 subtask.commentCount,
                                 style: TextStyle(
                                     fontSize: Converts.c16 - 4,
-                                    color: Colors.grey,
+                                    color: AppColors.muted,
                                     fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -219,20 +261,13 @@ class SubTaskItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ElevatedButton(
+                      FilledButton(
                         onPressed: () {
                           onUpdate(subtask.id.toString());
                         }, // your callback function
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.greenAccent,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 4),
-                          minimumSize: Size.zero, // makes the button small
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
                         child: const Text(
                           "Update",
-                          style: TextStyle(fontSize: 12, color: Colors.black),
+                          style: TextStyle(fontSize: 12),
                         ),
                       ),
                     ],
@@ -249,7 +284,9 @@ class SubTaskItem extends StatelessWidget {
             ),
             const SizedBox(height: 4),*/
             //Text("${subtask.progress}%"),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );

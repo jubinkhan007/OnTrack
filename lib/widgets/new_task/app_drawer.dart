@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:tmbi/models/user_response.dart';
+import 'package:tmbi/config/app_theme.dart';
 
 import '../../config/converts.dart';
 
@@ -14,7 +13,7 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback onSync;
   final VoidCallback onLogout;
   final VoidCallback onAccountDeletion;
-  final VoidCallback? onReports;
+  final VoidCallback? onDashboards;
   //final VoidCallback onCardScan;
 
   const AppDrawer(
@@ -25,90 +24,121 @@ class AppDrawer extends StatelessWidget {
       required this.onLogout,
       required this.onAccountDeletion,
       required this.isEmailUser,
-      this.onReports,
+      this.onDashboards,
       //required this.onCardScan
       });
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Drawer(
-      backgroundColor: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // header
-          UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(color: Colors.white),
-            accountName: Text(
-              staffName,
-              style: TextStyle(color: Colors.black, fontSize: Converts.c16 - 2),
-            ),
-            accountEmail: Text(
-              staffId,
-              style: TextStyle(color: Colors.grey, fontSize: Converts.c16 - 4),
-            ),
-            currentAccountPicture: CircleAvatar(
-              radius: Converts.c8,
-              backgroundColor: Colors.blue.shade50,
-              child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl:
-                      "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/$staffId/$staffId-0.jpg",
-                  fit: BoxFit.cover,
-                  width: Converts.c64,
-                  height: Converts.c64,
-                  placeholder: (_, __) =>
-                      const Icon(Icons.person_outline, color: Colors.blue),
-                  errorWidget: (_, __, ___) =>
-                      const Icon(Icons.person_outline, color: Colors.blue),
+      child: Container(
+        color: AppColors.surface,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+              decoration: const BoxDecoration(gradient: AppGradients.header),
+              child: SafeArea(
+                bottom: false,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.18),
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "HTTP://HRIS.PRANGROUP.COM:8686/CONTENT/EMPLOYEE/EMP/$staffId/$staffId-0.jpg",
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => const Center(
+                            child: Icon(Icons.person_outline,
+                                color: Colors.white),
+                          ),
+                          errorWidget: (_, __, ___) => const Center(
+                            child: Icon(Icons.person_outline,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            staffName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.titleMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            staffId,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: Colors.white.withOpacity(0.78),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-
-          // menu items
-          isEmailUser
-              ? const SizedBox.shrink()
-              : _drawerItem(
-                  icon: Icons.sync,
-                  text: 'Sync',
-                  onTap: () {
-                    onSync();
-                  },
-                  selected: false,
-                ),
-          // this is not for android
-          Platform.isIOS
-              ? _drawerItem(
-                  icon: Icons.delete_forever,
-                  text: 'Account delete',
-                  onTap: () {
-                    onAccountDeletion();
-                  },
-                )
-              : const SizedBox.shrink(),
-          /*_drawerItem(
-            icon: Icons.document_scanner,
-            text: 'Card Scan',
-            onTap: () {
-              onCardScan();
-            },
-          ),*/
-          _drawerItem(
-            icon: Icons.bar_chart,
-            text: 'Reports',
-            onTap: () {
-              onReports?.call();
-            },
-          ),
-          _drawerItem(
-            icon: Icons.logout,
-            text: 'Logout',
-            onTap: () {
-              onLogout();
-            },
-          ),
-        ],
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                children: [
+                  if (!isEmailUser)
+                    _drawerItem(
+                      icon: Icons.sync_rounded,
+                      text: 'Sync',
+                      onTap: onSync,
+                    ),
+                  if (Platform.isIOS)
+                    _drawerItem(
+                      icon: Icons.delete_forever_rounded,
+                      text: 'Account delete',
+                      danger: true,
+                      onTap: onAccountDeletion,
+                    ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Divider(height: 1),
+                  ),
+                  _drawerItem(
+                    icon: Icons.bar_chart_rounded,
+                    text: 'Dashboards',
+                    onTap: () => onDashboards?.call(),
+                  ),
+                  _drawerItem(
+                    icon: Icons.logout_rounded,
+                    text: 'Logout',
+                    danger: true,
+                    onTap: onLogout,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -118,20 +148,31 @@ class AppDrawer extends StatelessWidget {
     required String text,
     required VoidCallback onTap,
     bool selected = false,
+    bool danger = false,
   }) {
-    return ListTile(
-      leading: Icon(icon,
-          color: selected ? Colors.blue : Colors.black87, size: Converts.c16),
-      title: Text(
-        text,
-        style: TextStyle(
-            color: selected ? Colors.blue : Colors.black87,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-            fontSize: Converts.c16 - 2),
+    final fg = danger ? AppColors.danger : AppColors.primary;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      child: ListTile(
+        dense: true,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        leading: Icon(
+          icon,
+          color: selected ? AppColors.accent : fg.withOpacity(0.85),
+          size: Converts.c16 + 2,
+        ),
+        title: Text(
+          text,
+          style: TextStyle(
+            color: selected ? AppColors.accent : fg.withOpacity(0.92),
+            fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+            fontSize: Converts.c16 - 2,
+          ),
+        ),
+        onTap: onTap,
+        selected: selected,
+        selectedTileColor: AppColors.accent.withOpacity(0.10),
       ),
-      onTap: onTap,
-      selected: selected,
-      selectedTileColor: Colors.blue.withOpacity(0.1),
     );
   }
 }

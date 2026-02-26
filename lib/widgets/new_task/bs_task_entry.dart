@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/network/ui_state.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/widgets/new_task/bs_assigns.dart';
 import 'package:tmbi/widgets/new_task/dropdown_type.dart';
 
@@ -14,6 +15,7 @@ class BsTaskEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       color: Colors.transparent, // To preserve the rounded corners
       child: ClipRRect(
@@ -22,211 +24,223 @@ class BsTaskEntry extends StatelessWidget {
         child: Consumer<NewTaskDashboardViewmodel>(
             builder: (context, provider, _) {
           return SafeArea(
+            bottom: false,
             child: Container(
-              color: Colors.white,
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
+              color: Theme.of(context).colorScheme.surface,
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.5,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _handle(context, provider),
-                    // editable task
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      child: Column(
-                        children: [
-                          TextField(
-                            maxLines: 2,
-                            minLines: 2,
-                            onChanged: (value) {
-                              provider.onTaskTextChanged(value);
-                            },
-                            controller: provider.taskTextEdit,
-                            keyboardType: TextInputType.multiline,
-                            decoration: InputDecoration(
-                              hintText: 'Tap to add a title*',
-                              hintStyle: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: Converts.c20),
-                              border: InputBorder.none, // no visible border
-                            ),
-                            style: TextStyle(
-                              fontSize: Converts.c16,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
-                          ),
-                          TextField(
-                            maxLines: 5,
-                            minLines: 3,
-                            onChanged: (value) {
-                              //provider.onTaskTextChanged(value);
-                            },
-                            controller: provider.taskDetailTextEdit,
-                            keyboardType: TextInputType.multiline,
-                            decoration: InputDecoration(
-                              hintText: 'Tap to add a description...',
-                              hintStyle: TextStyle(color: Colors.grey.shade400),
-                              border: InputBorder.none, // no visible border
-                            ),
-                            style: TextStyle(
-                              fontSize: Converts.c16,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 24.0),
-                            child: Container(
-                              height: 1,
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // add assignees
-                    ListTile(
-                        leading: Icon(
-                          Icons.account_circle_outlined,
-                          color: Colors.grey.shade600,
-                          size: Converts.c16,
-                        ),
-                        title: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Add assignee',
-                              style: TextStyle(
-                                  color: Colors.grey.shade700,
-                                  fontSize: Converts.c16 - 2),
-                            ),
-                            provider.selectedStaffs.isEmpty
-                                ? const SizedBox.shrink()
-                                : Text(
-                                    provider.selectedStaffs
-                                        .map((staff) => staff.userName)
-                                        .join(', '),
+                            // editable task
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              child: Column(
+                                children: [
+                                  TextField(
+                                    maxLines: 2,
+                                    minLines: 2,
+                                    onChanged: (value) {
+                                      provider.onTaskTextChanged(value);
+                                    },
+                                    controller: provider.taskTextEdit,
+                                    keyboardType: TextInputType.multiline,
+                                    decoration: InputDecoration(
+                                      labelText: 'Title*',
+                                      hintText: 'Tap to add a title',
+                                      hintStyle: TextStyle(
+                                          color: AppColors.muted,
+                                          fontSize: Converts.c16),
+                                    ),
                                     style: TextStyle(
-                                        color: Colors.black87,
-                                        fontSize: Converts.c16 - 2,
-                                        fontWeight: FontWeight.w500),
-                                  )
+                                      fontSize: Converts.c16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  TextField(
+                                    maxLines: 5,
+                                    minLines: 3,
+                                    onChanged: (value) {
+                                      //provider.onTaskTextChanged(value);
+                                    },
+                                    controller: provider.taskDetailTextEdit,
+                                    keyboardType: TextInputType.multiline,
+                                    decoration: InputDecoration(
+                                      labelText: 'Description',
+                                      hintText: 'Tap to add a description...',
+                                      hintStyle:
+                                          TextStyle(color: AppColors.muted),
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: Converts.c16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 24.0),
+                                    child: Container(
+                                      height: 1,
+                                      color: AppColors.outline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // add assignees
+                            ListTile(
+                                leading: Icon(
+                                  Icons.account_circle_outlined,
+                                  color: AppColors.muted,
+                                  size: Converts.c16,
+                                ),
+                                title: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Add assignee',
+                                      style: TextStyle(
+                                          color: AppColors.muted,
+                                          fontSize: Converts.c16 - 2),
+                                    ),
+                                    provider.selectedStaffs.isEmpty
+                                        ? const SizedBox.shrink()
+                                        : Text(
+                                            provider.selectedStaffs
+                                                .map((staff) => staff.userName)
+                                                .join(', '),
+                                            style: TextStyle(
+                                                color: AppColors.primary,
+                                                fontSize: Converts.c16 - 2,
+                                                fontWeight: FontWeight.w500),
+                                          )
+                                  ],
+                                ),
+                                onTap: () {
+                                  final vm =
+                                      context.read<NewTaskDashboardViewmodel>();
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    builder: (_) {
+                                      return ChangeNotifierProvider.value(
+                                        value: vm,
+                                        child: const BsAssigns(),
+                                      );
+                                    },
+                                  );
+                                }),
+
+                            Padding(
+                              padding: const EdgeInsets.only(left: 38.0),
+                              child: Container(
+                                height: 1,
+                                color: AppColors.outline,
+                              ),
+                            ),
+
+                            // set start date
+                            ListTile(
+                              leading: Icon(
+                                Icons.calendar_today_outlined,
+                                color: AppColors.muted,
+                                size: Converts.c16,
+                              ),
+                              title: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Start date',
+                                    style: TextStyle(
+                                      color: AppColors.muted,
+                                      fontSize: Converts.c16 - 2,
+                                    ),
+                                  ),
+                                  provider.selectedStartDate == null
+                                      ? const SizedBox.shrink()
+                                      : Text(
+                                          _formatDisplayDate(
+                                              provider.selectedStartDate!),
+                                          style: TextStyle(
+                                              color: AppColors.primary,
+                                              fontSize: Converts.c16 - 2,
+                                              fontWeight: FontWeight.w500),
+                                        )
+                                ],
+                              ),
+                              onTap: () => _pickStartDate(context, provider),
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.only(left: 38.0),
+                              child: Container(
+                                height: 1,
+                                color: AppColors.outline,
+                              ),
+                            ),
+
+                            // set end date
+                            ListTile(
+                              leading: Icon(
+                                Icons.event_available_outlined,
+                                color: AppColors.muted,
+                                size: Converts.c16,
+                              ),
+                              title: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'End date',
+                                    style: TextStyle(
+                                      color: AppColors.muted,
+                                      fontSize: Converts.c16 - 2,
+                                    ),
+                                  ),
+                                  provider.selectedEndDate == null
+                                      ? const SizedBox.shrink()
+                                      : Text(
+                                          _formatDisplayDate(
+                                              provider.selectedEndDate!),
+                                          style: TextStyle(
+                                              color: AppColors.primary,
+                                              fontSize: Converts.c16 - 2,
+                                              fontWeight: FontWeight.w500),
+                                        )
+                                ],
+                              ),
+                              onTap: () => _pickEndDate(context, provider),
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: Container(
+                                height: 1,
+                                color: AppColors.outline,
+                              ),
+                            ),
                           ],
                         ),
-                        onTap: () {
-                          final vm = context.read<NewTaskDashboardViewmodel>();
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (_) {
-                              return ChangeNotifierProvider.value(
-                                value: vm,
-                                child: const BsAssigns(),
-                              );
-                            },
-                          );
-                        }),
-
-                    Padding(
-                      padding: const EdgeInsets.only(left: 38.0),
-                      child: Container(
-                        height: 1,
-                        color: Colors.grey.shade300,
                       ),
                     ),
-
-                    // set start date
-                    ListTile(
-                      leading: Icon(
-                        Icons.calendar_today_outlined,
-                        color: Colors.grey.shade600,
-                        size: Converts.c16,
-                      ),
-                      title: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Start date',
-                            style: TextStyle(
-                              color: Colors.grey.shade700,
-                              fontSize: Converts.c16 - 2,
-                            ),
-                          ),
-                          provider.selectedStartDate == null
-                              ? const SizedBox.shrink()
-                              : Text(
-                                  _formatDisplayDate(provider.selectedStartDate!),
-                                  style: TextStyle(
-                                      color: Colors.black87,
-                                      fontSize: Converts.c16 - 2,
-                                      fontWeight: FontWeight.w500),
-                                )
-                        ],
-                      ),
-                      onTap: () => _pickStartDate(context, provider),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(left: 38.0),
-                      child: Container(
-                        height: 1,
-                        color: Colors.grey.shade300,
-                      ),
-                    ),
-
-                    // set end date
-                    ListTile(
-                      leading: Icon(
-                        Icons.event_available_outlined,
-                        color: Colors.grey.shade600,
-                        size: Converts.c16,
-                      ),
-                      title: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'End date',
-                            style: TextStyle(
-                              color: Colors.grey.shade700,
-                              fontSize: Converts.c16 - 2,
-                            ),
-                          ),
-                          provider.selectedEndDate == null
-                              ? const SizedBox.shrink()
-                              : Text(
-                                  _formatDisplayDate(provider.selectedEndDate!),
-                                  style: TextStyle(
-                                      color: Colors.black87,
-                                      fontSize: Converts.c16 - 2,
-                                      fontWeight: FontWeight.w500),
-                                )
-                        ],
-                      ),
-                      onTap: () => _pickEndDate(context, provider),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: Container(
-                        height: 1,
-                        color: Colors.grey.shade300,
-                      ),
-                    ),
-                    const Spacer(),
 
                     // create button view
                     Padding(
-                      padding: const EdgeInsets.only(right: 16.0, bottom: 8),
+                      padding: EdgeInsets.only(
+                        right: 16.0,
+                        bottom: 8 + MediaQuery.of(context).viewPadding.bottom,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -330,7 +344,7 @@ class BsTaskEntry extends StatelessWidget {
                                     )
                                   : SizedBox(
                                       height: Converts.c40,
-                                      child: ElevatedButton(
+                                      child: FilledButton(
                                         //onPressed: () => Navigator.pop(context),
                                         onPressed: provider.canCreate
                                             ? () async {
@@ -364,18 +378,12 @@ class BsTaskEntry extends StatelessWidget {
                                                 }
                                               }
                                             : null,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.redAccent,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                        ),
                                         child: Text(
                                           'Create',
-                                          style: TextStyle(
-                                              fontSize: Converts.c16 - 2,
-                                              color: Colors.white),
+                                          style: textTheme.labelLarge?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -403,14 +411,14 @@ class BsTaskEntry extends StatelessWidget {
           width: Converts.c48,
           height: 4,
           decoration: BoxDecoration(
-            color: Colors.grey.shade400,
+            color: AppColors.outline,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
         IconButton(
           icon: Icon(
             Icons.close,
-            color: Colors.grey.shade400,
+            color: AppColors.muted,
           ),
           onPressed: () {
             provider.resetTaskEntry();

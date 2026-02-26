@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/app_navigator.dart';
 import 'package:tmbi/config/notification/notification_service.dart';
-import 'package:tmbi/config/palette.dart';
+import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/config/screen_config.dart';
 import 'package:tmbi/config/sp_helper.dart';
 import 'package:tmbi/db/dao/sync_dao.dart';
@@ -97,10 +97,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           onGenerateRoute: (settings) => generateRoute(settings),
           navigatorKey: AppNavigator.key,
-          theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Palette.mainColor),
-              useMaterial3: true,
-              scaffoldBackgroundColor: Palette.scaffold),
+          theme: AppTheme.light(),
           home: const SplashScreen()),
     );
   }
@@ -113,11 +110,31 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnim;
+  late Animation<Offset> _slideAnim;
+
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 900),
+      vsync: this,
+    )..forward();
+    _fadeAnim = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.12),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     _checkLoginState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _checkLoginState() async {
@@ -183,8 +200,64 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppGradients.header),
+        child: FadeTransition(
+          opacity: _fadeAnim,
+          child: SlideTransition(
+            position: _slideAnim,
+            child: const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _SplashLogo(),
+                  SizedBox(height: 24),
+                  Text(
+                    'OnTrack',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 34,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Transforming the way you work',
+                    style: TextStyle(
+                      color: Color(0xCCFFFFFF),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SplashLogo extends StatelessWidget {
+  const _SplashLogo();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.12),
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white.withOpacity(0.18)),
+      ),
+      child: const Icon(
+        Icons.track_changes_rounded,
+        color: Colors.white,
+        size: 52,
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmbi/config/extension_file.dart';
+import 'package:tmbi/config/app_theme.dart';
 import '../../config/converts.dart';
 
 class AppHeader extends StatelessWidget {
@@ -17,15 +18,19 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
-      color: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: Converts.c8, vertical: 10),
+      decoration: const BoxDecoration(
+        gradient: AppGradients.header,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.menu),
+                icon: const Icon(Icons.menu, color: Colors.white),
                 onPressed: () {
                   Scaffold.of(context).openDrawer();
                 },
@@ -36,11 +41,14 @@ class AppHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(DateTime.now().getGreeting(),
-                        style: const TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold)),
+                        style: textTheme.titleSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        )),
                     Text(DateTime.now().toFormattedString(),
                         style: TextStyle(
                           fontSize: Converts.c16 - 2,
+                          color: Colors.white.withOpacity(0.85),
                         )),
                   ],
                 ),
@@ -65,7 +73,7 @@ class AppHeader extends StatelessWidget {
                 onPressed: () {
                   onNotificationTap();
                 },
-                icon: const Icon(Icons.notifications),
+                icon: const Icon(Icons.notifications, color: Colors.white),
               ),
             ],
           ),
