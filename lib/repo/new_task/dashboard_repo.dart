@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/new_task/dashboard_response.dart';
@@ -162,6 +164,37 @@ class DashboardRepo {
       }
     }
 
+    // Fetches sub-dept/TNA type: vm+dp as query params (matches web app format)
+    Future<List<DashboardFilterOption>> safeFetchQuery(
+      String vm,
+      String deptIdParam,
+    ) async {
+      try {
+        final response = await dio.get(
+          'getall',
+          queryParameters: {'vm': vm, 'dp': deptIdParam},
+          options: Options(
+            headers: {'va': staffId},
+            responseType: ResponseType.plain,
+          ),
+        );
+        // Response format: { [...] } — array wrapped in {} with no key.
+        // Strip the outer { } and decode the inner array.
+        final raw = (response.data as String).trim();
+        final inner = raw.substring(1, raw.length - 1).trim();
+        final list = jsonDecode(inner) as List;
+        return list
+            .map((e) => DashboardFilterOption(
+                  id: (e['R'] ?? 0).toString(),
+                  name: e['D']?.toString() ?? '',
+                ))
+            .toList();
+      } catch (e) {
+        debugPrint('[DashboardRepo] $vm (query) failed: $e');
+        return [];
+      }
+    }
+
     // Company list should remain available even after selecting a company.
     final compsFuture = safeFetch('FILTER_COM', 'R', 'D', vbOverride: '0');
     final groupsFuture = safeFetch('FILTER_GROUP', 'R', 'D');
@@ -169,10 +202,10 @@ class DashboardRepo {
 
     final shouldLoadDependent = deptId != '0';
     final subDeptsFuture = shouldLoadDependent
-        ? safeFetch('FILTER_SUB_DEPT', 'R', 'D', vc: groupId, vd: deptId)
+        ? safeFetchQuery('FILTER_SUB_DEPT', deptId)
         : Future.value(<DashboardFilterOption>[]);
     final tnaFuture = shouldLoadDependent
-        ? safeFetch('FILTER_TNA_TYPE', 'R', 'D', vc: groupId, vd: deptId)
+        ? safeFetchQuery('FILTER_TNA_TYPE', deptId)
         : Future.value(<DashboardFilterOption>[]);
 
     return DashboardFilters(

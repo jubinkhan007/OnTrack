@@ -116,6 +116,9 @@ class _FilterBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final allOption = DashboardFilterOption(id: '0', name: 'All');
     final hasDeptSelected = vm.selectedDeptId != '0';
+    final dependentEnabled = hasDeptSelected && !vm.filtersLoading;
+    final dependentPlaceholder =
+        hasDeptSelected && vm.filtersLoading ? 'Loading…' : 'Select Dept';
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -155,10 +158,10 @@ class _FilterBar extends StatelessWidget {
           _buildFilterDropdown(
             label: 'Sub Dept',
             selectedId: vm.selectedSubDeptId,
-            options: hasDeptSelected ? vm.filterOptions.subDepts : const [],
+            options: dependentEnabled ? vm.filterOptions.subDepts : const [],
             allOption: allOption,
-            enabled: hasDeptSelected,
-            placeholder: 'Select Dept',
+            enabled: dependentEnabled,
+            placeholder: dependentPlaceholder,
             onChanged: (id) => vm.onFilterChanged(subDeptId: id),
           ),
           SizedBox(width: Converts.c8),
@@ -167,10 +170,10 @@ class _FilterBar extends StatelessWidget {
           _buildFilterDropdown(
             label: 'TNA Type',
             selectedId: vm.selectedTnaTypeId,
-            options: hasDeptSelected ? vm.filterOptions.tnaTypes : const [],
+            options: dependentEnabled ? vm.filterOptions.tnaTypes : const [],
             allOption: allOption,
-            enabled: hasDeptSelected,
-            placeholder: 'Select Dept',
+            enabled: dependentEnabled,
+            placeholder: dependentPlaceholder,
             onChanged: (id) => vm.onFilterChanged(tnaTypeId: id),
           ),
           SizedBox(width: Converts.c8),

@@ -16,14 +16,36 @@ class DashboardViewmodel extends ChangeNotifier {
   UiState _uiState = UiState.loading;
   UiState get uiState => _uiState;
 
-  List<DeptWiseStatus> _deptData = [];
-  List<DeptWiseStatus> get deptData => _deptData;
+  bool _filtersLoading = false;
+  bool get filtersLoading => _filtersLoading;
 
-  List<CompanyWiseStatus> _companyData = [];
-  List<CompanyWiseStatus> get companyData => _companyData;
+  // Raw (unfiltered) data from the server
+  List<DeptWiseStatus> _rawDeptData = [];
+  List<CompanyWiseStatus> _rawCompanyData = [];
+  List<UserWiseStatus> _rawUserData = [];
 
-  List<UserWiseStatus> _userData = [];
-  List<UserWiseStatus> get userData => _userData;
+  // Frontend-filtered getters
+  List<DeptWiseStatus> get deptData {
+    if (_selectedDeptId == '0') return _rawDeptData;
+    final opt = _filterOptions.depts.firstWhere(
+      (o) => o.id == _selectedDeptId,
+      orElse: () => DashboardFilterOption(id: '0', name: ''),
+    );
+    if (opt.name.isEmpty) return _rawDeptData;
+    return _rawDeptData.where((d) => d.deptName == opt.name).toList();
+  }
+
+  List<CompanyWiseStatus> get companyData {
+    if (_selectedCompId == '0') return _rawCompanyData;
+    final opt = _filterOptions.companies.firstWhere(
+      (o) => o.id == _selectedCompId,
+      orElse: () => DashboardFilterOption(id: '0', name: ''),
+    );
+    if (opt.name.isEmpty) return _rawCompanyData;
+    return _rawCompanyData.where((c) => c.companyName == opt.name).toList();
+  }
+
+  List<UserWiseStatus> get userData => _rawUserData;
 
   DashboardFilters _filterOptions = DashboardFilters.empty();
   DashboardFilters get filterOptions => _filterOptions;
@@ -76,9 +98,9 @@ class DashboardViewmodel extends ChangeNotifier {
         tnaTypeId: _selectedTnaTypeId,
       );
 
-      _deptData = await deptFuture;
-      _companyData = await companyFuture;
-      _userData = await userFuture;
+      _rawDeptData = await deptFuture;
+      _rawCompanyData = await companyFuture;
+      _rawUserData = await userFuture;
       _uiState = UiState.success;
     } catch (e) {
       _errorMessage = e.toString();
@@ -89,6 +111,9 @@ class DashboardViewmodel extends ChangeNotifier {
   }
 
   Future<void> loadFilters() async {
+    if (_filtersLoading) return;
+    _filtersLoading = true;
+    notifyListeners();
     try {
       _filterOptions = await dashboardRepo.getDashboardFilters(
         staffId: staffId,
@@ -96,9 +121,11 @@ class DashboardViewmodel extends ChangeNotifier {
         groupId: _selectedGroupId,
         deptId: _selectedDeptId,
       );
-      notifyListeners();
     } catch (e) {
       debugPrint('[DashboardViewmodel] loadFilters error: $e');
+    } finally {
+      _filtersLoading = false;
+      notifyListeners();
     }
   }
 
@@ -117,6 +144,12 @@ class DashboardViewmodel extends ChangeNotifier {
       _selectedDeptId = '0';
       _selectedSubDeptId = '0';
       _selectedTnaTypeId = '0';
+      _filterOptions = _filterOptions.copyWith(
+        groups: const [],
+        depts: const [],
+        subDepts: const [],
+        tnaTypes: const [],
+      );
       changed = true;
       loadFilters();
     }
@@ -125,6 +158,11 @@ class DashboardViewmodel extends ChangeNotifier {
       _selectedDeptId = '0';
       _selectedSubDeptId = '0';
       _selectedTnaTypeId = '0';
+      _filterOptions = _filterOptions.copyWith(
+        depts: const [],
+        subDepts: const [],
+        tnaTypes: const [],
+      );
       changed = true;
       loadFilters();
     }
@@ -132,6 +170,10 @@ class DashboardViewmodel extends ChangeNotifier {
       _selectedDeptId = deptId;
       _selectedSubDeptId = '0';
       _selectedTnaTypeId = '0';
+      _filterOptions = _filterOptions.copyWith(
+        subDepts: const [],
+        tnaTypes: const [],
+      );
       changed = true;
       loadFilters();
     }
@@ -144,8 +186,9 @@ class DashboardViewmodel extends ChangeNotifier {
       changed = true;
     }
 
+    // Filtering is done on the frontend — no re-fetch needed, just re-render.
     if (changed) {
-      loadDashboard();
+      notifyListeners();
     }
   }
 
@@ -155,7 +198,8 @@ class DashboardViewmodel extends ChangeNotifier {
     _selectedDeptId = '0';
     _selectedSubDeptId = '0';
     _selectedTnaTypeId = '0';
+    _filterOptions = DashboardFilters.empty();
     loadFilters();
-    loadDashboard();
+    notifyListeners();
   }
 }

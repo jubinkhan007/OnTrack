@@ -27,6 +27,7 @@ class CustomInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    debugPrint('\n\n--- Error [${err.type}] ${err.requestOptions.uri} | status=${err.response?.statusCode} | ${err.error ?? err.message} ---');
     switch (err.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:

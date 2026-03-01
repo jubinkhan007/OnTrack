@@ -123,6 +123,22 @@ class DashboardFilters {
     required this.tnaTypes,
   });
 
+  DashboardFilters copyWith({
+    List<DashboardFilterOption>? companies,
+    List<DashboardFilterOption>? groups,
+    List<DashboardFilterOption>? depts,
+    List<DashboardFilterOption>? subDepts,
+    List<DashboardFilterOption>? tnaTypes,
+  }) {
+    return DashboardFilters(
+      companies: companies ?? this.companies,
+      groups: groups ?? this.groups,
+      depts: depts ?? this.depts,
+      subDepts: subDepts ?? this.subDepts,
+      tnaTypes: tnaTypes ?? this.tnaTypes,
+    );
+  }
+
   factory DashboardFilters.empty() => DashboardFilters(
         companies: [],
         groups: [],
