@@ -145,56 +145,110 @@ extension StatusColor on String {
 }
 
 extension ShimmerLoadingExtension on BuildContext {
-  // Shimmer loading extension method //
-  Shimmer shimmerLoading() {
-    return Shimmer.fromColors(
-      baseColor: Colors.red[100]!,
-      highlightColor: Colors.red[50]!,
-      child: Padding(
-        padding: EdgeInsets.only(
-            top: Converts.c24, left: Converts.c8, right: Converts.c8),
-        child: ListView.builder(
-          itemCount: 5, // Number of shimmering items
-          itemBuilder: (context, index) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        //width: Converts.c208,
-                        height: Converts.c80,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Container(
-                        //width: Converts.c208,
-                        height: Converts.c80,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Container(
-                  width: double.infinity,
-                  height: Converts.c16,
+  Widget shimmerLoading() {
+    Widget skeleton() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: Container(
+          height: 86,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: Row(
+            children: [
+              // Left status bar
+              Container(
+                width: 5,
+                height: 86,
+                decoration: const BoxDecoration(
                   color: Colors.white,
+                  borderRadius:
+                      BorderRadius.horizontal(left: Radius.circular(16)),
                 ),
-                const SizedBox(height: 4),
-                Container(
-                  width: Converts.c296,
-                  height: Converts.c16,
-                  color: Colors.white,
+              ),
+              const SizedBox(width: 12),
+              // Content area
+              Expanded(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title row + status chip
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Container(
+                            width: 72,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      // Assignee row + comment count
+                      Row(
+                        children: [
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 100,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                          ),
+                          const Spacer(),
+                          Container(
+                            width: 36,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                SizedBox(height: Converts.c16),
-              ],
-            );
-          },
+              ),
+            ],
+          ),
         ),
+      );
+    }
+
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[200]!,
+      highlightColor: Colors.grey[100]!,
+      child: Column(
+        children: List.generate(6, (_) => skeleton()),
       ),
     );
   }

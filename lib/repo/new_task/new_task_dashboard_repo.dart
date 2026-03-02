@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:tmbi/models/new_task/task_response.dart';
+import 'package:tmbi/network/http_header_sanitizer.dart';
+import 'package:tmbi/network/network_debug_logger.dart';
 
 class NewTaskDashboardRepo {
   final Dio dio;
@@ -106,28 +109,82 @@ class NewTaskDashboardRepo {
       required String userId,
       required String assignees}) async {
     try {
-      final headers = {
-        "dtype": "INQUERY",
+      final safeTitle = HttpHeaderSanitizer.sanitize(title);
+      final safeDetails = HttpHeaderSanitizer.sanitize(details);
+      final safeAssignees = HttpHeaderSanitizer.sanitize(assignees);
+
+      Future<Response<dynamic>> postWithHeaders(Map<String, dynamic> headers) {
+        return dio.post(
+          "saveall",
+          options: Options(headers: headers),
+        );
+      }
+
+      Map<String, dynamic> buildHeaders({required String dtype}) {
+        return {
+        "dtype": dtype,
         "compid": companyId,
         "custid": customerId,
         "inqrid": inquiryId,
-        "inqrname": title,
-        "inqrdesc": details,
+        "inqrname": safeTitle,
+        "inqrdesc": safeDetails,
+        // Backwards/forwards compatibility: some backends use a misspelled key.
         "salmpleflag": isSample,
+        "sampleflag": isSample,
         "needdate": dueDate,
         "startdate": startDate ?? dueDate,
         "userid": userId,
         "custname": customerName,
         "priorityid": priorityId,
-        "taskdetail": assignees,
+        "taskdetail": safeAssignees,
         "files": "0"
-      };
-      final response = await dio.post(
-        "saveall",
-        options: Options(headers: headers),
+        };
+      }
+
+      // Prefer the correct spelling ("INQUIRY"). Some environments still accept
+      // "INQUERY", so we keep a fallback for compatibility.
+      final headers = buildHeaders(dtype: "INQUIRY");
+      NetworkDebugLogger.logSaveTaskDiagnostics(
+        title: safeTitle,
+        details: safeDetails,
+        dueDate: dueDate,
+        startDate: startDate,
+        assignees: safeAssignees,
+        headers: headers,
       );
-      debugPrint("RESPONSE#${response.data}");
-      return response.data['status'] == "200";
+
+      Response<dynamic> response = await postWithHeaders(headers);
+      dynamic status = response.data is Map ? response.data['status'] : null;
+
+      // Some backends return numeric status; normalize for comparisons.
+      final statusStr = status?.toString() ?? "";
+      debugPrint('[saveTask] status=$status (${status.runtimeType})');
+      if (statusStr == "200") return true;
+
+      if (statusStr == "400") {
+        if (kDebugMode) {
+          debugPrint("[saveTask] Server rejected the request (status=400).");
+          debugPrint(
+            "[saveTask] Hints: try a much shorter Description, verify date format, and confirm backend expects dtype='INQUERY' vs 'INQUIRY'.",
+          );
+          debugPrint(
+            "[saveTask] Lengths: inqrname=${safeTitle.length}, inqrdesc=${safeDetails.length}, taskdetail=${safeAssignees.length}",
+          );
+          debugPrint("[saveTask] Fallback retry with dtype='INQUERY'...");
+        }
+
+        // Fallback: some environments use INQUERY instead of INQUIRY.
+        final probeHeaders = buildHeaders(dtype: "INQUERY");
+        response = await postWithHeaders(probeHeaders);
+        status = response.data is Map ? response.data['status'] : null;
+        final probeStatusStr = status?.toString() ?? "";
+        if (kDebugMode) {
+          debugPrint("[saveTask] Fallback status=$status (${status.runtimeType})");
+        }
+        if (probeStatusStr == "200") return true;
+      }
+
+      return false;
     } on DioException catch (error) {
       debugPrint("RESPONSE_ERROR#$error");
       rethrow;

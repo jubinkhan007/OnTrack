@@ -116,8 +116,9 @@ class Task {
 
   // Factory method to parse JSON into Task
   factory Task.fromJson(Map<String, dynamic> json) {
+    final hris = (json['TNST_HRIS'] ?? json['INQM_ENTU'] ?? "").toString();
     return Task(
-      tnstHris: json['TNST_HRIS'].toString(),
+      tnstHris: hris,
       id: json['ID'].toString(),
       name: json['NAME'].toString(),
       assignToId: json['ASSIGN_TO_ID'].toString(),

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:tmbi/network/http_header_sanitizer.dart';
 
 class SignUpRepo {
   final Dio dio;
@@ -20,19 +21,27 @@ class SignUpRepo {
     String tasks, // []
   ) async {
     try {
+      final safeInquiryName = HttpHeaderSanitizer.sanitize(inquiryName);
+      final safeInquiryDesc = HttpHeaderSanitizer.sanitize(inquiryDesc);
+      final safeCustomerName = HttpHeaderSanitizer.sanitize(customerName);
+      final safeUserId = HttpHeaderSanitizer.sanitize(userId);
+      final safeTasks = HttpHeaderSanitizer.sanitize(tasks);
+
       final headers = {
         "dtype": "SIGN_UP",
         "compid": companyId,
         "custid": customerId,
         "inqrid": inquiryId,
-        "inqrname": inquiryName,
-        "inqrdesc": inquiryDesc,
+        "inqrname": safeInquiryName,
+        "inqrdesc": safeInquiryDesc,
+        // Backwards/forwards compatibility: some backends use a misspelled key.
         "salmpleflag": isSample,
+        "sampleflag": isSample,
         "needdate": neededDate,
-        "userid": userId,
-        "custname": customerName,
+        "userid": safeUserId,
+        "custname": safeCustomerName,
         "priorityid": priorityId,
-        "taskdetail": tasks,
+        "taskdetail": safeTasks,
         "files": 0
       };
 

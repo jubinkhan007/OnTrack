@@ -89,12 +89,6 @@ class NewTaskDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final vm = Provider.of<NewTaskDashboardViewmodel>(context);
 
-    if (vm.uiState == UiState.loading) {
-      return Scaffold(
-        body: Center(child: context.shimmerLoading()),
-      );
-    }
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -222,171 +216,104 @@ class NewTaskDashboardScreen extends StatelessWidget {
                     pending: vm.pending,
                     overdue: vm.overdue,
                     completed: vm.completed,
+                    selectedStatus: vm.statusTab,
                     onFinalTap: (tsf) {
                       vm.changeStatus(tsf);
                     },
                   ),
                 ),
-                // --- Tab Menu --- \\
                 SliverToBoxAdapter(
                   child: SizedBox(height: Converts.c12),
                 ),
-                SliverToBoxAdapter(
-                  child: _tabMenu(vm),
-                ),
                 // --- Task List --- \\
-                vm.tasks.isNotEmpty
-                    ? /*SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final task = vm.tasks[index];
-                            return TaskItem(
-                              task: task,
-                              staffId: staffId,
-                              completionText:
-                                  "${task.completion}% | ${task.status}",
-                              completionColor: task.status ==
-                                      TaskStatusFlag.completed.getData.first
-                                  ? Colors.green
-                                  : Colors.red,
-                            );
+                if (vm.uiState == UiState.loading)
+                  SliverToBoxAdapter(
+                    child: Center(child: context.shimmerLoading()),
+                  )
+                else if (vm.tasks.isNotEmpty)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final task = vm.tasks[index];
+                        final isCompleted = task.status ==
+                            TaskStatusFlag.completed.getData.first;
+                        final isOverdue = task.status ==
+                            TaskStatusFlag.overdue.getData.first;
+                        final completionColor = isCompleted
+                            ? AppColors.success
+                            : (isOverdue ? AppColors.danger : AppColors.warning);
+
+                        final item = TaskItem(
+                          task: task,
+                          staffId: staffId,
+                          completionText:
+                              "${task.completion}% | ${task.status}",
+                          completionColor: completionColor,
+                          onCommentTap: () {},
+                          onReturn: () => vm.getTasks(),
+                          onLongPress: vm.selectedTab == 0
+                              ? () async {
+                                  final ok = await _showDeleteDialog(context, task);
+                                  if (ok == true) vm.deleteTask(task.id);
+                                }
+                              : null,
+                        );
+
+                        if (vm.selectedTab != 0) return item;
+
+                        return Dismissible(
+                          key: ValueKey<String>(task.id),
+                          direction: DismissDirection.endToStart,
+                          confirmDismiss: (_) async {
+                            final ok = await _showDeleteDialog(context, task);
+                            if (ok == true) vm.deleteTask(task.id);
+                            return ok == true;
                           },
-                          childCount: vm.tasks.length,
-                        ),
-                      )*/
-                    SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final task = vm.tasks[index];
-                            final isCompleted = task.status ==
-                                TaskStatusFlag.completed.getData.first;
-                            final isOverdue = task.status ==
-                                TaskStatusFlag.overdue.getData.first;
-                            final completionColor = isCompleted
-                                ? AppColors.success
-                                : (isOverdue ? AppColors.danger : AppColors.warning);
-
-                            final item = TaskItem(
-                              task: task,
-                              staffId: staffId,
-                              completionText:
-                                  "${task.completion}% | ${task.status}",
-                              completionColor: completionColor,
-                              onCommentTap: () {},
-                              onReturn: () => vm.getTasks(),
-                              onLongPress: vm.selectedTab == 0
-                                  ? () async {
-                                      final ok = await _showDeleteDialog(context, task);
-                                      if (ok == true) vm.deleteTask(task.id);
-                                    }
-                                  : null,
-                            );
-
-                            if (vm.selectedTab != 0) return item;
-
-                            return Dismissible(
-                              key: ValueKey<String>(task.id),
-                              direction: DismissDirection.endToStart,
-                              confirmDismiss: (_) async {
-                                final ok = await _showDeleteDialog(context, task);
-                                if (ok == true) vm.deleteTask(task.id);
-                                return ok == true;
-                              },
-                              background: Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
-                                alignment: Alignment.centerRight,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                decoration: BoxDecoration(
-                                  color: AppColors.danger.withOpacity(0.92),
-                                  borderRadius: BorderRadius.circular(16),
+                          background: Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            alignment: Alignment.centerRight,
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: AppColors.danger.withOpacity(0.92),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Icon(Icons.delete_outline_rounded,
+                                    color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700),
                                 ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Icon(Icons.delete_outline_rounded,
-                                        color: Colors.white),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Delete',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              child: item,
-                            );
-                          },
-                          childCount: vm.tasks.length,
-                        ),
-                      )
-                    : SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 20.0),
-                          child: Center(
-                            child: ErrorContainer(
-                              message: vm.message ?? "Something went wrong!",
+                              ],
                             ),
                           ),
+                          child: item,
+                        );
+                      },
+                      childCount: vm.tasks.length,
+                    ),
+                  )
+                else
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Center(
+                        child: ErrorContainer(
+                          message: vm.message ?? "Something went wrong!",
                         ),
                       ),
+                    ),
+                  ),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _tabMenu(NewTaskDashboardViewmodel vm) {
-    List<TaskStatusFlag> tabs = [
-      TaskStatusFlag.pending,
-      TaskStatusFlag.overdue,
-      TaskStatusFlag.completed
-    ];
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: Converts.c12),
-      child: Row(
-        children: List.generate(
-          tabs.length,
-          (index) {
-            final selected = vm.statusTab == tabs[index];
-            return Expanded(
-              child: GestureDetector(
-                onTap: () => vm.changeStatus(tabs[index]),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? AppColors.accent.withOpacity(0.10)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: selected
-                          ? AppColors.accent.withOpacity(0.25)
-                          : AppColors.outline,
-                    ),
-                  ),
-                  child: Center(
-                    child: AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 220),
-                      style: TextStyle(
-                        fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                        color: selected ? AppColors.accent : AppColors.muted,
-                      ),
-                      child: Text(tabs[index].getData.first),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tmbi/widgets/file_attachment.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:tmbi/network/http_header_sanitizer.dart';
 
 import '../models/image_file.dart';
 import '../models/models.dart';
@@ -48,34 +49,62 @@ class InquiryRepo {
       String tasks,
       List<String> fileNames) async {
     try {
-      final headers = {
-        "dtype": "INQUERY",
+      final safeInquiryName = HttpHeaderSanitizer.sanitize(inquiryName);
+      final safeInquiryDesc = HttpHeaderSanitizer.sanitize(inquiryDesc);
+      final safeTasks = HttpHeaderSanitizer.sanitize(tasks);
+
+      Map<String, dynamic> buildHeaders(String dtype) {
+        final headers = {
+        // Prefer the correct spelling ("INQUIRY"). Some environments still accept
+        // "INQUERY", so we keep a fallback.
+        "dtype": dtype,
         "compid": companyId,
         "custid": customerId,
         "inqrid": inquiryId,
-        "inqrname": inquiryName,
-        "inqrdesc": inquiryDesc,
+        "inqrname": safeInquiryName,
+        "inqrdesc": safeInquiryDesc,
+        // Backwards/forwards compatibility: some backends use a misspelled key.
         "salmpleflag": isSample,
+        "sampleflag": isSample,
         "needdate": neededDate,
         "userid": userId,
         "custname": customerName,
         "priorityid": priorityId,
-        "taskdetail": tasks,
+        "taskdetail": safeTasks,
         "files": fileNames.length
       };
-
-      // set file names
-      for (var i = 0; i < fileNames.length; i++) {
-        headers['picture${i + 1}'] = fileNames[i];
+        // set file names
+        for (var i = 0; i < fileNames.length; i++) {
+          headers['picture${i + 1}'] = fileNames[i];
+        }
+        return headers;
       }
 
-      final response = await dio.post(
-        //"saveall2",
-        "saveall",
-        options: Options(headers: headers),
-      );
+      Future<Response<dynamic>> postWithHeaders(Map<String, dynamic> headers) {
+        return dio.post(
+          "saveall",
+          options: Options(headers: headers),
+        );
+      }
+
+      var headers = buildHeaders("INQUIRY");
+      var response = await postWithHeaders(headers);
       debugPrint("RESPONSE#${response.data}");
-      return response.data['status'] == "200";
+      final status = response.data is Map ? response.data['status'] : null;
+      final statusStr = status?.toString() ?? "";
+      if (statusStr == "200") return true;
+
+      if (statusStr == "400") {
+        headers = buildHeaders("INQUERY");
+        response = await postWithHeaders(headers);
+        debugPrint("RESPONSE_FALLBACK#${response.data}");
+        final fallbackStatus =
+            response.data is Map ? response.data['status'] : null;
+        final fallbackStatusStr = fallbackStatus?.toString() ?? "";
+        return fallbackStatusStr == "200";
+      }
+
+      return false;
     } on DioException catch (error) {
       debugPrint("RESPONSE_ERROR#$error");
       throw Exception(error);
@@ -85,11 +114,12 @@ class InquiryRepo {
   Future<bool> updateTask(String inquiryId, String taskId, String priorityId,
       String description, String userId, int percentage, List<String> fileNames) async {
     try {
+      final safeDescription = HttpHeaderSanitizer.sanitize(description);
       final headers = {
         "dtype": "TASK",
         "inqrid": inquiryId,
         "taskid": taskId,
-        "inqrdesc": description,
+        "inqrdesc": safeDescription,
         "userid": userId,
         "priorityid": priorityId,
         "percentage_value": percentage,
@@ -140,11 +170,12 @@ class InquiryRepo {
   Future<bool> editTask(String inquiryId, String taskId, String isUpdateToAll,
       String newTask, String userId, List<String> fileNames) async {
     try {
+      final safeNewTask = HttpHeaderSanitizer.sanitize(newTask);
       final headers = {
         "dtype": "TASK_EDIT",
         "inqrid": inquiryId,
         "taskid": taskId,
-        "inqrdesc": newTask,
+        "inqrdesc": safeNewTask,
         "userid": userId,
         "priorityid": isUpdateToAll,
         "files": fileNames.length,
@@ -163,11 +194,12 @@ class InquiryRepo {
 
   Future<bool> editEmailMob(String mobileNo, String email, String userId) async {
     try {
+      final safeEmail = HttpHeaderSanitizer.sanitize(email);
       final headers = {
         "dtype": "UPDATE_EMAIL_MOB",
         "inqrid": "0",
         "taskid": mobileNo,
-        "inqrdesc": email,
+        "inqrdesc": safeEmail,
         "userid": userId,
         "priorityid": "0",
         "files": "0",
@@ -188,11 +220,12 @@ class InquiryRepo {
   Future<bool> forwardTask(String inquiryId, String taskId, String priorityId,
       String fUserId, String userId, List<String> fileNames) async {
     try {
+      final safeForwardUser = HttpHeaderSanitizer.sanitize(fUserId);
       final headers = {
         "dtype": "TASK_FORWARD",
         "inqrid": inquiryId,
         "taskid": taskId,
-        "inqrdesc": fUserId,
+        "inqrdesc": safeForwardUser,
         "userid": userId,
         "priorityid": priorityId,
         "files": fileNames.length,

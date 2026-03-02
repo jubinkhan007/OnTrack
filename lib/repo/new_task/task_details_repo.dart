@@ -3,6 +3,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:tmbi/models/new_task/main_task_response.dart';
+import 'package:tmbi/network/http_header_sanitizer.dart';
 
 class TaskDetailsRepo {
   final Dio dio;
@@ -33,11 +34,12 @@ class TaskDetailsRepo {
   Future<bool> updateTask(String inquiryId, String taskId, String priorityId,
       String description, String userId, String percentage, List<String> fileNames) async {
     try {
+      final safeDescription = HttpHeaderSanitizer.sanitize(description);
       final headers = {
         "dtype": "TASK",
         "inqrid": inquiryId,
         "taskid": taskId,
-        "inqrdesc": description,
+        "inqrdesc": safeDescription,
         "userid": userId,
         "priorityid": priorityId,
         "percentage_value": percentage,

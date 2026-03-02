@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:tmbi/network/dio_exception.dart';
+import 'package:tmbi/network/network_debug_logger.dart';
 
 class CustomInterceptor extends Interceptor {
   @override
@@ -9,25 +9,19 @@ class CustomInterceptor extends Interceptor {
     if (accessToken != null) {
       options.headers['Authorization'] = 'Bearer $accessToken';
     }*/
-    debugPrint('\n\n--- Request ---');
-    debugPrint('Method: ${options.method}');
-    debugPrint('URL: ${options.uri}');
-    debugPrint('Headers: ${options.headers}');
-    debugPrint('Data: ${options.data}');
+    NetworkDebugLogger.logRequest(options);
     super.onRequest(options, handler);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    debugPrint('\n\n--- Response ---');
-    debugPrint('Status Code: ${response.statusCode}');
-    debugPrint('Data: ${response.data}');
+    NetworkDebugLogger.logResponse(response);
     super.onResponse(response, handler);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    debugPrint('\n\n--- Error [${err.type}] ${err.requestOptions.uri} | status=${err.response?.statusCode} | ${err.error ?? err.message} ---');
+    NetworkDebugLogger.logDioError(err);
     switch (err.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:

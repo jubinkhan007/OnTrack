@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/notification/notification_service.dart';
+import 'package:tmbi/config/build_signature.dart';
 import 'package:tmbi/db/dao/pending_task_queue_dao.dart';
 import 'package:tmbi/db/dao/pending_task_update_queue_dao.dart';
 import 'package:tmbi/db/dao/sync_dao.dart';
@@ -22,6 +24,10 @@ import '../../network/ui_state.dart';
 import '../../widgets/new_task/dropdown_type.dart';
 
 class NewTaskDashboardViewmodel extends ChangeNotifier {
+  // Set to true temporarily when investigating "created but not visible" cases.
+  // This can generate a lot of GET_TASKS calls after saving.
+  static const bool _kDeepProbeNewTaskVisibility = false;
+
   final NewTaskDashboardRepo ntdRepo;
   final PendingTaskQueueDao _pendingTaskQueueDao = PendingTaskQueueDao();
   final PendingTaskUpdateQueueDao _pendingTaskUpdateQueueDao =
@@ -32,6 +38,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   NewTaskDashboardViewmodel(
       {required this.name, required this.staffId, required this.ntdRepo}) {
+    logBuildSignature('NewTaskDashboardViewmodel');
     _taskDetailsSyncRepo = TaskDetailsRepo(dio: ntdRepo.dio);
     _bootstrapQueue();
     _startPendingSyncTimer();
@@ -464,7 +471,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   /// NEW TASK ENTRY \\\
   TextEditingController taskTextEdit = TextEditingController();
   TextEditingController taskDetailTextEdit = TextEditingController();
-  TextEditingController searchTextEdit = TextEditingController();
   String? _selectedStartDate = DateTime.now().toFormattedString(
     format: "yyyy-MM-dd",
   );
@@ -567,7 +573,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     _pendingSyncTimer?.cancel();
     taskTextEdit.dispose();
     taskDetailTextEdit.dispose();
-    searchTextEdit.dispose();
     super.dispose();
   }
 
@@ -584,18 +589,9 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   List<BusinessUnit> get selectedStaffs => _selectedStaffs;
 
-  String _search = '';
-
-  // available staffs (excluding selected)
-  List<BusinessUnit> get availableStaffs {
-    final list = _buStaffs.where((c) => !_selectedStaffs.contains(c)).toList();
-    if (_search.isEmpty) return list;
-    return list
-        .where(
-          (c) => c.userName.toLowerCase().contains(_search.toLowerCase()),
-        )
-        .toList();
-  }
+  // available staffs (excluding already-selected)
+  List<BusinessUnit> get availableStaffs =>
+      _buStaffs.where((c) => !_selectedStaffs.contains(c)).toList();
 
   void add(BusinessUnit customer) {
     _selectedStaffs.add(customer);
@@ -604,11 +600,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   void remove(BusinessUnit customer) {
     _selectedStaffs.remove(customer);
-    notifyListeners();
-  }
-
-  void search(String value) {
-    _search = value;
     notifyListeners();
   }
 
@@ -726,7 +717,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       format: "yyyy-MM-dd",
     );
     _selectedStaffs.clear();
-    _search = '';
     _selectedDropdownOption = DropdownOption(
       id: 1,
       icon: Icons.circle_outlined,
@@ -757,9 +747,9 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       startDate: effectiveStartDate,
       isSample: _selectedDropdownOption != null
           ? _selectedDropdownOption!.id == 1
-              ? "Y"
-              : "N"
-          : "Y",
+              ? "N"
+              : "Y"
+          : "N",
       priorityId: _selectedPriorityDropdownOption != null
           ? _selectedPriorityDropdownOption!.id.toString()
           : "1",
@@ -768,6 +758,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
     try {
       final response = await ntdRepo.saveTask(
+          companyId: payload.companyId,
           title: payload.title,
           details: payload.details,
           dueDate: payload.dueDate,
@@ -781,6 +772,11 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         taskTextEdit.clear();
         taskDetailTextEdit.clear();
         await getTasks();
+        if (kDebugMode) {
+          // Helps diagnose "created but not visible" cases by checking whether
+          // (and where) the server returns the new task via GET_TASKS.
+          unawaited(_debugProbeNewTaskVisibility(payload.title, payload.companyId));
+        }
       }
 
       _isSuccessTask = response;
@@ -806,6 +802,126 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       _message = error.toString();
     } finally {
       notifyListeners();
+    }
+  }
+
+  Future<void> _debugProbeNewTaskVisibility(String title, String companyId) async {
+    if (!kDebugMode) return;
+
+    Future<bool> runProbe({
+      required String buId,
+      required String createdFlag,
+      required String status,
+    }) async {
+      try {
+        final r = await ntdRepo.getTasks(
+          staffId,
+          buId,
+          createdFlag,
+          buStaffId.isEmpty ? "0" : buStaffId,
+          status,
+        );
+        if (r.data.isEmpty) return false;
+
+        final tasks = r.data.first.tasks;
+        if (tasks.isEmpty) return false;
+
+        final query = title.trim().toLowerCase();
+        final matches = tasks.where((t) {
+          final name = t.name.trim().toLowerCase();
+          return name == query || name.contains(query);
+        }).toList();
+        if (matches.isEmpty) return false;
+
+        final first = matches.first;
+        debugPrint(
+          "[saveTask][probe] Found on server: id=${first.id}, status='${first.status}', buId=$buId, createdFlag=$createdFlag, statusCode=$status",
+        );
+        return true;
+      } catch (e) {
+        debugPrint(
+          "[saveTask][probe] Probe failed (buId=$buId, createdFlag=$createdFlag, statusCode=$status): $e",
+        );
+        return false;
+      }
+    }
+
+    final currentBu = selectedBU?.compId ?? "0";
+    final buCandidates = <String>{
+      currentBu,
+      "999",
+      companyId,
+    }.where((e) => e.isNotEmpty).toList();
+
+    final createdCandidates = <String>{
+      selectedTab.toString(),
+      (selectedTab == 0 ? "1" : "0"),
+    }.toList();
+
+    // Try "All" (8) first, then common bucket codes.
+    // Some environments classify future-dated tasks under a separate code
+    // (often "3" = upcoming), so we include it here by default.
+    final statusCandidates = <String>["8", "2", "3", "1", "0", "4", "6"];
+
+    // Give the backend a moment in case insert/commit is asynchronous.
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    var foundAny = false;
+    for (final status in statusCandidates) {
+      for (final buId in buCandidates) {
+        for (final createdFlag in createdCandidates) {
+          final found = await runProbe(
+            buId: buId,
+            createdFlag: createdFlag,
+            status: status,
+          );
+          foundAny = foundAny || found;
+          if (foundAny) break;
+        }
+        if (foundAny) break;
+      }
+      if (foundAny) break;
+    }
+
+    if (!foundAny && _kDeepProbeNewTaskVisibility) {
+      debugPrint("[saveTask][probe] Deep probe enabled: expanding status/createdFlag candidates...");
+
+      final deepCreatedCandidates = <String>{
+        ...createdCandidates,
+        "Y",
+        "N",
+        "true",
+        "false",
+      }.toList();
+
+      // Brute-force a wider set of status codes (0..12) plus known ones.
+      final deepStatusCandidates = <String>{
+        ...statusCandidates,
+        for (var i = 0; i <= 12; i++) i.toString(),
+      }.toList()
+        ..sort((a, b) => int.tryParse(a)?.compareTo(int.tryParse(b) ?? 0) ?? a.compareTo(b));
+
+      for (final status in deepStatusCandidates) {
+        for (final buId in buCandidates) {
+          for (final createdFlag in deepCreatedCandidates) {
+            final found = await runProbe(
+              buId: buId,
+              createdFlag: createdFlag,
+              status: status,
+            );
+            foundAny = foundAny || found;
+            if (foundAny) break;
+          }
+          if (foundAny) break;
+        }
+        if (foundAny) break;
+      }
+    }
+
+    if (!foundAny) {
+      debugPrint(
+        "[saveTask][probe] Not found via GET_TASKS. Backend may return status=200 without inserting a task visible to GET_TASKS, or it may place it under a different filter/status code.",
+      );
     }
   }
 
@@ -887,6 +1003,14 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     return didSyncAny;
   }
 
+  /// Returns the user's actual company ID (first non-"All" entry), or "0".
+  String get _effectiveCompanyId {
+    for (final c in compInfoList) {
+      if (c.compId != "999" && c.compId != "0") return c.compId;
+    }
+    return "0";
+  }
+
   PendingTaskQueueItem _buildTaskQueueItem({
     required String title,
     required String details,
@@ -895,9 +1019,10 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     required String isSample,
     required String priorityId,
     required String assignees,
+    String? companyId,
   }) {
     return PendingTaskQueueItem(
-      companyId: "0",
+      companyId: companyId ?? _effectiveCompanyId,
       inquiryId: "0",
       customerId: "0",
       customerName: "Other",
@@ -1640,6 +1765,10 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   String _createAssigneesJSON() {
     final List<Map<String, dynamic>> assignedTasks = [];
+    final detail = taskDetailTextEdit.text.trim();
+    final comment = detail.isNotEmpty
+        ? detail.replaceAll("%", " percent ")
+        : taskTextEdit.text.replaceAll("%", " percent ");
 
     if (_selectedStaffs.isNotEmpty) {
       for (var user in _selectedStaffs) {
@@ -1647,9 +1776,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           "NAME": user.userName,
           "STAFFID": user.userHris.toString(),
           "DATETIME": effectiveEndDate,
-          "STARTDATE": effectiveStartDate,
-          "ENDDATE": effectiveEndDate,
-          "COMMENTS": taskTextEdit.text.replaceAll("%", " percent "),
+          "COMMENTS": comment,
         });
       }
     } else {
@@ -1657,9 +1784,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         "NAME": name,
         "STAFFID": staffId,
         "DATETIME": effectiveEndDate,
-        "STARTDATE": effectiveStartDate,
-        "ENDDATE": effectiveEndDate,
-        "COMMENTS": taskTextEdit.text.replaceAll("%", " percent "),
+        "COMMENTS": comment,
       });
     }
     return assignedTasks.isNotEmpty ? jsonEncode(assignedTasks) : "";

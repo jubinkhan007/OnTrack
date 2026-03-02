@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:tmbi/models/new_task/main_task_response.dart';
+import 'package:tmbi/network/http_header_sanitizer.dart';
 
 import '../../models/new_task/comment_response.dart';
 
@@ -44,10 +45,11 @@ class CommentRepo {
   Future<bool> saveComment(
       String inquiryId, String body, String userId, SubTask? subTask) async {
     try {
+      final safeBody = HttpHeaderSanitizer.sanitize(body);
       final headers = {
         "dtype": "TASK",
         "inqrid": inquiryId,
-        "inqrdesc": body,
+        "inqrdesc": safeBody,
         "taskid": subTask == null ? "0" : subTask.id,
         "userid": userId,
         "priorityid": subTask == null
