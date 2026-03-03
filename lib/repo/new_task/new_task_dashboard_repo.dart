@@ -35,7 +35,26 @@ class NewTaskDashboardRepo {
         "getall",
         options: Options(headers: headers),
       );
-      //debugPrint("RESPONSE# ${response.data}");
+      if (kDebugMode) {
+        try {
+          final data = response.data;
+          if (data is Map && data['Data'] is List) {
+            final dataList = data['Data'] as List;
+            for (var i = 0; i < dataList.length; i++) {
+              final item = dataList[i];
+              if (item is Map) {
+                final tasks = item['TASKS'];
+                final taskCount = tasks is List ? tasks.length : '?';
+                debugPrint(
+                  '[getTasks] va=$buId vc=$isCreatedByMe ve=$status → '
+                  'PENNDING=${item['PENNDING']} OVERDUE=${item['OVERDUE']} '
+                  'COMPLETED=${item['COMPLETED']} TASKS=$taskCount',
+                );
+              }
+            }
+          }
+        } catch (_) {}
+      }
       return TaskDataModel.fromJson(response.data);
     } on DioException catch (error) {
       debugPrint('Dio Exception: ${error.message}');
@@ -120,17 +139,14 @@ class NewTaskDashboardRepo {
         );
       }
 
-      Map<String, dynamic> buildHeaders({required String dtype}) {
-        return {
-        "dtype": dtype,
+      final headers = {
+        "dtype": "INQUERY",
         "compid": companyId,
         "custid": customerId,
         "inqrid": inquiryId,
         "inqrname": safeTitle,
         "inqrdesc": safeDetails,
-        // Backwards/forwards compatibility: some backends use a misspelled key.
         "salmpleflag": isSample,
-        "sampleflag": isSample,
         "needdate": dueDate,
         "startdate": startDate ?? dueDate,
         "userid": userId,
@@ -138,12 +154,7 @@ class NewTaskDashboardRepo {
         "priorityid": priorityId,
         "taskdetail": safeAssignees,
         "files": "0"
-        };
-      }
-
-      // Prefer the correct spelling ("INQUIRY"). Some environments still accept
-      // "INQUERY", so we keep a fallback for compatibility.
-      final headers = buildHeaders(dtype: "INQUIRY");
+      };
       NetworkDebugLogger.logSaveTaskDiagnostics(
         title: safeTitle,
         details: safeDetails,
@@ -153,36 +164,11 @@ class NewTaskDashboardRepo {
         headers: headers,
       );
 
-      Response<dynamic> response = await postWithHeaders(headers);
+      final response = await postWithHeaders(headers);
       dynamic status = response.data is Map ? response.data['status'] : null;
-
-      // Some backends return numeric status; normalize for comparisons.
       final statusStr = status?.toString() ?? "";
       debugPrint('[saveTask] status=$status (${status.runtimeType})');
       if (statusStr == "200") return true;
-
-      if (statusStr == "400") {
-        if (kDebugMode) {
-          debugPrint("[saveTask] Server rejected the request (status=400).");
-          debugPrint(
-            "[saveTask] Hints: try a much shorter Description, verify date format, and confirm backend expects dtype='INQUERY' vs 'INQUIRY'.",
-          );
-          debugPrint(
-            "[saveTask] Lengths: inqrname=${safeTitle.length}, inqrdesc=${safeDetails.length}, taskdetail=${safeAssignees.length}",
-          );
-          debugPrint("[saveTask] Fallback retry with dtype='INQUERY'...");
-        }
-
-        // Fallback: some environments use INQUERY instead of INQUIRY.
-        final probeHeaders = buildHeaders(dtype: "INQUERY");
-        response = await postWithHeaders(probeHeaders);
-        status = response.data is Map ? response.data['status'] : null;
-        final probeStatusStr = status?.toString() ?? "";
-        if (kDebugMode) {
-          debugPrint("[saveTask] Fallback status=$status (${status.runtimeType})");
-        }
-        if (probeStatusStr == "200") return true;
-      }
 
       return false;
     } on DioException catch (error) {

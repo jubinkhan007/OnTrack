@@ -352,13 +352,11 @@ class BsTaskEntry extends StatelessWidget {
                                                 onCreate(
                                                     provider.taskTextEdit.text);
                                                 await provider.saveTask();
-                                                if (provider.isSuccessTask &&
-                                                    rootContext.mounted) {
+                                                if (!rootContext.mounted) return;
+                                                if (provider.isSuccessTask) {
                                                   final wasOfflineSave =
                                                       provider
                                                           .isOfflineTaskSaved;
-                                                  await provider
-                                                      .showCreatedInQueue();
                                                   provider.resetTaskEntry();
                                                   if (!rootContext.mounted) {
                                                     return;
@@ -372,6 +370,19 @@ class BsTaskEntry extends StatelessWidget {
                                                         wasOfflineSave
                                                             ? "Task saved offline. It will sync automatically when internet returns."
                                                             : "Task created successfully.",
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  ScaffoldMessenger.of(
+                                                          rootContext)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      backgroundColor:
+                                                          Colors.red.shade700,
+                                                      content: Text(
+                                                        provider.message ??
+                                                            "Failed to create task. Please try again.",
                                                       ),
                                                     ),
                                                   );

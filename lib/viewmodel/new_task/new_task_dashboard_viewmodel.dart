@@ -27,6 +27,10 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
   // Set to true temporarily when investigating "created but not visible" cases.
   // This can generate a lot of GET_TASKS calls after saving.
   static const bool _kDeepProbeNewTaskVisibility = false;
+  // When loading In Queue, we also fetch ve="8" (All) and merge any task
+  // that isn't labeled Overdue or Completed. This captures future-dated tasks
+  // regardless of which internal status bucket the backend assigns them to.
+  static const bool _kIncludeUpcomingInPending = true;
 
   final NewTaskDashboardRepo ntdRepo;
   final PendingTaskQueueDao _pendingTaskQueueDao = PendingTaskQueueDao();
@@ -55,6 +59,9 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   List<Task> _tasks = [];
   List<Task> _localPendingTasks = [];
+  // Tasks added optimistically after a successful save. Shown in the In Queue
+  // tab until the server returns them via GET_TASKS (name-match dedup).
+  final List<Task> _recentlyCreatedTasks = [];
   final Map<String, List<Task>> _completionCompletedByContext = {};
 
   int get _localPendingNotCompletedCount {
@@ -79,7 +86,12 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       final pendingLocal = _localPendingTasks
           .where((t) => t.completion.split('.').first != "100")
           .toList();
-      return [...pendingLocal, ..._tasks];
+      // Show recently created tasks not yet returned by the server.
+      final serverNames = _tasks.map((t) => t.name.toLowerCase().trim()).toSet();
+      final freshRecent = _recentlyCreatedTasks
+          .where((t) => !serverNames.contains(t.name.toLowerCase().trim()))
+          .toList();
+      return [...pendingLocal, ...freshRecent, ..._tasks];
     }
     if (statusTab == TaskStatusFlag.completed) {
       final derived =
@@ -350,8 +362,31 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         _overdue = data.overdue.toString();
         _completed = data.completed.toString();
 
-        if (data.tasks.isNotEmpty) {
-          _tasks.addAll(data.tasks);
+        var effectiveTasks = data.tasks;
+        if (_kIncludeUpcomingInPending && statusTab == TaskStatusFlag.pending) {
+          try {
+            // Fetch all tasks (ve="8") and keep only those not already marked
+            // Overdue or Completed. This captures future-dated tasks regardless
+            // of which internal bucket the backend assigns them to.
+            final all = await _fetchTasksForStatusCode("8");
+            final active = all
+                .where((t) =>
+                    t.status != TaskStatusFlag.overdue.getData.first &&
+                    t.status != TaskStatusFlag.completed.getData.first)
+                .toList();
+            if (active.isNotEmpty) {
+              effectiveTasks = _mergeDedupTasks(effectiveTasks, active);
+            }
+          } catch (_) {
+            // Ignore if the All fetch fails.
+          }
+        }
+
+        if (effectiveTasks.isNotEmpty) {
+          _tasks.addAll(effectiveTasks);
+          // Remove optimistic entries that the server now returns.
+          _recentlyCreatedTasks.removeWhere((r) => _tasks.any(
+              (t) => t.name.toLowerCase().trim() == r.name.toLowerCase().trim()));
           await _applyPendingUpdateQueueToTasks();
           _reclassifyCompletedByCompletion();
           await _applyPendingCommentCounts();
@@ -369,13 +404,13 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           "verifiedCounts": _verifiedCounts.toString(),
         });
 
-        if (_tasks.isEmpty && _localPendingTasks.isEmpty) {
+        if (_tasks.isEmpty && _localPendingTasks.isEmpty && _recentlyCreatedTasks.isEmpty) {
           _message = "(no data found)";
         }
 
         _uiState = UiState.success;
         await _cacheLatestTaskSnapshot();
-      } else if (_localPendingTasks.isEmpty) {
+      } else if (_localPendingTasks.isEmpty && _recentlyCreatedTasks.isEmpty) {
         _message = "(no data found)";
         _uiState = UiState.success; // still success, just empty
         await _cacheLatestTaskSnapshot();
@@ -747,9 +782,9 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       startDate: effectiveStartDate,
       isSample: _selectedDropdownOption != null
           ? _selectedDropdownOption!.id == 1
-              ? "N"
-              : "Y"
-          : "N",
+              ? "Y"
+              : "N"
+          : "Y",
       priorityId: _selectedPriorityDropdownOption != null
           ? _selectedPriorityDropdownOption!.id.toString()
           : "1",
@@ -758,7 +793,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
     try {
       final response = await ntdRepo.saveTask(
-          companyId: payload.companyId,
           title: payload.title,
           details: payload.details,
           dueDate: payload.dueDate,
@@ -771,15 +805,47 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       if (response) {
         taskTextEdit.clear();
         taskDetailTextEdit.clear();
-        await getTasks();
+        // The backend returns 200 before the new task is fully committed and
+        // queryable. A short pause prevents the immediately following GET_TASKS
+        // from missing the task.
+        await Future.delayed(const Duration(milliseconds: 800));
+        await showCreatedInQueue();
+        // Optimistic UI: show the task immediately if GET_TASKS didn't return it.
+        if (!_tasks.any((t) => t.name.toLowerCase().trim() == text.toLowerCase().trim())) {
+          _recentlyCreatedTasks.insert(0, Task(
+            tnstHris: staffId,
+            id: "recent_${DateTime.now().millisecondsSinceEpoch}",
+            name: text,
+            assignToId: staffId,
+            assignToName: name,
+            completion: "0",
+            createdDate: DateTime.now().toIso8601String(),
+            status: "In Queue",
+            commentCount: "0",
+          ));
+          notifyListeners();
+        }
+        if (staffId.isEmail()) {
+          // Email users are forced to the Assigned tab; ensure list refresh.
+          await getTasks();
+        }
+        // Schedule a second refresh a few seconds later in case 800ms was not
+        // enough for the backend to index the new record.
+        Future.delayed(const Duration(seconds: 4), () async {
+          if (_uiState != UiState.loading) {
+            await getTasks();
+          }
+        });
         if (kDebugMode) {
-          // Helps diagnose "created but not visible" cases by checking whether
-          // (and where) the server returns the new task via GET_TASKS.
           unawaited(_debugProbeNewTaskVisibility(payload.title, payload.companyId));
         }
       }
 
       _isSuccessTask = response;
+      if (!response) {
+        _message = "Task could not be saved — the server rejected the request. "
+            "Check logs for details (compid, dtype, date format).";
+      }
       _uiStateTask = UiState.success;
     } on DioException catch (error) {
       if (_isOfflineError(error)) {
@@ -835,12 +901,12 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
         final first = matches.first;
         debugPrint(
-          "[saveTask][probe] Found on server: id=${first.id}, status='${first.status}', buId=$buId, createdFlag=$createdFlag, statusCode=$status",
+          "[saveTask][probe] *** FOUND *** id=${first.id}, taskStatus='${first.status}', va(buId)=$buId, vc(createdFlag)=$createdFlag, ve(statusCode)=$status",
         );
         return true;
       } catch (e) {
         debugPrint(
-          "[saveTask][probe] Probe failed (buId=$buId, createdFlag=$createdFlag, statusCode=$status): $e",
+          "[saveTask][probe] Error (buId=$buId, createdFlag=$createdFlag, statusCode=$status): $e",
         );
         return false;
       }
@@ -858,14 +924,19 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       (selectedTab == 0 ? "1" : "0"),
     }.toList();
 
-    // Try "All" (8) first, then common bucket codes.
-    // Some environments classify future-dated tasks under a separate code
-    // (often "3" = upcoming), so we include it here by default.
+    // "All" (8) first, then common per-status codes, then "3" (upcoming bucket).
     final statusCandidates = <String>["8", "2", "3", "1", "0", "4", "6"];
 
-    // Give the backend a moment in case insert/commit is asynchronous.
-    await Future.delayed(const Duration(milliseconds: 600));
+    // Give the backend time to commit the new row before probing.
+    await Future.delayed(const Duration(seconds: 2));
+    debugPrint(
+      "[saveTask][probe] === Starting full probe for: '$title' (companyId=$companyId) ===",
+    );
+    debugPrint(
+      "[saveTask][probe] va candidates=$buCandidates, vc candidates=$createdCandidates, ve candidates=$statusCandidates",
+    );
 
+    // Do NOT break on first match — log every combination that finds the task.
     var foundAny = false;
     for (final status in statusCandidates) {
       for (final buId in buCandidates) {
@@ -875,16 +946,13 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
             createdFlag: createdFlag,
             status: status,
           );
-          foundAny = foundAny || found;
-          if (foundAny) break;
+          if (found) foundAny = true;
         }
-        if (foundAny) break;
       }
-      if (foundAny) break;
     }
 
-    if (!foundAny && _kDeepProbeNewTaskVisibility) {
-      debugPrint("[saveTask][probe] Deep probe enabled: expanding status/createdFlag candidates...");
+    if (!foundAny) {
+      debugPrint("[saveTask][probe] Not found in initial set. Running deep probe (status 0-12, extra createdFlags)...");
 
       final deepCreatedCandidates = <String>{
         ...createdCandidates,
@@ -894,7 +962,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         "false",
       }.toList();
 
-      // Brute-force a wider set of status codes (0..12) plus known ones.
       final deepStatusCandidates = <String>{
         ...statusCandidates,
         for (var i = 0; i <= 12; i++) i.toString(),
@@ -909,18 +976,20 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
               createdFlag: createdFlag,
               status: status,
             );
-            foundAny = foundAny || found;
-            if (foundAny) break;
+            if (found) foundAny = true;
           }
-          if (foundAny) break;
         }
-        if (foundAny) break;
       }
     }
 
-    if (!foundAny) {
+    if (foundAny) {
+      debugPrint("[saveTask][probe] === Probe complete. Task IS visible — see *** FOUND *** lines above. ===");
+    } else {
       debugPrint(
-        "[saveTask][probe] Not found via GET_TASKS. Backend may return status=200 without inserting a task visible to GET_TASKS, or it may place it under a different filter/status code.",
+        "[saveTask][probe] === NOT FOUND in any combination. Task is NOT visible via GET_TASKS. ===",
+      );
+      debugPrint(
+        "[saveTask][probe] Check: does the backend use dtype=INQUIRY for tasks queryable via vm=GET_TASKS?",
       );
     }
   }
@@ -1022,7 +1091,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     String? companyId,
   }) {
     return PendingTaskQueueItem(
-      companyId: companyId ?? _effectiveCompanyId,
+      companyId: companyId ?? "0",
       inquiryId: "0",
       customerId: "0",
       customerName: "Other",
@@ -1372,6 +1441,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           "status": status.name,
           "contextKey": contextKey,
         });
+        // Pending may require an additional fetch for "upcoming" bucket (3).
         final response = await ntdRepo.getTasks(
           staffId,
           selectedBU != null ? selectedBU!.compId : "0",
@@ -1379,6 +1449,21 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           buStaffId.isEmpty ? "0" : buStaffId,
           status.getData.second,
         );
+
+        TaskDataModel? allTasksResponse;
+        if (_kIncludeUpcomingInPending && status == TaskStatusFlag.pending) {
+          try {
+            allTasksResponse = await ntdRepo.getTasks(
+              staffId,
+              selectedBU != null ? selectedBU!.compId : "0",
+              selectedTab.toString(),
+              buStaffId.isEmpty ? "0" : buStaffId,
+              "8",
+            );
+          } catch (_) {
+            allTasksResponse = null;
+          }
+        }
 
         if (requestVersion != _countsRequestVersion ||
             contextKey != _countsContextKey) {
@@ -1405,6 +1490,26 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           // Prefer the server count if it indicates more than the returned list.
           // Some server responses may omit TASKS while still providing counts.
           var fetchedCount = serverCount > tasksLen ? serverCount : tasksLen;
+
+          // Fold future-dated tasks from the All (ve=8) fetch into the
+          // pending count so the In Queue card shows an accurate number.
+          if (_kIncludeUpcomingInPending &&
+              status == TaskStatusFlag.pending &&
+              allTasksResponse != null &&
+              allTasksResponse.data.isNotEmpty) {
+            final allTasks = allTasksResponse.data[0].tasks;
+            final active = allTasks
+                .where((t) =>
+                    t.status != TaskStatusFlag.overdue.getData.first &&
+                    t.status != TaskStatusFlag.completed.getData.first)
+                .toList();
+            if (active.isNotEmpty) {
+              final mergedLen =
+                  _mergeDedupTasks(serverCounts.tasks, active).length;
+              if (mergedLen > fetchedCount) fetchedCount = mergedLen;
+            }
+          }
+
           if (selectedTab == 0) {
             if (status == TaskStatusFlag.pending) {
               fetchedCount += _localPendingNotCompletedCount;
@@ -1486,6 +1591,32 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           serverCount > localMainCount ? serverCount : localMainCount;
       task.commentCount = effectiveCount.toString();
     }
+  }
+
+  Future<List<Task>> _fetchTasksForStatusCode(String statusCode) async {
+    final response = await ntdRepo.getTasks(
+      staffId,
+      selectedBU != null ? selectedBU!.compId : "0",
+      selectedTab.toString(),
+      buStaffId.isEmpty ? "0" : buStaffId,
+      statusCode,
+    );
+    if (response.data.isEmpty) return [];
+    return response.data.first.tasks;
+  }
+
+  List<Task> _mergeDedupTasks(List<Task> a, List<Task> b) {
+    if (a.isEmpty) return List<Task>.from(b);
+    if (b.isEmpty) return List<Task>.from(a);
+    final seen = <String>{};
+    final out = <Task>[];
+    for (final t in a) {
+      if (seen.add(t.id)) out.add(t);
+    }
+    for (final t in b) {
+      if (seen.add(t.id)) out.add(t);
+    }
+    return out;
   }
 
   int _countPendingComments(SharedPreferences prefs, String key) {
@@ -1765,10 +1896,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
   String _createAssigneesJSON() {
     final List<Map<String, dynamic>> assignedTasks = [];
-    final detail = taskDetailTextEdit.text.trim();
-    final comment = detail.isNotEmpty
-        ? detail.replaceAll("%", " percent ")
-        : taskTextEdit.text.replaceAll("%", " percent ");
+    final titleComment = taskTextEdit.text.replaceAll("%", " percent ");
 
     if (_selectedStaffs.isNotEmpty) {
       for (var user in _selectedStaffs) {
@@ -1776,7 +1904,9 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           "NAME": user.userName,
           "STAFFID": user.userHris.toString(),
           "DATETIME": effectiveEndDate,
-          "COMMENTS": comment,
+          "STARTDATE": effectiveStartDate,
+          "ENDDATE": effectiveEndDate,
+          "COMMENTS": titleComment,
         });
       }
     } else {
@@ -1784,7 +1914,9 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         "NAME": name,
         "STAFFID": staffId,
         "DATETIME": effectiveEndDate,
-        "COMMENTS": comment,
+        "STARTDATE": effectiveStartDate,
+        "ENDDATE": effectiveEndDate,
+        "COMMENTS": titleComment,
       });
     }
     return assignedTasks.isNotEmpty ? jsonEncode(assignedTasks) : "";

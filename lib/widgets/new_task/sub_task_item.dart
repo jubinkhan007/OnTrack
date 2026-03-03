@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/config/strings.dart';
 import 'package:tmbi/config/app_theme.dart';
 import 'package:tmbi/models/new_task/main_task_response.dart';
@@ -36,238 +35,203 @@ class SubTaskItem extends StatelessWidget {
     final base = isDone ? AppColors.success : AppColors.warning;
     final name = (subtask.assignToName).trim();
     final initial = name.isNotEmpty ? name.characters.first.toUpperCase() : '?';
+    final canUpdate = subtask.assignToId == staffId && !isDone;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
       child: Material(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.outline),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 8, 12, 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top section: bar + name/assignee content
-                IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        width: 5,
-                        decoration: BoxDecoration(
-                          color: base.withOpacity(0.9),
-                          borderRadius: const BorderRadius.horizontal(
-                            left: Radius.circular(16),
-                          ),
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: canUpdate ? () => onUpdate(subtask.id.toString()) : null,
+          borderRadius: BorderRadius.circular(14),
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.outline),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8, 10, 8),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Left color bar
+                    Container(
+                      width: 5,
+                      decoration: BoxDecoration(
+                        color: base.withOpacity(0.9),
+                        borderRadius: const BorderRadius.horizontal(
+                          left: Radius.circular(14),
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    subtask.name,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: base.withOpacity(0.12),
-                                    borderRadius: BorderRadius.circular(999),
-                                    border: Border.all(
-                                        color: base.withOpacity(0.25)),
-                                  ),
-                                  child: Text(
-                                    isDone
-                                        ? "Completed • ${subtask.completion}%"
-                                        : "In Progress • ${subtask.completion}%",
-                                    style: textTheme.labelSmall?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      color: base.withOpacity(0.9),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 12,
-                                  backgroundColor: base.withOpacity(0.12),
-                                  child: Text(
-                                    initial,
-                                    style: textTheme.labelMedium?.copyWith(
-                                      fontWeight: FontWeight.w900,
-                                      color: base.withOpacity(0.9),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    "${subtask.assignToName} ${Strings.dot} ${subtask.date}",
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: textTheme.bodySmall?.copyWith(
-                                      color: AppColors.muted,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Reminder row (assignee only)
-                if (onReminderTap != null) ...[
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          onTap: onReminderTap,
-                          borderRadius: BorderRadius.circular(8),
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(15, 4, 4, 4),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.notifications_none,
-                                  size: 16,
-                                  color: AppColors.muted,
-                                ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    reminderText == null
-                                        ? "Add reminder"
-                                        : "Remind me at $reminderText",
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: Converts.c16 - 4,
-                                      color: AppColors.muted,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (reminderText != null && onReminderClear != null)
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 18),
-                          color: AppColors.muted,
-                          onPressed: onReminderClear,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-
-                // Last note + comment button
-                const SizedBox(height: 4),
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          subtask.lastComment != "null"
-                              ? "Last Note • ${subtask.lastComment}"
-                              : "",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: Converts.c16 - 4,
-                              color: AppColors.muted),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CommentsScreen(
-                                staffId: staffId,
-                                inqId: mainTaskId,
-                                subTask: subtask,
-                              ),
-                            ),
-                          );
-                          onReturn?.call();
-                        },
-                        borderRadius: BorderRadius.circular(999),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 6),
-                          child: Row(
+                    ),
+                    const SizedBox(width: 10),
+                    // Content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Row 1: task name + completion chip
+                          Row(
                             children: [
-                              const Icon(
-                                Icons.comment,
-                                size: 16,
-                                color: AppColors.muted,
+                              Expanded(
+                                child: Text(
+                                  subtask.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
                               ),
-                              const SizedBox(width: 2),
-                              Text(
-                                subtask.commentCount,
-                                style: TextStyle(
-                                    fontSize: Converts.c16 - 4,
-                                    color: AppColors.muted,
-                                    fontWeight: FontWeight.bold),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: base.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border:
+                                      Border.all(color: base.withOpacity(0.25)),
+                                ),
+                                child: Text(
+                                  isDone
+                                      ? "Done"
+                                      : "${subtask.completion}%",
+                                  style: textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: base.withOpacity(0.9),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                        ),
+                          const SizedBox(height: 4),
+                          // Row 2: assignee avatar + name + date
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 10,
+                                backgroundColor: base.withOpacity(0.12),
+                                child: Text(
+                                  initial,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    color: base.withOpacity(0.9),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  "${subtask.assignToName} ${Strings.dot} ${subtask.date}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: AppColors.muted,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 3),
+                          // Row 3: reminder + last note + comment (single row)
+                          Row(
+                            children: [
+                              // Bell icon (assignee only)
+                              if (onReminderTap != null) ...[
+                                InkWell(
+                                  onTap: onReminderTap,
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 2, 4, 2),
+                                    child: Icon(
+                                      reminderText != null
+                                          ? Icons.notifications_active
+                                          : Icons.notifications_none,
+                                      size: 13,
+                                      color: reminderText != null
+                                          ? base.withOpacity(0.8)
+                                          : AppColors.muted,
+                                    ),
+                                  ),
+                                ),
+                                if (reminderText != null &&
+                                    onReminderClear != null)
+                                  InkWell(
+                                    onTap: onReminderClear,
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: const Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 2, 6, 2),
+                                      child: Icon(Icons.close,
+                                          size: 11, color: AppColors.muted),
+                                    ),
+                                  ),
+                              ],
+                              // Last note (expanded)
+                              Expanded(
+                                child: Text(
+                                  subtask.lastComment != "null"
+                                      ? subtask.lastComment
+                                      : "",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: Converts.c16 - 5,
+                                    color: AppColors.muted,
+                                  ),
+                                ),
+                              ),
+                              // Comment icon + count
+                              InkWell(
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => CommentsScreen(
+                                        staffId: staffId,
+                                        inqId: mainTaskId,
+                                        subTask: subtask,
+                                      ),
+                                    ),
+                                  );
+                                  onReturn?.call();
+                                },
+                                borderRadius: BorderRadius.circular(999),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 4),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.comment,
+                                          size: 12, color: AppColors.muted),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        subtask.commentCount,
+                                        style: TextStyle(
+                                          fontSize: Converts.c16 - 5,
+                                          color: AppColors.muted,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-
-                // Update button (assignee + incomplete only)
-                if (subtask.assignToId == staffId &&
-                    subtask.completion != "100")
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      FilledButton(
-                        onPressed: () => onUpdate(subtask.id.toString()),
-                        child: const Text(
-                          "Update",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
+              ),
             ),
           ),
         ),
