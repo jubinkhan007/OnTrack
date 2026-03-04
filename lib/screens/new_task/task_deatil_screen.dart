@@ -183,7 +183,6 @@ import '../../config/strings.dart';
 import '../../models/new_task/main_task_response.dart';
 import '../../network/api_service.dart';
 import '../../viewmodel/new_task/task_details_viewmodel.dart';
-import '../../widgets/new_task/progressbar.dart';
 import '../../widgets/new_task/section_header.dart';
 import '../../widgets/new_task/sub_task_item.dart';
 
@@ -431,7 +430,7 @@ class TaskDetailsScreen extends StatelessWidget {
       TaskDetailsViewmodel provider, SubTask subtask) {
     var selectedStatus = 3; // In Progress
     final noteController = TextEditingController();
-    var sliderValue = double.tryParse(subtask.completion ?? '') ?? 0;
+    var sliderValue = double.tryParse(subtask.completion) ?? 0;
 
     showModalBottomSheet(
       context: context,
@@ -745,69 +744,7 @@ class TaskDetailsScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text(
-                                        Strings.overAllProgress,
-                                        style: TextStyle(fontWeight: FontWeight.w800),
-                                      ),
-                                      Builder(builder: (context) {
-                                        final status =
-                                            provider.mainTaskResponse!.data.first.status;
-                                        final pctStr = provider
-                                            .mainTaskResponse!
-                                            .data
-                                            .first
-                                            .totalCompletion;
-                                        final pct = double.tryParse(pctStr) ?? 0;
-                                        final isDone = status ==
-                                            TaskStatusFlag.completed.getData.first;
-                                        final color = isDone
-                                            ? AppColors.success
-                                            : (status ==
-                                                    TaskStatusFlag.overdue.getData.first
-                                                ? AppColors.danger
-                                                : AppColors.warning);
-                                        return Text(
-                                          "${pct.round()}% | $status",
-                                          style: TextStyle(
-                                            color: color,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        );
-                                      }),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Builder(builder: (context) {
-                                    final pct = double.tryParse(provider
-                                            .mainTaskResponse!
-                                            .data
-                                            .first
-                                            .totalCompletion) ??
-                                        0;
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(999),
-                                      child: LinearProgressIndicator(
-                                        value: (pct / 100).clamp(0, 1),
-                                        minHeight: 10,
-                                        backgroundColor: AppColors.outline,
-                                        valueColor: const AlwaysStoppedAnimation(
-                                            AppColors.accent),
-                                      ),
-                                    );
-                                  }),
-                                ],
-                              ),
-                            ),
-                          ),
+                          const SizedBox(height: 6),
                           /*Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
@@ -861,6 +798,29 @@ class TaskDetailsScreen extends StatelessWidget {
                   SectionHeader(
                     title:
                         "Sub-tasks (${task.data.first.tasks.where((s) => s.completion == "100").length}/${task.data.first.tasks.length})",
+                    trailing: Builder(builder: (context) {
+                      final status = provider.mainTaskResponse!.data.first.status;
+                      final pctStr =
+                          provider.mainTaskResponse!.data.first.totalCompletion;
+                      final pct = double.tryParse(pctStr) ?? 0;
+                      final isDone =
+                          status == TaskStatusFlag.completed.getData.first;
+                      final color = isDone
+                          ? AppColors.success
+                          : (status == TaskStatusFlag.overdue.getData.first
+                              ? AppColors.danger
+                              : AppColors.warning);
+                      return Text(
+                        "${Strings.overAllProgress}: ${pct.round()}%",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: color,
+                          fontWeight: FontWeight.w800,
+                          fontSize: Converts.c16 - 4,
+                        ),
+                      );
+                    }),
                   ),
                   SliverList(
                     delegate: SliverChildBuilderDelegate(

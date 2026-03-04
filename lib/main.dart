@@ -98,46 +98,27 @@ class MyApp extends StatelessWidget {
           onGenerateRoute: (settings) => generateRoute(settings),
           navigatorKey: AppNavigator.key,
           theme: AppTheme.light(),
-          home: const SplashScreen()),
+          home: const _StartupRouter()),
     );
   }
 }
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class _StartupRouter extends StatefulWidget {
+  const _StartupRouter();
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<_StartupRouter> createState() => _StartupRouterState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnim;
-  late Animation<Offset> _slideAnim;
-
+class _StartupRouterState extends State<_StartupRouter> {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 900),
-      vsync: this,
-    )..forward();
-    _fadeAnim = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.12),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     _checkLoginState();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   Future<void> _checkLoginState() async {
+    await Future.delayed(const Duration(seconds: 3));
     final userResponse = await SPHelper().getUser();
     final isSaved = await SPHelper().isCredentialSaved();
 
@@ -201,62 +182,13 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppGradients.header),
-        child: FadeTransition(
-          opacity: _fadeAnim,
-          child: SlideTransition(
-            position: _slideAnim,
-            child: const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _SplashLogo(),
-                  SizedBox(height: 24),
-                  Text(
-                    'OnTrack',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 34,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Transforming the way you work',
-                    style: TextStyle(
-                      color: Color(0xCCFFFFFF),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Image.asset(
+          'assets/app_icon.png',
+          width: 180,
+          height: 180,
         ),
-      ),
-    );
-  }
-}
-
-class _SplashLogo extends StatelessWidget {
-  const _SplashLogo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.12),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(0.18)),
-      ),
-      child: const Icon(
-        Icons.track_changes_rounded,
-        color: Colors.white,
-        size: 52,
       ),
     );
   }

@@ -6,7 +6,6 @@ import 'package:tmbi/config/enum.dart';
 import 'package:tmbi/config/extension_file.dart';
 import 'package:tmbi/models/new_task/bu_response.dart';
 import 'package:tmbi/repo/new_task/new_task_dashboard_repo.dart';
-import 'package:tmbi/screens/new_task/card_scan_screen.dart';
 import 'package:tmbi/screens/new_task/sync_screen.dart';
 import 'package:tmbi/viewmodel/new_task/new_task_dashboard_viewmodel.dart';
 import 'package:tmbi/widgets/error_container.dart';
@@ -24,7 +23,6 @@ import '../../widgets/new_task/status_cards.dart';
 import '../../widgets/new_task/tab_selector.dart';
 import '../../widgets/new_task/task_item.dart';
 import '../login_screen.dart';
-import '../todo/todo_home_screen.dart';
 import 'notification_screen.dart';
 import 'dashboard_screen.dart';
 
@@ -180,7 +178,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
                 ),
                 // --- Tab Selector# Created By Me | Assigned To me -- \\
                 SliverToBoxAdapter(
-                  child: SizedBox(height: Converts.c12),
+                  child: SizedBox(height: Converts.c8),
                 ),
                 SliverToBoxAdapter(
                   child: staffId.isEmail()
@@ -223,7 +221,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: SizedBox(height: Converts.c12),
+                  child: SizedBox(height: Converts.c8),
                 ),
                 // --- Task List --- \\
                 if (vm.uiState == UiState.loading)
@@ -271,7 +269,7 @@ class NewTaskDashboardScreen extends StatelessWidget {
                           },
                           background: Container(
                             margin: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
+                                horizontal: 12, vertical: 1),
                             alignment: Alignment.centerRight,
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 20),

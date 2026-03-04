@@ -79,7 +79,7 @@ class SubTaskItem extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   subtask.name,
-                                  maxLines: 2,
+                                  maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.w800,
@@ -106,6 +106,14 @@ class SubTaskItem extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              if (canUpdate) ...[
+                                const SizedBox(width: 6),
+                                _MiniIconButton(
+                                  icon: Icons.edit_rounded,
+                                  color: base,
+                                  onTap: () => onUpdate(subtask.id.toString()),
+                                ),
+                              ],
                             ],
                           ),
                           const SizedBox(height: 4),
@@ -234,6 +242,34 @@ class SubTaskItem extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniIconButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _MiniIconButton({
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Icon(
+          icon,
+          size: 16,
+          color: color.withOpacity(0.9),
         ),
       ),
     );

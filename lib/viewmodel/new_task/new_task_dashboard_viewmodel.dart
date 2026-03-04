@@ -87,7 +87,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           .where((t) => t.completion.split('.').first != "100")
           .toList();
       // Show recently created tasks not yet returned by the server.
-      final serverNames = _tasks.map((t) => t.name.toLowerCase().trim()).toSet();
+      final serverNames =
+          _tasks.map((t) => t.name.toLowerCase().trim()).toSet();
       final freshRecent = _recentlyCreatedTasks
           .where((t) => !serverNames.contains(t.name.toLowerCase().trim()))
           .toList();
@@ -385,8 +386,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         if (effectiveTasks.isNotEmpty) {
           _tasks.addAll(effectiveTasks);
           // Remove optimistic entries that the server now returns.
-          _recentlyCreatedTasks.removeWhere((r) => _tasks.any(
-              (t) => t.name.toLowerCase().trim() == r.name.toLowerCase().trim()));
+          _recentlyCreatedTasks.removeWhere((r) => _tasks.any((t) =>
+              t.name.toLowerCase().trim() == r.name.toLowerCase().trim()));
           await _applyPendingUpdateQueueToTasks();
           _reclassifyCompletedByCompletion();
           await _applyPendingCommentCounts();
@@ -404,7 +405,9 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           "verifiedCounts": _verifiedCounts.toString(),
         });
 
-        if (_tasks.isEmpty && _localPendingTasks.isEmpty && _recentlyCreatedTasks.isEmpty) {
+        if (_tasks.isEmpty &&
+            _localPendingTasks.isEmpty &&
+            _recentlyCreatedTasks.isEmpty) {
           _message = "(no data found)";
         }
 
@@ -780,11 +783,16 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
       details: textDetail.replaceAll("%", " percent "),
       dueDate: effectiveEndDate,
       startDate: effectiveStartDate,
+      companyId: (selectedBU?.compId != null &&
+              selectedBU!.compId != "999" &&
+              selectedBU!.compId != "0")
+          ? selectedBU!.compId
+          : _effectiveCompanyId,
       isSample: _selectedDropdownOption != null
           ? _selectedDropdownOption!.id == 1
-              ? "Y"
-              : "N"
-          : "Y",
+              ? "N"
+              : "Y"
+          : "N",
       priorityId: _selectedPriorityDropdownOption != null
           ? _selectedPriorityDropdownOption!.id.toString()
           : "1",
@@ -793,6 +801,7 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
 
     try {
       final response = await ntdRepo.saveTask(
+          companyId: payload.companyId,
           title: payload.title,
           details: payload.details,
           dueDate: payload.dueDate,
@@ -811,18 +820,21 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         await Future.delayed(const Duration(milliseconds: 800));
         await showCreatedInQueue();
         // Optimistic UI: show the task immediately if GET_TASKS didn't return it.
-        if (!_tasks.any((t) => t.name.toLowerCase().trim() == text.toLowerCase().trim())) {
-          _recentlyCreatedTasks.insert(0, Task(
-            tnstHris: staffId,
-            id: "recent_${DateTime.now().millisecondsSinceEpoch}",
-            name: text,
-            assignToId: staffId,
-            assignToName: name,
-            completion: "0",
-            createdDate: DateTime.now().toIso8601String(),
-            status: "In Queue",
-            commentCount: "0",
-          ));
+        if (!_tasks.any(
+            (t) => t.name.toLowerCase().trim() == text.toLowerCase().trim())) {
+          _recentlyCreatedTasks.insert(
+              0,
+              Task(
+                tnstHris: staffId,
+                id: "recent_${DateTime.now().millisecondsSinceEpoch}",
+                name: text,
+                assignToId: staffId,
+                assignToName: name,
+                completion: "0",
+                createdDate: DateTime.now().toIso8601String(),
+                status: "In Queue",
+                commentCount: "0",
+              ));
           notifyListeners();
         }
         if (staffId.isEmail()) {
@@ -837,7 +849,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           }
         });
         if (kDebugMode) {
-          unawaited(_debugProbeNewTaskVisibility(payload.title, payload.companyId));
+          unawaited(
+              _debugProbeNewTaskVisibility(payload.title, payload.companyId));
         }
       }
 
@@ -871,7 +884,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     }
   }
 
-  Future<void> _debugProbeNewTaskVisibility(String title, String companyId) async {
+  Future<void> _debugProbeNewTaskVisibility(
+      String title, String companyId) async {
     if (!kDebugMode) return;
 
     Future<bool> runProbe({
@@ -952,7 +966,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     }
 
     if (!foundAny) {
-      debugPrint("[saveTask][probe] Not found in initial set. Running deep probe (status 0-12, extra createdFlags)...");
+      debugPrint(
+          "[saveTask][probe] Not found in initial set. Running deep probe (status 0-12, extra createdFlags)...");
 
       final deepCreatedCandidates = <String>{
         ...createdCandidates,
@@ -966,7 +981,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         ...statusCandidates,
         for (var i = 0; i <= 12; i++) i.toString(),
       }.toList()
-        ..sort((a, b) => int.tryParse(a)?.compareTo(int.tryParse(b) ?? 0) ?? a.compareTo(b));
+        ..sort((a, b) =>
+            int.tryParse(a)?.compareTo(int.tryParse(b) ?? 0) ?? a.compareTo(b));
 
       for (final status in deepStatusCandidates) {
         for (final buId in buCandidates) {
@@ -983,7 +999,8 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
     }
 
     if (foundAny) {
-      debugPrint("[saveTask][probe] === Probe complete. Task IS visible — see *** FOUND *** lines above. ===");
+      debugPrint(
+          "[saveTask][probe] === Probe complete. Task IS visible — see *** FOUND *** lines above. ===");
     } else {
       debugPrint(
         "[saveTask][probe] === NOT FOUND in any combination. Task is NOT visible via GET_TASKS. ===",
@@ -1904,8 +1921,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
           "NAME": user.userName,
           "STAFFID": user.userHris.toString(),
           "DATETIME": effectiveEndDate,
-          "STARTDATE": effectiveStartDate,
-          "ENDDATE": effectiveEndDate,
           "COMMENTS": titleComment,
         });
       }
@@ -1914,8 +1929,6 @@ class NewTaskDashboardViewmodel extends ChangeNotifier {
         "NAME": name,
         "STAFFID": staffId,
         "DATETIME": effectiveEndDate,
-        "STARTDATE": effectiveStartDate,
-        "ENDDATE": effectiveEndDate,
         "COMMENTS": titleComment,
       });
     }

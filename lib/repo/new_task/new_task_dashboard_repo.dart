@@ -147,6 +147,7 @@ class NewTaskDashboardRepo {
         "inqrname": safeTitle,
         "inqrdesc": safeDetails,
         "salmpleflag": isSample,
+        "sampleflag": isSample,
         "needdate": dueDate,
         "startdate": startDate ?? dueDate,
         "userid": userId,

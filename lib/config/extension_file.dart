@@ -23,12 +23,12 @@ extension DateTimeFormatter on DateTime {
 
 extension InquiryResponseExtensions on InquiryResponse {
   double get totalTaskPercentage {
-    if (tasks != null && tasks!.isNotEmpty) {
-      final total = tasks!
+    if (tasks.isNotEmpty) {
+      final total = tasks
           .map((task) => task.totalPercentage)
           .fold(0.0, (prev, curr) => prev + curr);
 
-      double percentage = total / tasks!.length;
+      double percentage = total / tasks.length;
 
       // Safeguard against NaN or Infinity
       if (percentage.isNaN || percentage.isInfinite) {
@@ -148,32 +148,32 @@ extension ShimmerLoadingExtension on BuildContext {
   Widget shimmerLoading() {
     Widget skeleton() {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
         child: Container(
-          height: 86,
+          height: 58,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: Colors.grey[200]!),
           ),
           child: Row(
             children: [
               // Left status bar
               Container(
-                width: 5,
-                height: 86,
+                width: 4,
+                height: 58,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius:
-                      BorderRadius.horizontal(left: Radius.circular(16)),
+                      BorderRadius.horizontal(left: Radius.circular(14)),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               // Content area
               Expanded(
                 child: Padding(
                   padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
+                      const EdgeInsets.symmetric(vertical: 7, horizontal: 2),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -193,7 +193,7 @@ extension ShimmerLoadingExtension on BuildContext {
                           const SizedBox(width: 10),
                           Container(
                             width: 72,
-                            height: 26,
+                            height: 20,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(999),
@@ -201,19 +201,19 @@ extension ShimmerLoadingExtension on BuildContext {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 3),
                       // Assignee row + comment count
                       Row(
                         children: [
                           Container(
-                            width: 24,
-                            height: 24,
+                            width: 16,
+                            height: 16,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 6),
                           Container(
                             width: 100,
                             height: 12,
@@ -284,7 +284,6 @@ extension StatusFlagExtension on StatusFlag {
       /*case StatusFlag.upcoming:
         return "3";*/
       case StatusFlag.completed:
-      default:
         return "4"; // Default flag value for unknown or unhandled statuses
     }
   }
