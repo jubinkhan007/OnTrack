@@ -9,6 +9,7 @@ import 'package:tmbi/widgets/error_container.dart';
 
 import '../../config/converts.dart';
 import '../../config/app_theme.dart';
+import '../../config/palette.dart';
 import '../../models/new_task/comment_response.dart';
 import '../../network/api_service.dart';
 import '../../network/ui_state.dart';
@@ -36,8 +37,7 @@ class CommentsScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.surface,
         appBar: AppBar(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: Palette.mainColor,
           title: Text(
             "Comments",
             style: TextStyle(fontSize: Converts.c16),

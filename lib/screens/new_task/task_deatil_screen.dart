@@ -643,6 +643,7 @@ class TaskDetailsScreen extends StatelessWidget {
                   style: TextStyle(fontSize: Converts.c16),
                 ),
                 centerTitle: true,
+                backgroundColor: Colors.redAccent,
               ),
               body: Center(
                   child: ErrorContainer(
@@ -659,6 +660,7 @@ class TaskDetailsScreen extends StatelessWidget {
                   style: TextStyle(fontSize: Converts.c16),
                 ),
                 centerTitle: true,
+                backgroundColor: Colors.redAccent,
               ),
               body: Center(
                   child: ErrorContainer(
@@ -673,9 +675,7 @@ class TaskDetailsScreen extends StatelessWidget {
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar(
-                    pinned: true,
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.redAccent,
                     title: Text(Strings.task_details,
                         style: TextStyle(fontSize: Converts.c16)),
                     centerTitle: true,
@@ -709,22 +709,33 @@ class TaskDetailsScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 10),
                                       Expanded(
-                                        child: Text(
-                                          assignName,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: Converts.c16 - 1,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        provider.mainTaskResponse!.data.first.date,
-                                        style: TextStyle(
-                                          color: AppColors.muted,
-                                          fontSize: Converts.c16 - 4,
-                                          fontWeight: FontWeight.w600,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              provider.mainTaskResponse!.data
+                                                  .first.mainTaskName,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: Converts.c16 + 1,
+                                                fontWeight: FontWeight.w900,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              "$assignName ${Strings.dot} ${provider.mainTaskResponse!.data.first.date}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: AppColors.muted,
+                                                fontSize: Converts.c16 - 4,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],

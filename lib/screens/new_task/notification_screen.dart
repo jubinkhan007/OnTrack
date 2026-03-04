@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/app_theme.dart';
+import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/network/ui_state.dart';
 import 'package:tmbi/repo/new_task/notification_repo.dart';
 import 'package:tmbi/viewmodel/new_task/notification_viewmodel.dart';
@@ -27,8 +28,7 @@ class NotificationScreen2 extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.surface,
         appBar: AppBar(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: Palette.mainColor,
           title: Text(
             "Notifications",
             style: TextStyle(fontSize: Converts.c16),

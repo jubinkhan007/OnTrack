@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tmbi/config/converts.dart';
 import 'package:tmbi/config/app_theme.dart';
+import 'package:tmbi/config/palette.dart';
 import 'package:tmbi/models/new_task/bu_response.dart';
 import 'package:tmbi/models/new_task/dashboard_response.dart';
 import 'package:tmbi/network/api_service.dart';
@@ -42,8 +43,7 @@ class DashboardScreen extends StatelessWidget {
         backgroundColor: AppColors.surface,
         appBar: AppBar(
           title: const Text('Dashboards'),
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: Palette.mainColor,
           bottom: TabBar(
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white.withOpacity(0.75),
